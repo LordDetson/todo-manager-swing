@@ -3,6 +3,7 @@ package by.babanin.todo.view.util;
 import java.awt.Dimension;
 import java.awt.Toolkit;
 
+import by.babanin.todo.view.exception.ResourceException;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -42,5 +43,22 @@ public final class GUIUtils {
         dimension.width = (int) (dimension.width * widthScale / SCALE_BASE);
         dimension.height = (int) (dimension.height * heightScale / SCALE_BASE);
         return dimension;
+    }
+
+    public static String buildResourcePath(String path, String name, String extension) {
+        StringBuilder resourcePathBuilder = new StringBuilder();
+        if(path != null && !path.isBlank()) {
+            resourcePathBuilder.append(path);
+        }
+        if(name != null && !name.isBlank()) {
+            resourcePathBuilder.append(name);
+        }
+        else {
+            throw new ResourceException("name can't be empty");
+        }
+        if(extension != null && !extension.isBlank()) {
+            resourcePathBuilder.append(".").append(extension);
+        }
+        return resourcePathBuilder.toString();
     }
 }

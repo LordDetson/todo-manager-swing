@@ -1,5 +1,6 @@
 package by.babanin.todo.view.translat;
 
+import java.lang.reflect.Field;
 import java.util.Locale;
 
 import org.springframework.context.i18n.LocaleContextHolder;
@@ -28,5 +29,9 @@ public class Translator {
 
     public static String getStatusCaption(Status status) {
         return Translator.toLocale(String.format(TranslateCode.TODO_STATUS, status.name().toLowerCase()));
+    }
+
+    public static <T> String getFieldCaption(Class<T> componentClass, Field field) {
+        return Translator.toLocale(String.format(TranslateCode.FIELD_CAPTION, componentClass.getSimpleName(), field.getName()));
     }
 }
