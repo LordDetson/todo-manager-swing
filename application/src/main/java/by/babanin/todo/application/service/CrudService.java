@@ -1,14 +1,16 @@
-package by.babanin.todo.application;
+package by.babanin.todo.application.service;
 
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
-import by.babanin.todo.model.Entity;
+import by.babanin.todo.model.Persistent;
 
-public interface CrudService<E extends Entity<I>, I> {
+public interface CrudService<E extends Persistent<I>, I> {
 
     E save(E entity);
+
+    void deleteAll();
 
     void deleteAll(Collection<E> entities);
 
@@ -19,6 +21,8 @@ public interface CrudService<E extends Entity<I>, I> {
     void deleteById(I id);
 
     List<E> getAll();
+
+    List<E> getAllById(Set<I> ids);
 
     E getById(I id);
 

@@ -9,11 +9,11 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 
-import by.babanin.todo.model.Entity;
+import by.babanin.todo.model.Persistent;
 import by.babanin.todo.view.component.tablemodel.TableModel;
 import by.babanin.todo.view.component.tablemodel.TableModelLoader;
 
-public class CrudTablePanel<E extends Entity<I>, I> extends JPanel{
+public class CrudTablePanel<E extends Persistent<I>, I> extends JPanel{
 
     public static final CrudStyle DEFAULT_STYLE = new CrudStyle();
 

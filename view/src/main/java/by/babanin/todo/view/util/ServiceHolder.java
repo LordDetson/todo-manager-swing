@@ -1,7 +1,7 @@
 package by.babanin.todo.view.util;
 
-import by.babanin.todo.application.PriorityService;
-import by.babanin.todo.application.TodoService;
+import by.babanin.todo.application.service.PriorityService;
+import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.view.exception.ViewException;
 import lombok.experimental.UtilityClass;
 

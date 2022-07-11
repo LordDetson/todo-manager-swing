@@ -1,6 +1,14 @@
 package by.babanin.todo.model;
 
 import java.util.Objects;
+import java.util.Set;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.OneToMany;
 
 import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
@@ -12,26 +20,36 @@ import lombok.RequiredArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.FieldDefaults;
+import lombok.experimental.FieldNameConstants;
 
+@Entity(name = "priorities")
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @RequiredArgsConstructor
 @AllArgsConstructor
 @Builder
 @Getter
 @Setter
-@ToString
+@ToString(exclude = "todos")
 @FieldDefaults(level = AccessLevel.PRIVATE)
-public class Priority implements Entity<Long> {
+@FieldNameConstants
+public class Priority implements Persistent<Long> {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
+    @Column(unique = true, nullable = false, length = 16)
     @ReportField(index = 0)
     @NonNull
     String name;
 
+    @Column(unique = true, nullable = false)
     @ReportField(index = 1)
     @NonNull
     int weight;
+
+    @OneToMany(mappedBy="priority")
+    Set<Todo> todos;
 
     @Override
     public boolean equals(Object o) {

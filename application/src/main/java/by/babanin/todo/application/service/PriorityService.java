@@ -1,6 +1,5 @@
-package by.babanin.todo.application;
+package by.babanin.todo.application.service;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -8,28 +7,26 @@ import java.util.Set;
 import org.springframework.stereotype.Component;
 
 import by.babanin.todo.application.exception.ApplicationException;
+import by.babanin.todo.application.repository.PriorityRepository;
 import by.babanin.todo.model.Priority;
 
 @Component
 public class PriorityService extends AbstractCrudService<Priority, Long> {
 
-    private final List<Priority> priorities = new ArrayList<>();
+    private final PriorityRepository priorityRepository;
 
-    public PriorityService() {
-        save(Priority.builder()
-                .name("High")
-                .weight(0)
-                .build());
+    public PriorityService(PriorityRepository priorityRepository) {
+        this.priorityRepository = priorityRepository;
     }
 
     @Override
     public Priority save(Priority entity) {
-        int insertIndex = priorities.size();
-        if(exist(entity)) {
-            insertIndex = priorities.indexOf(entity);
-        }
-        priorities.add(insertIndex, entity);
-        return entity;
+        return priorityRepository.save(entity);
+    }
+
+    @Override
+    public void deleteAll() {
+        priorityRepository.deleteAll();
     }
 
     @Override
@@ -39,12 +36,17 @@ public class PriorityService extends AbstractCrudService<Priority, Long> {
         if(!existAllIds) {
             throw new ApplicationException("Doesn't have such ids");
         }
-        priorities.removeIf(priority -> ids.contains(priority.getId()));
+        priorityRepository.deleteAllById(ids);
     }
 
     @Override
     public List<Priority> getAll() {
-        return Collections.unmodifiableList(priorities);
+        return Collections.unmodifiableList(priorityRepository.findAll());
+    }
+
+    @Override
+    public List<Priority> getAllById(Set<Long> ids) {
+        return priorityRepository.findAllById(ids);
     }
 
     @Override
@@ -52,14 +54,11 @@ public class PriorityService extends AbstractCrudService<Priority, Long> {
         if(!existById(id)) {
             throw new ApplicationException("No such priority");
         }
-        return priorities.stream()
-                .filter(priority -> priority.getId().equals(id))
-                .findFirst().get();
+        return priorityRepository.getReferenceById(id);
     }
 
     @Override
     public boolean existById(Long id) {
-        return priorities.stream()
-                .anyMatch(priority -> priority.getId().equals(id));
+        return priorityRepository.existsById(id);
     }
 }

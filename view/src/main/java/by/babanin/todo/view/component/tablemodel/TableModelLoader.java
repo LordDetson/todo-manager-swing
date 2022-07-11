@@ -1,9 +1,9 @@
 package by.babanin.todo.view.component.tablemodel;
 
-import by.babanin.todo.application.CrudService;
-import by.babanin.todo.model.Entity;
+import by.babanin.todo.application.service.CrudService;
+import by.babanin.todo.model.Persistent;
 
-public class TableModelLoader<E extends Entity<I>, I> {
+public class TableModelLoader<E extends Persistent<I>, I> {
 
     private final CrudService<E, I> crudService;
 

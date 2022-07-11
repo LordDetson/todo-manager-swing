@@ -13,8 +13,8 @@ import org.springframework.stereotype.Component;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 
-import by.babanin.todo.application.PriorityService;
-import by.babanin.todo.application.TodoService;
+import by.babanin.todo.application.service.PriorityService;
+import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;

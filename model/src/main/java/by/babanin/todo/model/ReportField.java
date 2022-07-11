@@ -10,4 +10,6 @@ import java.lang.annotation.Target;
 public @interface ReportField {
 
     int index();
+
+    boolean mandatory() default false;
 }
