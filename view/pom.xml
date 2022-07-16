@@ -11,6 +11,11 @@
 
     <artifactId>view</artifactId>
 
+    <properties>
+        <flatlaf.version>2.3</flatlaf.version>
+        <lgooddatepicker.version>11.2.1</lgooddatepicker.version>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>by.babanin.todo</groupId>
@@ -28,6 +33,12 @@
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
+            <version>${flatlaf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.github.lgooddatepicker</groupId>
+            <artifactId>LGoodDatePicker</artifactId>
+            <version>${lgooddatepicker.version}</version>
         </dependency>
     </dependencies>
 

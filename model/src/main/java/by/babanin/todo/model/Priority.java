@@ -5,6 +5,7 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -39,16 +40,16 @@ public class Priority implements Persistent<Long> {
     Long id;
 
     @Column(unique = true, nullable = false, length = 16)
-    @ReportField(index = 0)
+    @ReportableField(index = 0, mandatory = true)
     @NonNull
     String name;
 
     @Column(unique = true, nullable = false)
-    @ReportField(index = 1)
+    @ReportableField(index = 1, mandatory = true)
     @NonNull
-    int weight;
+    long weight;
 
-    @OneToMany(mappedBy="priority")
+    @OneToMany(mappedBy = "priority", fetch = FetchType.EAGER)
     Set<Todo> todos;
 
     @Override

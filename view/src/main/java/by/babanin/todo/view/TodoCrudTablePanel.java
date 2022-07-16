@@ -1,18 +1,24 @@
 package by.babanin.todo.view;
 
+import java.awt.Frame;
+import java.awt.event.ActionEvent;
 import java.time.LocalDate;
+import java.util.Map;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
-import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
-import by.babanin.todo.view.component.crud.CrudTablePanel;
-import by.babanin.todo.view.component.tablemodel.TableModel;
-import by.babanin.todo.view.component.tablemodel.TableModelLoader;
+import by.babanin.todo.model.Todo.Fields;
+import by.babanin.todo.model.Todo.TodoBuilder;
+import by.babanin.todo.representation.ComponentRepresentation;
+import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.component.CrudTablePanel;
+import by.babanin.todo.view.component.TableModel;
 import by.babanin.todo.view.renderer.LocalDataRenderer;
 import by.babanin.todo.view.renderer.PriorityRenderer;
 import by.babanin.todo.view.renderer.StatusRenderer;
@@ -20,21 +26,20 @@ import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
 import by.babanin.todo.view.util.IconResources;
-import by.babanin.todo.view.util.ServiceHolder;
 
 public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
 
-    private final JFrame owner;
     private JButton priorityButton;
 
-    public TodoCrudTablePanel(JFrame owner) {
-        super(Todo.class, new TableModelLoader<>(ServiceHolder.getTodoService()));
-        this.owner = owner;
+    public TodoCrudTablePanel() {
+        super(Todo.class, DEFAULT_STYLE
+                .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
+                .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate));
     }
 
     @Override
-    protected void createComponents() {
-        super.createComponents();
+    protected void createUiComponents() {
+        super.createUiComponents();
         priorityButton = new JButton();
         priorityButton.setIcon(IconResources.getIcon("priority"));
     }
@@ -50,22 +55,49 @@ public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
     @Override
     protected void addListeners() {
         super.addListeners();
-        priorityButton.addActionListener(event -> {
-            PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
-            priorityPanel.load();
+        priorityButton.addActionListener(this::showPriorityDialog);
+    }
 
-            JDialog dialog = new JDialog(owner, true);
-            dialog.setContentPane(priorityPanel);
-            dialog.setSize(GUIUtils.getHalfFrameSize());
-            dialog.setLocationRelativeTo(null);
-            dialog.setTitle(Translator.toLocale(TranslateCode.PRIORITY_FRAME_TITLE));
-            dialog.setVisible(true);
-        });
+    private void showPriorityDialog(ActionEvent event) {
+        PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
+        priorityPanel.load();
+
+        Frame frame = JOptionPane.getFrameForComponent(this);
+        JDialog dialog = new JDialog(frame, true);
+        dialog.setContentPane(priorityPanel);
+        dialog.setSize(GUIUtils.getHalfFrameSize());
+        dialog.setLocationRelativeTo(frame);
+        dialog.setTitle(Translator.toLocale(TranslateCode.PRIORITY_FRAME_TITLE));
+        dialog.setVisible(true);
     }
 
     @Override
     protected void placeComponents() {
         super.placeComponents();
         addToolBarComponent(priorityButton);
+    }
+
+    @Override
+    protected Todo createComponent(Map<ReportField, ?> fieldValueMap, Todo oldComponent) {
+        ComponentRepresentation<Todo> representation = ComponentRepresentation.get(Todo.class);
+        TodoBuilder builder = Todo.builder()
+                .title((String) fieldValueMap.get(representation.getField(Fields.title)))
+                .description((String) fieldValueMap.get(representation.getField(Fields.description)))
+                .priority((Priority) fieldValueMap.get(representation.getField(Fields.priority)))
+                .status(Status.OPEN)
+                .creationDate(LocalDate.now());
+        Status status = (Status) fieldValueMap.get(representation.getField(Fields.status));
+        if(status != null) {
+            builder.status(status);
+            if(status == Status.CLOSED) {
+                builder.completionDate(LocalDate.now());
+            }
+        }
+        LocalDate plannedDate = (LocalDate) fieldValueMap.get(representation.getField(Fields.plannedDate));
+        if(plannedDate == null) {
+            plannedDate = oldComponent.getPlannedDate();
+        }
+        builder.plannedDate(plannedDate);
+        return builder.build();
     }
 }

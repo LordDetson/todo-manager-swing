@@ -1,6 +1,7 @@
 package by.babanin.todo.view;
 
 import java.awt.EventQueue;
+import java.util.concurrent.ExecutorService;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
@@ -15,6 +16,8 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
+import by.babanin.todo.representation.ComponentRepresentation;
+import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
@@ -27,14 +30,17 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
     private final ResourceBundleMessageSource messageSource;
     private final PriorityService priorityService;
     private final TodoService todoService;
+    private final ExecutorService executorService;
 
     @Value("${application.resource.icons.path:/assets/icons/}")
     private String iconsPath;
 
-    public UILauncher(ResourceBundleMessageSource messageSource, PriorityService priorityService, TodoService todoService) {
+    public UILauncher(ResourceBundleMessageSource messageSource, PriorityService priorityService, TodoService todoService,
+            ExecutorService executorService) {
         this.messageSource = messageSource;
         this.priorityService = priorityService;
         this.todoService = todoService;
+        this.executorService = executorService;
     }
 
     @Override
@@ -43,20 +49,22 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         ServiceHolder.setPriorityService(priorityService);
         ServiceHolder.setTodoService(todoService);
         IconResources.setIconPath(iconsPath);
+        TaskManager.setExecutorService(executorService);
+        ComponentRepresentation.initializeComponentRepresentationMap();
 
         FlatDarculaLaf.setup();
         EventQueue.invokeLater(() -> {
 
+            TodoCrudTablePanel todoPanel = new TodoCrudTablePanel();
+            todoPanel.load();
+
             JFrame mainFrame = new JFrame();
-            TodoCrudTablePanel todoPanel = new TodoCrudTablePanel(mainFrame);
             mainFrame.setContentPane(todoPanel);
             mainFrame.setSize(GUIUtils.getLargeFrameSize());
             mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             mainFrame.setLocationRelativeTo(null);
             mainFrame.setTitle(Translator.toLocale(TranslateCode.TODO_FRAME_TITLE));
             mainFrame.setVisible(true);
-            
-            todoPanel.load();
         });
     }
 }

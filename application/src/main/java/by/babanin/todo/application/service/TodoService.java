@@ -61,4 +61,9 @@ public class TodoService extends AbstractCrudService<Todo, Long> {
     public boolean existById(Long id) {
         return todoRepository.existsById(id);
     }
+
+    @Override
+    public long count() {
+        return todoRepository.count();
+    }
 }

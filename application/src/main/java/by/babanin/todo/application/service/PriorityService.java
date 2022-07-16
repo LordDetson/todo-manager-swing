@@ -61,4 +61,9 @@ public class PriorityService extends AbstractCrudService<Priority, Long> {
     public boolean existById(Long id) {
         return priorityRepository.existsById(id);
     }
+
+    @Override
+    public long count() {
+        return priorityRepository.count();
+    }
 }

@@ -8,7 +8,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 
 public class LocalDataRenderer extends DefaultTableCellRenderer {
 
-    private final DateTimeFormatter dateFormatter;
+    private final transient DateTimeFormatter dateFormatter;
 
     public LocalDataRenderer() {
         this(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG));
@@ -21,8 +21,8 @@ public class LocalDataRenderer extends DefaultTableCellRenderer {
     @Override
     protected void setValue(Object value) {
         if(value instanceof LocalDate localDate) {
-            String formated = localDate.format(dateFormatter);
-            setText(formated);
+            String formatted = localDate.format(dateFormatter);
+            setText(formatted);
         }
         else {
             super.setValue(value);

@@ -31,4 +31,6 @@ public interface CrudService<E extends Persistent<I>, I> {
     }
 
     boolean existById(I id);
+
+    long count();
 }

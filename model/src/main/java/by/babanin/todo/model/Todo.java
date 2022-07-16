@@ -40,35 +40,35 @@ public class Todo implements Persistent<Long> {
     Long id;
 
     @Column(nullable = false, length = 16)
-    @ReportField(index = 0, mandatory = true)
+    @ReportableField(index = 0, mandatory = true)
     @NonNull
     String title;
 
     @Column(nullable = false)
-    @ReportField(index = 1)
+    @ReportableField(index = 1)
     String description;
 
     @ManyToOne
-    @JoinColumn(name="priority_id")
-    @ReportField(index = 2, mandatory = true)
+    @JoinColumn(name = "priority_id")
+    @ReportableField(index = 2)
     Priority priority;
 
     @Column(nullable = false)
-    @ReportField(index = 3, mandatory = true)
+    @ReportableField(index = 3, mandatory = true)
     @NonNull
     Status status;
 
     @Column(nullable = false)
-    @ReportField(index = 4, mandatory = true)
+    @ReportableField(index = 4, mandatory = true)
     @NonNull
     LocalDate creationDate;
 
     @Column(nullable = false)
-    @ReportField(index = 5, mandatory = true)
+    @ReportableField(index = 5, mandatory = true)
     @NonNull
     LocalDate plannedDate;
 
-    @ReportField(index = 6)
+    @ReportableField(index = 6)
     LocalDate completionDate;
 
     @Override

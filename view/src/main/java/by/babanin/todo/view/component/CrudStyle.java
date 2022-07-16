@@ -1,16 +1,23 @@
-package by.babanin.todo.view.component.crud;
+package by.babanin.todo.view.component;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 import javax.swing.Icon;
 
 import by.babanin.todo.view.util.IconResources;
 
-public class CrudStyle {
+public class CrudStyle implements Serializable {
 
     private String createButtonIconName = "plus";
     private String editButtonIconName = "pen_write";
     private String deleteButtonIconName = "minus";
     private String moveUpButtonIconName = "chevron_up";
     private String moveDownButtonIconName = "chevron_down";
+    private final List<String> excludedFieldFromCreationForm = new ArrayList<>();
+    private final List<String> excludedFieldFromEditForm = new ArrayList<>();
 
     public Icon getCreateButtonIcon() {
         return IconResources.getIcon(createButtonIconName);
@@ -54,6 +61,24 @@ public class CrudStyle {
 
     public CrudStyle setMoveDownButtonIconName(String moveDownButtonIconName) {
         this.moveDownButtonIconName = moveDownButtonIconName;
+        return this;
+    }
+
+    public List<String> getExcludedFieldFromCreationForm() {
+        return Collections.unmodifiableList(excludedFieldFromCreationForm);
+    }
+
+    public CrudStyle excludeFieldFromCreationForm(String... fields) {
+        this.excludedFieldFromCreationForm.addAll(List.of(fields));
+        return this;
+    }
+
+    public List<String> getExcludedFieldFromEditForm() {
+        return Collections.unmodifiableList(excludedFieldFromEditForm);
+    }
+
+    public CrudStyle excludeFieldFromEditForm(String... fields) {
+        this.excludedFieldFromEditForm.addAll(List.of(fields));
         return this;
     }
 }
