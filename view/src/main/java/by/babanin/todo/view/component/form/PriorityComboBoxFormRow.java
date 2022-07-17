@@ -9,6 +9,8 @@ import by.babanin.todo.view.util.ServiceHolder;
 
 public class PriorityComboBoxFormRow extends ComboBoxFormRow<Priority> {
 
+    private Priority selectedPriority;
+
     public PriorityComboBoxFormRow(ReportField field) {
         super(field);
         setAllowNone(true);
@@ -18,7 +20,16 @@ public class PriorityComboBoxFormRow extends ComboBoxFormRow<Priority> {
 
     private void loadPriorities() {
         GetTask<Priority, Long> task = new GetTask<>(ServiceHolder.getPriorityService());
-        task.addFinishListener(this::setItems);
+        task.addFinishListener(items -> {
+            setItems(items);
+            setValue(selectedPriority);
+        });
         TaskManager.run(task);
+    }
+
+    @Override
+    public void setValue(Priority value) {
+        super.setValue(value);
+        this.selectedPriority = value;
     }
 }
