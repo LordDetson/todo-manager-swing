@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import com.github.lgooddatepicker.components.DatePicker;
 
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.util.GUIUtils;
 
 public class LocalDateFormRow extends FormRow<LocalDate> {
 
@@ -13,7 +14,8 @@ public class LocalDateFormRow extends FormRow<LocalDate> {
 
     public LocalDateFormRow(ReportField field) {
         super(field);
-        datePicker = new DatePicker();
+        datePicker = GUIUtils.createDatePicker();
+        datePicker.getSettings().setAllowEmptyDates(!field.isMandatory());
         datePicker.addDateChangeListener(dateChangeEvent -> stateChanged());
     }
 
