@@ -80,11 +80,11 @@ public class Todo implements Persistent<Long> {
             return false;
         }
         Todo todo = (Todo) o;
-        return title.equals(todo.title);
+        return Objects.equals(id, todo.id);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(title);
+        return Objects.hash(id);
     }
 }
