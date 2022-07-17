@@ -49,7 +49,7 @@ public class Priority implements Persistent<Long> {
     @NonNull
     long weight;
 
-    @OneToMany(mappedBy = "priority", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "priority")
     Set<Todo> todos;
 
     @Override
