@@ -79,6 +79,7 @@ public class TodoService extends AbstractCrudService<Todo, Long> {
         return todoRepository.count();
     }
 
+    @Transactional
     public List<Todo> findAllByPriorities(Collection<Priority> priorities) {
         return todoRepository.findAllByPriorities(priorities);
     }

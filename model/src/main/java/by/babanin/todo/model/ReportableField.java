@@ -9,7 +9,7 @@ import java.lang.annotation.Target;
 @Target(ElementType.FIELD)
 public @interface ReportableField {
 
-    long index();
+    int index();
 
     boolean mandatory() default false;
 }

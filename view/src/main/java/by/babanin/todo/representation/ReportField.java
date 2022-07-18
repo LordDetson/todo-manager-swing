@@ -18,7 +18,7 @@ public class ReportField {
         this.field = field;
     }
 
-    public long getIndex() {
+    public int getIndex() {
         return getReportableField().index();
     }
 

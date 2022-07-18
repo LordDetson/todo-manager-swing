@@ -4,6 +4,8 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
@@ -18,6 +20,7 @@ import javax.swing.JToolBar;
 import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
+import by.babanin.todo.task.FinishListener;
 import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.SaveTask;
 import by.babanin.todo.task.TaskManager;
@@ -32,16 +35,18 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     public static final CrudStyle DEFAULT_STYLE = new CrudStyle();
 
+    private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final Class<C> componentClass;
     private final CrudStyle crudStyle;
 
-    private TableModel<C> model;
     private JToolBar toolBar;
     private JButton createButton;
     private JButton editButton;
     private JButton deleteButton;
     private JButton moveUpButton;
     private JButton moveDownButton;
+    private TableModel<C> model;
+    private CustomTableColumnModel<C> columnModel;
     private JTable table;
     private FormRowFactory formRowFactory;
 
@@ -50,7 +55,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         this.crudStyle = crudStyle;
 
         createUiComponents();
-        setupTable(table, model);
+        setupTable(table, model, columnModel);
         addListeners();
         placeComponents();
         actionEnabling();
@@ -59,6 +64,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     protected void createUiComponents() {
         toolBar = new JToolBar();
         model = new TableModel<>(componentClass);
+        columnModel = new CustomTableColumnModel<>(componentClass);
         table = new JTable();
 
         createButton = new JButton(crudStyle.getCreateButtonIcon());
@@ -70,8 +76,9 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         formRowFactory = new FormRowFactory();
     }
 
-    protected void setupTable(JTable table, TableModel<C> model) {
+    protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel<C> columnModel) {
         table.setModel(model);
+        table.setColumnModel(columnModel);
     }
 
     protected void addListeners() {
@@ -79,6 +86,42 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         createButton.addActionListener(this::showCreationDialog);
         editButton.addActionListener(this::showEditDialog);
         deleteButton.addActionListener(this::showDeleteConfirmDialog);
+
+        addCreationListener(result -> {
+            model.add(result);
+            selectComponent(result);
+        });
+        addLoadListener(result -> {
+            model.addAll(result);
+            selectFirstRow();
+        });
+        addEditListener(result -> {
+            int row = table.getSelectedRow();
+            model.set(row, result);
+            selectRow(row);
+        });
+        addDeletionListener(result -> model.remove(getSelectedComponents()));
+    }
+
+    public void addCreationListener(FinishListener<C> listener) {
+        addCrudListener(CrudAction.CREATE, listener);
+    }
+
+    public void addLoadListener(FinishListener<List<C>> listener) {
+        addCrudListener(CrudAction.READ, listener);
+    }
+
+    public void addEditListener(FinishListener<C> listener) {
+        addCrudListener(CrudAction.UPDATE, listener);
+    }
+
+    public void addDeletionListener(FinishListener<List<C>> listener) {
+        addCrudListener(CrudAction.DELETE, listener);
+    }
+
+    private void addCrudListener(CrudAction crudAction, FinishListener<?> listener) {
+        crudListenersMap.computeIfAbsent(crudAction, action -> new ArrayList<>());
+        crudListenersMap.get(crudAction).add(listener);
     }
 
     protected void placeComponents() {
@@ -105,12 +148,13 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         moveDownButton.setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
     }
 
+    @SuppressWarnings("unchecked")
     public void load() {
         GetTask<C, I> task = new GetTask<>(ServiceHolder.getCrudService(componentClass));
-        task.addFinishListener(result -> {
-            model.addAll(result);
-            selectFirstRow();
-        });
+        if(crudListenersMap.containsKey(CrudAction.READ)) {
+            crudListenersMap.get(CrudAction.READ)
+                    .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
+        }
         TaskManager.run(task);
     }
 
@@ -122,14 +166,15 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         showComponentForm(form, TranslateCode.CREATION_DIALOG_TITLE);
     }
 
+    @SuppressWarnings("unchecked")
     private ApplyListener createCreationListener() {
         return fieldValueMap -> {
             C component = createComponent(fieldValueMap, null);
             SaveTask<C, I> saveTask = new SaveTask<>(ServiceHolder.getCrudService(componentClass), component);
-            saveTask.addFinishListener(result -> {
-                model.add(result);
-                selectComponent(component);
-            });
+            if(crudListenersMap.containsKey(CrudAction.CREATE)) {
+                crudListenersMap.get(CrudAction.CREATE)
+                        .forEach(finishListener -> saveTask.addFinishListener((FinishListener<C>) finishListener));
+            }
             TaskManager.run(saveTask);
         };
     }
@@ -141,16 +186,16 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         showComponentForm(form, TranslateCode.EDIT_DIALOG_TITLE);
     }
 
+    @SuppressWarnings("unchecked")
     private ApplyListener createEditListener(C selectedComponent) {
         return fieldValueMap -> {
             C component = createComponent(fieldValueMap, selectedComponent);
             component.setId(selectedComponent.getId());
             SaveTask<C, I> saveTask = new SaveTask<>(ServiceHolder.getCrudService(componentClass), component);
-            saveTask.addFinishListener(result -> {
-                int row = model.indexOf(selectedComponent);
-                model.set(row, result);
-                selectRow(row);
-            });
+            if(crudListenersMap.containsKey(CrudAction.UPDATE)) {
+                crudListenersMap.get(CrudAction.UPDATE)
+                        .forEach(finishListener -> saveTask.addFinishListener((FinishListener<C>) finishListener));
+            }
             TaskManager.run(saveTask);
         };
     }
@@ -166,6 +211,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         dialog.setVisible(true);
     }
 
+    @SuppressWarnings("unchecked")
     private void showDeleteConfirmDialog(ActionEvent event) {
         Frame frame = JOptionPane.getFrameForComponent(CrudTablePanel.this);
         String componentPluralCaption = Translator.getComponentPluralCaption(componentClass);
@@ -179,7 +225,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                     .map(Persistent::getId)
                     .toList();
             DeleteTask<C, I> task = new DeleteTask<>(ServiceHolder.getCrudService(componentClass), ids);
-            task.addFinishListener(unused -> model.remove(selectedComponents));
+            if(crudListenersMap.containsKey(CrudAction.DELETE)) {
+                crudListenersMap.get(CrudAction.DELETE)
+                        .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
+            }
             TaskManager.run(task);
         }
     }
@@ -205,5 +254,13 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         if(model.getRowCount() > 0) {
             selectRow(0);
         }
+    }
+
+    public TableModel<C> getModel() {
+        return model;
+    }
+
+    public JTable getTable() {
+        return table;
     }
 }

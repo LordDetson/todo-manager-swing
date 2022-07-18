@@ -10,11 +10,8 @@ import java.util.stream.IntStream;
 
 import javax.swing.table.AbstractTableModel;
 
-import org.apache.commons.lang3.StringUtils;
-
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.translat.Translator;
 
 public class TableModel<C> extends AbstractTableModel {
 
@@ -40,16 +37,6 @@ public class TableModel<C> extends AbstractTableModel {
         C component = list.get(rowIndex);
         ReportField field = componentRepresentation.getFields().get(columnIndex);
         return componentRepresentation.getValueAt(component, field);
-    }
-
-    @Override
-    public String getColumnName(int column) {
-        ReportField field = componentRepresentation.getFields().get(column);
-        String caption = Translator.getFieldCaption(field);
-        if(StringUtils.isNotBlank(caption)) {
-            return caption;
-        }
-        return super.getColumnName(column);
     }
 
     @Override
@@ -85,6 +72,10 @@ public class TableModel<C> extends AbstractTableModel {
         return Arrays.stream(indices)
                 .mapToObj(this::get)
                 .toList();
+    }
+
+    public List<C> getAll() {
+        return Collections.unmodifiableList(list);
     }
 
     public int indexOf(C component) {

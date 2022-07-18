@@ -3,6 +3,8 @@ package by.babanin.todo.view;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 import javax.swing.JButton;
@@ -18,6 +20,7 @@ import by.babanin.todo.model.Todo.TodoBuilder;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.component.CrudTablePanel;
+import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.TableModel;
 import by.babanin.todo.view.renderer.LocalDataRenderer;
 import by.babanin.todo.view.renderer.PriorityRenderer;
@@ -26,6 +29,7 @@ import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
 import by.babanin.todo.view.util.IconResources;
+import by.babanin.todo.view.util.ServiceHolder;
 
 public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
 
@@ -45,8 +49,8 @@ public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
     }
 
     @Override
-    protected void setupTable(JTable table, TableModel<Todo> model) {
-        super.setupTable(table, model);
+    protected void setupTable(JTable table, TableModel<Todo> model, CustomTableColumnModel<Todo> columnModel) {
+        super.setupTable(table, model, columnModel);
         table.setDefaultRenderer(Priority.class, new PriorityRenderer());
         table.setDefaultRenderer(Status.class, new StatusRenderer());
         table.setDefaultRenderer(LocalDate.class, new LocalDataRenderer());
@@ -60,6 +64,23 @@ public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
 
     private void showPriorityDialog(ActionEvent event) {
         PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
+        priorityPanel.addEditListener(priority -> {
+            List<Todo> todos = ServiceHolder.getTodoService().findAllByPriorities(Collections.singleton(priority));
+            todos.forEach(todo -> {
+                TableModel<Todo> model = getModel();
+                int row = getModel().indexOf(todo);
+                model.set(row, todo);
+            });
+        });
+        priorityPanel.addDeletionListener(priorities -> {
+            int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
+            TableModel<Todo> model = getModel();
+            model.getAll().stream()
+                    .filter(todo -> priorities.contains(todo.getPriority()))
+                    .peek(todo -> todo.setPriority(null))
+                    .map(model::indexOf)
+                    .forEach(row -> model.fireTableCellUpdated(row, columnIndex));
+        });
         priorityPanel.load();
 
         Frame frame = JOptionPane.getFrameForComponent(this);

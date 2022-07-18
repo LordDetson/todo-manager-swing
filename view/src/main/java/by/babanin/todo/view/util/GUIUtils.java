@@ -14,6 +14,7 @@ import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import javax.swing.table.TableColumn;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
@@ -21,7 +22,9 @@ import com.github.lgooddatepicker.components.DatePicker;
 import com.github.lgooddatepicker.components.DatePickerSettings;
 import com.github.lgooddatepicker.components.DatePickerSettings.DateArea;
 
+import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ResourceException;
+import by.babanin.todo.view.translat.Translator;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -167,5 +170,12 @@ public final class GUIUtils {
         DatePicker datePicker = new DatePicker(dateSettings);
         datePicker.getComponentDateTextField().setBorder(new JTextField().getBorder());
         return datePicker;
+    }
+
+    public static TableColumn createTableColumn(ReportField field) {
+        TableColumn column = new TableColumn(field.getIndex());
+        column.setIdentifier(field.getName());
+        column.setHeaderValue(Translator.getFieldCaption(field));
+        return column;
     }
 }
