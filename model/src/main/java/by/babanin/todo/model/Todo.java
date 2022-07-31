@@ -39,12 +39,12 @@ public class Todo implements Persistent<Long> {
     @GeneratedValue(strategy = GenerationType.AUTO)
     Long id;
 
-    @Column(nullable = false, length = 16)
+    @Column(nullable = false, length = 32)
     @ReportableField(index = 0, mandatory = true)
     @NonNull
     String title;
 
-    @Column(nullable = false)
+    @Column(nullable = false, length = 1024)
     @ReportableField(index = 1)
     String description;
 

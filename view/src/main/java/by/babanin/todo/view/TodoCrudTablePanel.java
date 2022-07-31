@@ -23,6 +23,7 @@ import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CrudTablePanel;
 import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.TableModel;
+import by.babanin.todo.view.component.validation.TodoValidatorFactory;
 import by.babanin.todo.view.renderer.LocalDataRenderer;
 import by.babanin.todo.view.renderer.PriorityRenderer;
 import by.babanin.todo.view.renderer.StatusRenderer;
@@ -38,6 +39,7 @@ public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
 
     public TodoCrudTablePanel() {
         super(Todo.class, new CrudStyle()
+                .setValidatorFactory(new TodoValidatorFactory())
                 .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
                 .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate));
     }
