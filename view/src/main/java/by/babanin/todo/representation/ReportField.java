@@ -9,6 +9,7 @@ import java.lang.reflect.Method;
 
 import by.babanin.todo.model.ReportableField;
 import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.view.translat.Translator;
 
 public class ReportField {
 
@@ -40,6 +41,10 @@ public class ReportField {
 
     public Class<?> getType() {
         return field.getType();
+    }
+
+    public String getCaption() {
+        return Translator.getFieldCaption(this);
     }
 
     public Object getValue(Object o) {

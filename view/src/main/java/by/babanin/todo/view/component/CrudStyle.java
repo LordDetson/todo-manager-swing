@@ -4,9 +4,11 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.Icon;
 
+import by.babanin.todo.view.component.validation.ValidatorFactory;
 import by.babanin.todo.view.util.IconResources;
 
 public class CrudStyle implements Serializable {
@@ -16,6 +18,7 @@ public class CrudStyle implements Serializable {
     private String deleteButtonIconName = "minus";
     private String moveUpButtonIconName = "chevron_up";
     private String moveDownButtonIconName = "chevron_down";
+    private ValidatorFactory validatorFactory;
     private final List<String> excludedFieldFromCreationForm = new ArrayList<>();
     private final List<String> excludedFieldFromEditForm = new ArrayList<>();
 
@@ -61,6 +64,15 @@ public class CrudStyle implements Serializable {
 
     public CrudStyle setMoveDownButtonIconName(String moveDownButtonIconName) {
         this.moveDownButtonIconName = moveDownButtonIconName;
+        return this;
+    }
+
+    public Optional<ValidatorFactory> getValidatorFactory() {
+        return Optional.ofNullable(validatorFactory);
+    }
+
+    public CrudStyle setValidatorFactory(ValidatorFactory validatorFactory) {
+        this.validatorFactory = validatorFactory;
         return this;
     }
 

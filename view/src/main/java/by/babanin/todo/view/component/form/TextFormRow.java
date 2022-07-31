@@ -1,8 +1,9 @@
 package by.babanin.todo.view.component.form;
 
-import java.awt.Component;
-
+import javax.swing.JComponent;
 import javax.swing.JTextField;
+
+import org.apache.commons.lang3.StringUtils;
 
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.util.GUIUtils;
@@ -18,13 +19,17 @@ public class TextFormRow extends FormRow<String> {
     }
 
     @Override
-    public Component getInputComponent() {
+    public JComponent getInputComponent() {
         return textField;
     }
 
     @Override
     public String getValue() {
-        return textField.getText();
+        String text = textField.getText().trim();
+        if(StringUtils.isBlank(text)) {
+            text = null;
+        }
+        return text;
     }
 
     @Override

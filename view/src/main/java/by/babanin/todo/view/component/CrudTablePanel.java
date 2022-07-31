@@ -33,8 +33,6 @@ import by.babanin.todo.view.util.ServiceHolder;
 
 public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel {
 
-    public static final CrudStyle DEFAULT_STYLE = new CrudStyle();
-
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final Class<C> componentClass;
     private final CrudStyle crudStyle;

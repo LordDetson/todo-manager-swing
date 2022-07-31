@@ -14,12 +14,13 @@ import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class IconResources {
+
     public static final String PNG = "png";
 
-    private static String iconPath;
+    private static String iconsPath;
 
-    public static void setIconPath(String iconPath) {
-        IconResources.iconPath = iconPath;
+    public static void setIconsPath(String iconsPath) {
+        IconResources.iconsPath = iconsPath;
     }
 
     public static Icon getIcon(String name) {
@@ -34,7 +35,7 @@ public class IconResources {
         if(path == null || path.isBlank()) {
             path = "";
         }
-        path = iconPath + path;
+        path = iconsPath + path;
         InputStream resourceAsStream = getResourceAsStream(path, name, extension);
         try {
             BufferedImage image = ImageIO.read(resourceAsStream);

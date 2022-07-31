@@ -2,6 +2,7 @@ package by.babanin.todo.application.service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 import javax.transaction.Transactional;
@@ -80,5 +81,9 @@ public class PriorityService extends AbstractCrudService<Priority, Long> {
     @Override
     public long count() {
         return priorityRepository.count();
+    }
+
+    public Optional<Priority> findByName(String name) {
+        return priorityRepository.findByName(name);
     }
 }

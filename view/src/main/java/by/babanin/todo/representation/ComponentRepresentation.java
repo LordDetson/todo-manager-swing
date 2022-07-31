@@ -49,6 +49,10 @@ public class ComponentRepresentation<C> {
                 .toList();
     }
 
+    public Class<C> getComponentClass() {
+        return componentClass;
+    }
+
     public List<ReportField> getFields() {
         return fields;
     }

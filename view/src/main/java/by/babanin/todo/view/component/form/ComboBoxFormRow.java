@@ -1,9 +1,9 @@
 package by.babanin.todo.view.component.form;
 
-import java.awt.Component;
 import java.util.List;
 
 import javax.swing.JComboBox;
+import javax.swing.JComponent;
 import javax.swing.ListCellRenderer;
 
 import by.babanin.todo.representation.ReportField;
@@ -20,7 +20,7 @@ public class ComboBoxFormRow<T> extends FormRow<T> {
     }
 
     @Override
-    public Component getInputComponent() {
+    public JComponent getInputComponent() {
         return comboBox;
     }
 

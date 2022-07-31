@@ -1,11 +1,22 @@
 package by.babanin.todo.view.util;
 
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Container;
+import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.Frame;
+import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
+import java.awt.Window;
 import java.beans.PropertyChangeEvent;
+import java.io.PrintWriter;
+import java.io.StringWriter;
 import java.util.Objects;
 
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPopupMenu;
 import javax.swing.JTextField;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
@@ -24,7 +35,6 @@ import com.github.lgooddatepicker.components.DatePickerSettings.DateArea;
 
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ResourceException;
-import by.babanin.todo.view.translat.Translator;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -34,6 +44,8 @@ public final class GUIUtils {
     private static final int HALF_FRAME_SCALE = 50;
     private static final int SMALL_FRAME_SCALE = 35;
     private static final double SCALE_BASE = 100;
+
+    private static JFrame mainWindow;
 
     public static Dimension getFullScreenSize() {
         return Toolkit.getDefaultToolkit().getScreenSize();
@@ -175,7 +187,78 @@ public final class GUIUtils {
     public static TableColumn createTableColumn(ReportField field) {
         TableColumn column = new TableColumn(field.getIndex());
         column.setIdentifier(field.getName());
-        column.setHeaderValue(Translator.getFieldCaption(field));
+        column.setHeaderValue(field.getCaption());
         return column;
+    }
+
+    public static String stacktraceToString(Throwable e) {
+        if(e == null) {
+            return "";
+        }
+
+        StringWriter writer = new StringWriter();
+        PrintWriter printWriter = new PrintWriter(writer);
+        e.printStackTrace(printWriter);
+        printWriter.flush();
+
+        return writer.toString();
+    }
+
+    public static void removeFocus(JComponent component) {
+        component.setRequestFocusEnabled(false);
+        component.setFocusable(false);
+    }
+
+    public static Window getWindowOwner(Component component) {
+        // can no longer assert component has window ancestor, since multi-user messages
+        // can auto-close dialogs or remove component from hierarchy (hierarchical table child table collapse)
+
+        Window window;
+        if(component == null || component instanceof Window) {
+            window = (Window) component;
+        }
+        else {
+            window = getWindowAncestor(component);
+        }
+
+        while(window != null && !window.isShowing()) {
+            window = window.getOwner();
+        }
+        if(window != null) {
+            return window;
+        }
+        return getActiveWindow();
+    }
+
+    private static Window getWindowAncestor(Component component) {
+        for(Container parent = component.getParent(); parent != null; parent = parent.getParent()) {
+            if(parent instanceof Window window) {
+                return window;
+            }
+            else if(parent instanceof JPopupMenu popupMenu && parent.getParent() == null) {
+                return getWindowAncestor(popupMenu.getInvoker());
+            }
+        }
+        return null;
+    }
+
+    public static Window getActiveWindow() {
+        Window window = KeyboardFocusManager.getCurrentKeyboardFocusManager().getActiveWindow();
+        while(window != null && (!(window instanceof Dialog) && !(window instanceof Frame))) {
+            window = window.getOwner();
+        }
+
+        if(window != null) {
+            return window;
+        }
+        return getMainWindow();
+    }
+
+    public static void setMainWindow(JFrame window) {
+        mainWindow = window;
+    }
+
+    public static JFrame getMainWindow() {
+        return mainWindow;
     }
 }

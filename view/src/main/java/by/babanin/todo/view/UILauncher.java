@@ -48,7 +48,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         Translator.setMessageSource(messageSource);
         ServiceHolder.setPriorityService(priorityService);
         ServiceHolder.setTodoService(todoService);
-        IconResources.setIconPath(iconsPath);
+        IconResources.setIconsPath(iconsPath);
         TaskManager.setExecutorService(executorService);
         ComponentRepresentation.initializeComponentRepresentationMap();
 
@@ -65,6 +65,8 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
             mainFrame.setLocationRelativeTo(null);
             mainFrame.setTitle(Translator.toLocale(TranslateCode.TODO_FRAME_TITLE));
             mainFrame.setVisible(true);
+
+            GUIUtils.setMainWindow(mainFrame);
         });
     }
 }

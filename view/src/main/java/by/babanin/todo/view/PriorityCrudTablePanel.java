@@ -8,13 +8,16 @@ import by.babanin.todo.model.Priority.Fields;
 import by.babanin.todo.model.Priority.PriorityBuilder;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CrudTablePanel;
+import by.babanin.todo.view.component.validation.PriorityValidatorFactory;
 import by.babanin.todo.view.util.ServiceHolder;
 
 public class PriorityCrudTablePanel extends CrudTablePanel<Priority, Long> {
 
     public PriorityCrudTablePanel() {
-        super(Priority.class, DEFAULT_STYLE
+        super(Priority.class, new CrudStyle()
+                .setValidatorFactory(new PriorityValidatorFactory())
                 .excludeFieldFromCreationForm(Fields.weight)
                 .excludeFieldFromEditForm(Fields.weight));
     }

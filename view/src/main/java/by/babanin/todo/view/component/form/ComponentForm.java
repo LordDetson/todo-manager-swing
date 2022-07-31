@@ -20,6 +20,8 @@ import javax.swing.event.ChangeListener;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.component.CrudStyle;
+import by.babanin.todo.view.component.statusbar.LogStatusBarItem;
+import by.babanin.todo.view.component.statusbar.StatusBar;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
@@ -33,6 +35,7 @@ public class ComponentForm<C> extends JPanel {
     private final List<ApplyListener> applyListeners = new ArrayList<>();
     private final Map<ReportField, Object> values = new HashMap<>();
     private Window owner;
+    private LogStatusBarItem statusBarItem;
     private JButton applyButton;
     private JButton cancelButton;
 
@@ -53,6 +56,7 @@ public class ComponentForm<C> extends JPanel {
 
     protected void createUiComponents() {
         formRows.addAll(createFormRows());
+        statusBarItem = new LogStatusBarItem();
         applyButton = new JButton(Translator.toLocale(TranslateCode.APPLY_BUTTON_TEXT));
         applyButton.setEnabled(false);
         cancelButton = new JButton(Translator.toLocale(TranslateCode.CANCEL_BUTTON_TEXT));
@@ -79,27 +83,43 @@ public class ComponentForm<C> extends JPanel {
     }
 
     protected void addListeners() {
-        formRows.forEach(formRow -> formRow.addListener(createChangeListener()));
+        formRows.forEach(formRow -> {
+            formRow.addListener(createChangeListener());
+            crudStyle.getValidatorFactory()
+                    .ifPresent(validatorFactory -> formRow.addValidators(validatorFactory.factor(formRow.getField())));
+            statusBarItem.addLogger(formRow.getInputComponent(), formRow.getField().getCaption(), formRow.getLogger());
+        });
 
         applyButton.addActionListener(event -> {
             collectValues(values);
             applyListeners.forEach(applyListener -> applyListener.accept(values));
-            owner.setVisible(false);
+            hideWindow();
         });
-        cancelButton.addActionListener(event -> owner.setVisible(false));
+        cancelButton.addActionListener(event -> hideWindow());
     }
 
     private ChangeListener createChangeListener() {
         return event -> {
-            boolean mandatoryFieldsExist = formRows.stream()
-                    .filter(formRow -> formRow.getField().isMandatory())
-                    .allMatch(formRow -> formRow.getValue() != null);
-            applyButton.setEnabled(mandatoryFieldsExist);
+            boolean enable = false;
+            boolean valid = true;
+            if(event instanceof InputEvent inputEvent) {
+                valid = inputEvent.isValid();
+            }
+            if(valid) {
+                enable = formRows.stream()
+                        .filter(formRow -> formRow.getField().isMandatory())
+                        .allMatch(formRow -> formRow.getValue() != null);
+            }
+            applyButton.setEnabled(enable);
         };
     }
 
     private void collectValues(Map<ReportField, Object> values) {
         formRows.forEach(formRow -> values.put(formRow.getField(), formRow.getValue()));
+    }
+
+    private void hideWindow() {
+        owner.setVisible(false);
     }
 
     protected void placeComponents() {
@@ -115,6 +135,9 @@ public class ComponentForm<C> extends JPanel {
             formRowsPanel.add(formRow.getInputComponent());
         });
 
+        StatusBar statusBar = new StatusBar();
+        statusBar.add(statusBarItem);
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
         buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
@@ -123,7 +146,10 @@ public class ComponentForm<C> extends JPanel {
         buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonPanel.add(cancelButton);
 
-        add(formRowsPanel, BorderLayout.CENTER);
+        JPanel formWithStatusBarPanel = new JPanel(new BorderLayout());
+        formWithStatusBarPanel.add(formRowsPanel, BorderLayout.CENTER);
+        formWithStatusBarPanel.add(statusBar, BorderLayout.PAGE_END);
+        add(formWithStatusBarPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.PAGE_END);
     }
 

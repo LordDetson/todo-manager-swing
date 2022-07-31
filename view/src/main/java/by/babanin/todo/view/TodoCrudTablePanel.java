@@ -19,6 +19,7 @@ import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.model.Todo.TodoBuilder;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CrudTablePanel;
 import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.TableModel;
@@ -36,7 +37,7 @@ public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
     private JButton priorityButton;
 
     public TodoCrudTablePanel() {
-        super(Todo.class, DEFAULT_STYLE
+        super(Todo.class, new CrudStyle()
                 .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
                 .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate));
     }

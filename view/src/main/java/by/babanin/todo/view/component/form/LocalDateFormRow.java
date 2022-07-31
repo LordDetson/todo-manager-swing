@@ -1,7 +1,8 @@
 package by.babanin.todo.view.component.form;
 
-import java.awt.Component;
 import java.time.LocalDate;
+
+import javax.swing.JComponent;
 
 import com.github.lgooddatepicker.components.DatePicker;
 
@@ -20,7 +21,7 @@ public class LocalDateFormRow extends FormRow<LocalDate> {
     }
 
     @Override
-    public Component getInputComponent() {
+    public JComponent getInputComponent() {
         return datePicker;
     }
 
