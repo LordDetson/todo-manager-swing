@@ -85,17 +85,21 @@ public class LogStatusBarItem extends StatusBarItem {
 
             @Override
             public void logChanged() {
-                if(!loggerMap.isEmpty()) {
-                    clear();
-                    load();
-                }
+                reload();
             }
 
             @Override
             public void logCleared() {
-                clear();
+                reload();
             }
         };
+    }
+
+    private void reload() {
+        if(!loggerMap.isEmpty()) {
+            clear();
+            load();
+        }
     }
 
     private void load() {

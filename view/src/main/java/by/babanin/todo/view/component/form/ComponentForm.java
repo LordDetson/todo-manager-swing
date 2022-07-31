@@ -101,14 +101,14 @@ public class ComponentForm<C> extends JPanel {
     private ChangeListener createChangeListener() {
         return event -> {
             boolean enable = false;
-            boolean valid = true;
-            if(event instanceof InputEvent inputEvent) {
-                valid = inputEvent.isValid();
-            }
+            boolean valid = formRows.stream()
+                    .allMatch(formRow -> formRow.getLogger().isValid());
             if(valid) {
                 enable = formRows.stream()
                         .filter(formRow -> formRow.getField().isMandatory())
-                        .allMatch(formRow -> formRow.getValue() != null);
+                        .allMatch(formRow -> formRow.getValue() != null) &&
+                        formRows.stream()
+                                .allMatch(formRow -> formRow.getLogger().isValid());
             }
             applyButton.setEnabled(enable);
         };
