@@ -18,7 +18,7 @@ public class CrudStyle implements Serializable {
     private String deleteButtonIconName = "minus";
     private String moveUpButtonIconName = "chevron_up";
     private String moveDownButtonIconName = "chevron_down";
-    private ValidatorFactory validatorFactory;
+    private transient ValidatorFactory validatorFactory;
     private final List<String> excludedFieldFromCreationForm = new ArrayList<>();
     private final List<String> excludedFieldFromEditForm = new ArrayList<>();
 

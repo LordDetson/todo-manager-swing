@@ -30,7 +30,7 @@ import by.babanin.todo.view.util.GUIUtils;
 public class LogStatusBarItem extends StatusBarItem {
 
     private final Map<LogOwner, Logger> loggerMap = new LinkedHashMap<>();
-    private final CombinedLogger combinedLogger = new CombinedLogger();
+    private final transient CombinedLogger combinedLogger = new CombinedLogger();
 
     private final AbstractAction showLogAction;
 

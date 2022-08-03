@@ -16,7 +16,7 @@ import by.babanin.todo.representation.ReportField;
 public class TableModel<C> extends AbstractTableModel {
 
     private final List<C> list = new ArrayList<>();
-    private final ComponentRepresentation<C> componentRepresentation;
+    private final transient ComponentRepresentation<C> componentRepresentation;
 
     public TableModel(Class<C> componentClass) {
         this.componentRepresentation = ComponentRepresentation.get(componentClass);

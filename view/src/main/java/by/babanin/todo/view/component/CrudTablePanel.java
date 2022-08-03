@@ -35,7 +35,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final Class<C> componentClass;
-    private final FormRowFactory formRowFactory;
+    private final transient FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
 
     private JToolBar toolBar;

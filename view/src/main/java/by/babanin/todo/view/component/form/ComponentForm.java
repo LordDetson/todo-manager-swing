@@ -29,10 +29,10 @@ import by.babanin.todo.view.translat.Translator;
 
 public class ComponentForm<C> extends JPanel {
 
-    private final ComponentRepresentation<C> componentRepresentation;
-    private final FormRowFactory formRowFactory;
+    private final transient ComponentRepresentation<C> componentRepresentation;
+    private final transient FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
-    private final C component;
+    private final transient C component;
     private final List<FormRow<?>> formRows = new ArrayList<>();
     private final List<ApplyListener> applyListeners = new ArrayList<>();
     private final Map<ReportField, Object> values = new HashMap<>();

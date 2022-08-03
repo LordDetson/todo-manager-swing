@@ -11,7 +11,7 @@ import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
 public class CombinedLogPanel extends JTabbedPane {
-    private final CombinedLogger combinedLogger;
+    private final transient CombinedLogger combinedLogger;
 
     public CombinedLogPanel(CombinedLogger combinedLogger) {
         this.combinedLogger = combinedLogger;
