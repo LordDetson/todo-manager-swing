@@ -35,6 +35,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final Class<C> componentClass;
+    private final FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
 
     private JToolBar toolBar;
@@ -46,10 +47,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private TableModel<C> model;
     private CustomTableColumnModel<C> columnModel;
     private JTable table;
-    private FormRowFactory formRowFactory;
 
-    protected CrudTablePanel(Class<C> componentClass, CrudStyle crudStyle) {
+    protected CrudTablePanel(Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
         this.componentClass = componentClass;
+        this.formRowFactory = formRowFactory;
         this.crudStyle = crudStyle;
 
         createUiComponents();
@@ -70,8 +71,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         deleteButton = new JButton(crudStyle.getDeleteButtonIcon());
         moveUpButton = new JButton(crudStyle.getMoveUpButtonIcon());
         moveDownButton = new JButton(crudStyle.getMoveDownButtonIcon());
-
-        formRowFactory = new FormRowFactory();
     }
 
     protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel<C> columnModel) {

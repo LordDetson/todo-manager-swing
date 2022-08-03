@@ -2,7 +2,9 @@ package by.babanin.todo.view.component.form;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
+import java.awt.Insets;
 import java.awt.Window;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -73,9 +75,8 @@ public class ComponentForm<C> extends JPanel {
                 .toList();
     }
 
-    @SuppressWarnings("unchecked")
     private FormRow<?> createFormRow(ReportField field) {
-        FormRow<Object> formRow = (FormRow<Object>) formRowFactory.factor(field);
+        FormRow<Object> formRow = formRowFactory.factor(field);
         if(component != null) {
             formRow.setValue(componentRepresentation.getValueAt(component, field));
         }
@@ -127,26 +128,35 @@ public class ComponentForm<C> extends JPanel {
         setLayout(borderLayout);
 
         JPanel formRowsPanel = new JPanel();
-        GridLayout formRowsPanelLayout = new GridLayout(formRows.size(), 2, 10, 10);
-        formRowsPanel.setLayout(formRowsPanelLayout);
-        formRowsPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
-        formRows.forEach(formRow -> {
-            formRowsPanel.add(formRow.getLabel());
-            formRowsPanel.add(formRow.getInputComponent());
-        });
+        formRowsPanel.setLayout(new GridBagLayout());
+        for(int i = 0; i < formRows.size(); i++) {
+            FormRow<?> formRow = formRows.get(i);
+            GridBagConstraints constraints = new GridBagConstraints();
+            constraints.gridx = 0;
+            constraints.gridy = i;
+            constraints.fill = GridBagConstraints.NONE;
+            constraints.anchor = GridBagConstraints.LINE_START;
+            formRowsPanel.add(formRow.getLabel(), constraints);
+            constraints.gridx = 1;
+            constraints.gridy = i;
+            constraints.fill = GridBagConstraints.BOTH;
+            constraints.insets = new Insets(2, 8, 2, 0);
+            formRowsPanel.add(formRow.wrap(formRow.getInputComponent()), constraints);
+        }
 
         StatusBar statusBar = new StatusBar();
         statusBar.add(statusBarItem);
 
         JPanel buttonPanel = new JPanel();
         buttonPanel.setLayout(new BoxLayout(buttonPanel, BoxLayout.LINE_AXIS));
-        buttonPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+        buttonPanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 10, 10));
         buttonPanel.add(Box.createHorizontalGlue());
         buttonPanel.add(applyButton);
         buttonPanel.add(Box.createRigidArea(new Dimension(10, 0)));
         buttonPanel.add(cancelButton);
 
         JPanel formWithStatusBarPanel = new JPanel(new BorderLayout());
+        formWithStatusBarPanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 0, 10));
         formWithStatusBarPanel.add(formRowsPanel, BorderLayout.CENTER);
         formWithStatusBarPanel.add(statusBar, BorderLayout.PAGE_END);
         add(formWithStatusBarPanel, BorderLayout.CENTER);

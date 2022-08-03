@@ -10,11 +10,12 @@ import by.babanin.todo.view.util.GUIUtils;
 
 public class TextFormRow extends FormRow<String> {
 
+    private static final int DEFAULT_COLUMNS = 16;
     private final JTextField textField;
 
     public TextFormRow(ReportField field) {
         super(field);
-        textField = new JTextField();
+        textField = new JTextField(DEFAULT_COLUMNS);
         GUIUtils.addChangeListener(textField, e -> stateChanged());
     }
 
