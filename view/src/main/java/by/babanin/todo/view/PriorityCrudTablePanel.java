@@ -18,9 +18,7 @@ public class PriorityCrudTablePanel extends CrudTablePanel<Priority, Long> {
 
     public PriorityCrudTablePanel() {
         super(Priority.class, new PriorityFormRowFactory(), new CrudStyle()
-                .setValidatorFactory(new PriorityValidatorFactory())
-                .excludeFieldFromCreationForm(Fields.weight)
-                .excludeFieldFromEditForm(Fields.weight));
+                .setValidatorFactory(new PriorityValidatorFactory()));
     }
 
     @Override

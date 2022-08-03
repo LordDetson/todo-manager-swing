@@ -90,7 +90,7 @@ public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
         Frame frame = JOptionPane.getFrameForComponent(this);
         JDialog dialog = new JDialog(frame, true);
         dialog.setContentPane(priorityPanel);
-        dialog.setSize(GUIUtils.getHalfFrameSize());
+        dialog.setSize(GUIUtils.getSmallFrameSize());
         dialog.setLocationRelativeTo(frame);
         dialog.setTitle(Translator.toLocale(TranslateCode.PRIORITY_FRAME_TITLE));
         dialog.setVisible(true);

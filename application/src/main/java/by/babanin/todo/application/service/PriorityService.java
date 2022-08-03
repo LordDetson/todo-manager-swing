@@ -3,15 +3,19 @@ package by.babanin.todo.application.service;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.OptionalLong;
 import java.util.Set;
 
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Sort;
+import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Component;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.repository.PriorityRepository;
 import by.babanin.todo.model.Priority;
+import by.babanin.todo.model.Priority.Fields;
 
 @Component
 public class PriorityService extends AbstractCrudService<Priority, Long> {
@@ -47,13 +51,23 @@ public class PriorityService extends AbstractCrudService<Priority, Long> {
             todo.setPriority(null);
             todoService.save(todo);
         });
+        OptionalLong minWeight = prioritiesToDelete.stream()
+                .mapToLong(Priority::getWeight)
+                .min();
         priorityRepository.deleteAllById(ids);
+        if(minWeight.isPresent()) {
+            List<Priority> greaterWeightPriorities = priorityRepository.findByWeightGreaterThanOrderByWeightAsc(minWeight.getAsLong());
+            for(int i = 0; i < greaterWeightPriorities.size(); i++) {
+                greaterWeightPriorities.get(i).setWeight(i + minWeight.getAsLong());
+            }
+            priorityRepository.saveAll(greaterWeightPriorities);
+        }
     }
 
     @Transactional
     @Override
     public List<Priority> getAll() {
-        return Collections.unmodifiableList(priorityRepository.findAll());
+        return Collections.unmodifiableList(priorityRepository.findAll(Sort.by(Direction.ASC, Fields.weight)));
     }
 
     @Transactional

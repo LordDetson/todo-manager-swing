@@ -5,7 +5,6 @@ import java.util.Set;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
-import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
@@ -45,7 +44,6 @@ public class Priority implements Persistent<Long> {
     String name;
 
     @Column(unique = true, nullable = false)
-    @ReportableField(index = 1, mandatory = true)
     @NonNull
     long weight;
 

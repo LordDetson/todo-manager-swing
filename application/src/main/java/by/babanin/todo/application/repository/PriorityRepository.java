@@ -1,5 +1,6 @@
 package by.babanin.todo.application.repository;
 
+import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -11,4 +12,5 @@ import by.babanin.todo.model.Priority;
 public interface PriorityRepository extends JpaRepository<Priority, Long> {
 
     Optional<Priority> findByName(String name);
+    List<Priority> findByWeightGreaterThanOrderByWeightAsc(long weight);
 }
