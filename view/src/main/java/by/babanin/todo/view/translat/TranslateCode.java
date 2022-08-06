@@ -7,6 +7,7 @@ public class TranslateCode {
 
     public static final String TODO_FRAME_TITLE = "todo.frame.title";
     public static final String PRIORITY_FRAME_TITLE = "priority.frame.title";
+    public static final String PRIORITY_UNPRIORITIZED = "priority.unprioritized";
     public static final String APPLY_BUTTON_TEXT = "component.apply.button.text";
     public static final String CANCEL_BUTTON_TEXT = "component.cancel.button.text";
     public static final String CREATION_DIALOG_TITLE = "component.creation.dialog.title";

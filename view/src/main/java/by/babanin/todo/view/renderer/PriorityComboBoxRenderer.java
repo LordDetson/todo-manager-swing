@@ -6,6 +6,8 @@ import javax.swing.JList;
 import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 import by.babanin.todo.model.Priority;
+import by.babanin.todo.view.translat.TranslateCode;
+import by.babanin.todo.view.translat.Translator;
 
 public class PriorityComboBoxRenderer extends BasicComboBoxRenderer {
 
@@ -15,7 +17,7 @@ public class PriorityComboBoxRenderer extends BasicComboBoxRenderer {
             value = priority.getName();
         }
         if(value == null) {
-            value = "None";
+            value = Translator.toLocale(TranslateCode.PRIORITY_UNPRIORITIZED);
         }
         return super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
     }

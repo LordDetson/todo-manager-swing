@@ -1,12 +1,14 @@
 package by.babanin.todo.view.component.validation;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Priority.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.ServiceHolder;
 
@@ -27,6 +29,8 @@ public class PriorityValidatorFactory implements ValidatorFactory {
                     name -> ServiceHolder.getPriorityService().findByName(name).isPresent()));
             validators.add(new LengthLimitValidation(fieldCaption, NAME_LENGTH_LIMIT));
             validators.add(new ForbiddenSymbolsValidator(fieldCaption, "~`!@#$%^&*()_+='\";:<>?,./|\\0123456789"));
+            String unprioritized = Translator.toLocale(TranslateCode.PRIORITY_UNPRIORITIZED);
+            validators.add(new ReservedWordsValidator(Collections.singletonList(unprioritized)));
         }
         return validators;
     }
