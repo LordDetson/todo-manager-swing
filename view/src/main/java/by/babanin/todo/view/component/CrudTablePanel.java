@@ -98,7 +98,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             model.set(row, result);
             selectRow(row);
         });
-        addDeletionListener(result -> model.remove(getSelectedComponents()));
+        addDeletionListener(result -> model.remove(result));
     }
 
     public void addCreationListener(FinishListener<C> listener) {
