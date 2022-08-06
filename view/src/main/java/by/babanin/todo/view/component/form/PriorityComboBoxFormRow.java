@@ -1,5 +1,6 @@
 package by.babanin.todo.view.component.form;
 
+import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.GetTask;
@@ -19,7 +20,7 @@ public class PriorityComboBoxFormRow extends ComboBoxFormRow<Priority> {
     }
 
     private void loadPriorities() {
-        GetTask<Priority, Long> task = new GetTask<>(ServiceHolder.getPriorityService());
+        GetTask<Priority, Long, PriorityService> task = new GetTask<>(ServiceHolder.getPriorityService());
         task.addFinishListener(items -> {
             setItems(items);
             setValue(selectedPriority);

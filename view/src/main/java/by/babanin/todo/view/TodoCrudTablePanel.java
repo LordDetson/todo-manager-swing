@@ -12,16 +12,19 @@ import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
+import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
-import by.babanin.todo.model.Todo.TodoBuilder;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.task.todo.CreateTodoTask;
+import by.babanin.todo.task.Task;
+import by.babanin.todo.task.todo.UpdateTodoTask;
 import by.babanin.todo.view.component.CrudStyle;
-import by.babanin.todo.view.component.CrudTablePanel;
 import by.babanin.todo.view.component.CustomTableColumnModel;
+import by.babanin.todo.view.component.MovableCrudTablePanel;
 import by.babanin.todo.view.component.TableModel;
 import by.babanin.todo.view.component.form.TodoFormRowFactory;
 import by.babanin.todo.view.component.validation.TodoValidatorFactory;
@@ -34,7 +37,7 @@ import by.babanin.todo.view.util.GUIUtils;
 import by.babanin.todo.view.util.IconResources;
 import by.babanin.todo.view.util.ServiceHolder;
 
-public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
+public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
     private JButton priorityButton;
 
@@ -103,26 +106,16 @@ public class TodoCrudTablePanel extends CrudTablePanel<Todo, Long> {
     }
 
     @Override
-    protected Todo createComponent(Map<ReportField, ?> fieldValueMap, Todo oldComponent) {
-        ComponentRepresentation<Todo> representation = ComponentRepresentation.get(Todo.class);
-        TodoBuilder builder = Todo.builder()
-                .title((String) fieldValueMap.get(representation.getField(Fields.title)))
-                .description((String) fieldValueMap.get(representation.getField(Fields.description)))
-                .priority((Priority) fieldValueMap.get(representation.getField(Fields.priority)))
-                .status(Status.OPEN)
-                .creationDate(LocalDate.now());
-        Status status = (Status) fieldValueMap.get(representation.getField(Fields.status));
-        if(status != null) {
-            builder.status(status);
-            if(status == Status.CLOSED) {
-                builder.completionDate(LocalDate.now());
-            }
-        }
-        LocalDate plannedDate = (LocalDate) fieldValueMap.get(representation.getField(Fields.plannedDate));
-        if(plannedDate == null) {
-            plannedDate = oldComponent.getPlannedDate();
-        }
-        builder.plannedDate(plannedDate);
-        return builder.build();
+    protected Task<Todo> createCreationTask(Map<ReportField, ?> fieldValueMap) {
+        TodoService service = ServiceHolder.getTodoService();
+        ComponentRepresentation<Todo> representation = ComponentRepresentation.get(getComponentClass());
+        return new CreateTodoTask(service, representation, fieldValueMap);
+    }
+
+    @Override
+    protected Task<Todo> createUpdateTask(Map<ReportField, ?> fieldValueMap, Todo selectedComponent) {
+        TodoService service = ServiceHolder.getTodoService();
+        ComponentRepresentation<Todo> representation = ComponentRepresentation.get(getComponentClass());
+        return new UpdateTodoTask(service, representation, fieldValueMap, selectedComponent);
     }
 }

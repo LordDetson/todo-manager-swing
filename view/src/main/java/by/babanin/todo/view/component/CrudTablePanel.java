@@ -17,12 +17,13 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 
+import by.babanin.todo.application.service.CrudService;
 import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
 import by.babanin.todo.task.FinishListener;
 import by.babanin.todo.task.GetTask;
-import by.babanin.todo.task.SaveTask;
+import by.babanin.todo.task.Task;
 import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.form.ApplyListener;
 import by.babanin.todo.view.component.form.ComponentForm;
@@ -42,8 +43,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private JButton createButton;
     private JButton editButton;
     private JButton deleteButton;
-    private JButton moveUpButton;
-    private JButton moveDownButton;
     private TableModel<C> model;
     private CustomTableColumnModel<C> columnModel;
     private JTable table;
@@ -62,15 +61,17 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     protected void createUiComponents() {
         toolBar = new JToolBar();
-        model = new TableModel<>(componentClass);
+        model = createTableModel(componentClass);
         columnModel = new CustomTableColumnModel<>(componentClass);
         table = new JTable();
 
         createButton = new JButton(crudStyle.getCreateButtonIcon());
         editButton = new JButton(crudStyle.getEditButtonIcon());
         deleteButton = new JButton(crudStyle.getDeleteButtonIcon());
-        moveUpButton = new JButton(crudStyle.getMoveUpButtonIcon());
-        moveDownButton = new JButton(crudStyle.getMoveDownButtonIcon());
+    }
+
+    protected TableModel<C> createTableModel(Class<C> componentClass) {
+        return new TableModel<>(componentClass);
     }
 
     protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel<C> columnModel) {
@@ -125,8 +126,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         addToolBarComponent(createButton);
         addToolBarComponent(editButton);
         addToolBarComponent(deleteButton);
-        addToolBarComponent(moveUpButton);
-        addToolBarComponent(moveDownButton);
 
         setLayout(new BorderLayout());
         add(toolBar, BorderLayout.PAGE_START);
@@ -141,13 +140,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         int selectionCount = table.getSelectionModel().getSelectedItemsCount();
         editButton.setEnabled(selectionCount == 1);
         deleteButton.setEnabled(selectionCount >= 1);
-        moveUpButton.setEnabled(selectionCount == 1 && table.getSelectedRow() != 0);
-        moveDownButton.setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
     }
 
     @SuppressWarnings("unchecked")
     public void load() {
-        GetTask<C, I> task = new GetTask<>(ServiceHolder.getCrudService(componentClass));
+        GetTask<C, I, CrudService<C, I>> task = new GetTask<>(ServiceHolder.getCrudService(componentClass));
         if(crudListenersMap.containsKey(CrudAction.READ)) {
             crudListenersMap.get(CrudAction.READ)
                     .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
@@ -155,47 +152,46 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         TaskManager.run(task);
     }
 
-    protected abstract C createComponent(Map<ReportField, ?> fieldValueMap, C oldComponent);
-
     private void showCreationDialog(ActionEvent event) {
         ComponentForm<C> form = new ComponentForm<>(componentClass, formRowFactory, crudStyle);
-        form.addApplyListener(createCreationListener());
+        form.addApplyListener(runCreationTask());
         showComponentForm(form, TranslateCode.CREATION_DIALOG_TITLE);
     }
 
     @SuppressWarnings("unchecked")
-    private ApplyListener createCreationListener() {
+    private ApplyListener runCreationTask() {
         return fieldValueMap -> {
-            C component = createComponent(fieldValueMap, null);
-            SaveTask<C, I> saveTask = new SaveTask<>(ServiceHolder.getCrudService(componentClass), component);
+            Task<C> task = createCreationTask(fieldValueMap);
             if(crudListenersMap.containsKey(CrudAction.CREATE)) {
                 crudListenersMap.get(CrudAction.CREATE)
-                        .forEach(finishListener -> saveTask.addFinishListener((FinishListener<C>) finishListener));
+                        .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
             }
-            TaskManager.run(saveTask);
+            TaskManager.run(task);
         };
     }
+
+    protected abstract Task<C> createCreationTask(Map<ReportField, ?> fieldValueMap);
 
     private void showEditDialog(ActionEvent event) {
         C selectedComponent = getSelectedComponent();
         ComponentForm<C> form = new ComponentForm<>(componentClass, formRowFactory, crudStyle, selectedComponent);
-        form.addApplyListener(createEditListener(selectedComponent));
+        form.addApplyListener(runUpdateTask(selectedComponent));
         showComponentForm(form, TranslateCode.EDIT_DIALOG_TITLE);
     }
 
     @SuppressWarnings("unchecked")
-    private ApplyListener createEditListener(C selectedComponent) {
+    private ApplyListener runUpdateTask(C selectedComponent) {
         return fieldValueMap -> {
-            C component = createComponent(fieldValueMap, selectedComponent);
-            component.setId(selectedComponent.getId());
-            SaveTask<C, I> saveTask = new SaveTask<>(ServiceHolder.getCrudService(componentClass), component);
+            Task<C> task = createUpdateTask(fieldValueMap, selectedComponent);
             if(crudListenersMap.containsKey(CrudAction.UPDATE)) {
                 crudListenersMap.get(CrudAction.UPDATE)
-                        .forEach(finishListener -> saveTask.addFinishListener((FinishListener<C>) finishListener));
+                        .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
             }
-            TaskManager.run(saveTask);
+            TaskManager.run(task);
         };
     }
+
+    protected abstract Task<C> createUpdateTask(Map<ReportField, ?> fieldValueMap, C selectedComponent);
 
     private void showComponentForm(ComponentForm<C> form, String titleCode) {
         Frame frame = JOptionPane.getFrameForComponent(this);
@@ -221,13 +217,21 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             List<I> ids = selectedComponents.stream()
                     .map(Persistent::getId)
                     .toList();
-            DeleteTask<C, I> task = new DeleteTask<>(ServiceHolder.getCrudService(componentClass), ids);
+            DeleteTask<C, I, CrudService<C, I>> task = new DeleteTask<>(ServiceHolder.getCrudService(componentClass), ids);
             if(crudListenersMap.containsKey(CrudAction.DELETE)) {
                 crudListenersMap.get(CrudAction.DELETE)
                         .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
             }
             TaskManager.run(task);
         }
+    }
+
+    protected Class<C> getComponentClass() {
+        return componentClass;
+    }
+
+    protected CrudStyle getCrudStyle() {
+        return crudStyle;
     }
 
     public C getSelectedComponent() {

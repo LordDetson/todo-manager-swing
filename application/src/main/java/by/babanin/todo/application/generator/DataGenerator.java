@@ -10,8 +10,6 @@ import org.springframework.stereotype.Component;
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.model.Priority;
-import by.babanin.todo.model.Status;
-import by.babanin.todo.model.Todo;
 
 @Component
 public class DataGenerator implements ApplicationListener<ContextRefreshedEvent> {
@@ -32,19 +30,8 @@ public class DataGenerator implements ApplicationListener<ContextRefreshedEvent>
         if(dataGenerationEnable) {
             todoService.deleteAll();
             priorityService.deleteAll();
-            Priority high = priorityService.save(Priority.builder()
-                    .name("High")
-                    .weight(0)
-                    .build());
-            todoService.save(Todo.builder()
-                    .title("First todo")
-                    .description("Description")
-                    .priority(high)
-                    .status(Status.OPEN)
-                    .creationDate(LocalDate.of(2022, 5, 15))
-                    .plannedDate(LocalDate.of(2022, 5, 15))
-                    .completionDate(LocalDate.of(2022, 5, 15))
-                    .build());
+            Priority high = priorityService.create("High");
+            todoService.create("First todo", "Description", high, LocalDate.now());
         }
     }
 }

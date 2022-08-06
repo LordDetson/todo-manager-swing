@@ -7,6 +7,7 @@ import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Priority.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.ServiceHolder;
 
 public class PriorityValidatorFactory implements ValidatorFactory {
@@ -18,7 +19,7 @@ public class PriorityValidatorFactory implements ValidatorFactory {
         List<Validator> validators = new ArrayList<>();
         ComponentRepresentation<Priority> representation = ComponentRepresentation.get(Priority.class);
         if(representation.getFields().contains(field) && field.getName().equals(Fields.name)) {
-            String fieldCaption = field.getCaption();
+            String fieldCaption = Translator.getFieldCaption(field);
             if(field.isMandatory()) {
                 validators.add(new MandatoryValueValidator(fieldCaption));
             }

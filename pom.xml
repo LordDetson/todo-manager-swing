@@ -19,6 +19,7 @@
         <module>model</module>
         <module>application</module>
         <module>view</module>
+        <module>task</module>
     </modules>
 
     <properties>

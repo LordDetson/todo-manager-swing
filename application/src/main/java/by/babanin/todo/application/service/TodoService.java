@@ -1,86 +1,94 @@
 package by.babanin.todo.application.service;
 
+import java.time.LocalDate;
+import java.util.Arrays;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.List;
-import java.util.Set;
+import java.util.StringJoiner;
 
 import javax.transaction.Transactional;
 
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Component;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.repository.TodoRepository;
 import by.babanin.todo.model.Priority;
+import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
 
 @Component
-public class TodoService extends AbstractCrudService<Todo, Long> {
-
-    private final TodoRepository todoRepository;
+public class TodoService extends IndexableCrudService<Todo, Long> {
 
     public TodoService(TodoRepository todoRepository) {
-        this.todoRepository = todoRepository;
+        super(todoRepository);
+    }
+
+    @Override
+    protected TodoRepository getRepository() {
+        return (TodoRepository) super.getRepository();
     }
 
     @Transactional
-    @Override
-    public Todo save(Todo entity) {
-        return todoRepository.save(entity);
-    }
-
-    @Transactional
-    @Override
-    public void deleteAll() {
-        todoRepository.deleteAll();
-    }
-
-    @Transactional
-    @Override
-    public void deleteAllById(Set<Long> ids) {
-        boolean existAllIds = ids.stream()
-                .allMatch(this::existById);
-        if(!existAllIds) {
-            throw new ApplicationException("Doesn't have such ids");
+    public Todo create(String title, String description, Priority priority, LocalDate plannedDate) {
+        validateTitle(title);
+        if(plannedDate.isBefore(LocalDate.now())) {
+            throw new ApplicationException("Planned date can't be before today");
         }
-        todoRepository.deleteAllById(ids);
+        Todo todo = Todo.builder()
+                .title(title)
+                .description(description)
+                .priority(priority)
+                .status(Status.OPEN)
+                .creationDate(LocalDate.now())
+                .plannedDate(plannedDate)
+                .position(count())
+                .build();
+        return getRepository().save(todo);
     }
 
     @Transactional
-    @Override
-    public List<Todo> getAll() {
-        return Collections.unmodifiableList(todoRepository.findAll());
-    }
-
-    @Transactional
-    @Override
-    public List<Todo> getAllById(Set<Long> ids) {
-        return todoRepository.findAllById(ids);
-    }
-
-    @Transactional
-    @Override
-    public Todo getById(Long id) {
-        if(!existById(id)) {
-            throw new ApplicationException("No such priority");
+    public Todo update(Todo todo, String title, String description, Priority priority, Status status) {
+        validateTitle(title);
+        if(status == null) {
+            throw new ApplicationException("Status can't be null");
         }
-        return todoRepository.getReferenceById(id);
+
+        todo = getById(todo.getId());
+        Status currentStatus = todo.getStatus();
+        if(currentStatus.compareTo(status) > 0) {
+            StringJoiner joiner = new StringJoiner(" > ");
+            Arrays.stream(Status.values())
+                    .map(Status::toString)
+                    .forEach(joiner::add);
+            throw new ApplicationException(status + " status cannot be applied. Status Workflow: " + joiner);
+        }
+
+        todo.setTitle(title);
+        todo.setDescription(description);
+        todo.setPriority(priority);
+        todo.setStatus(status);
+        if(status == Status.CLOSED) {
+            todo.setCompletionDate(LocalDate.now());
+        }
+        return getRepository().save(todo);
+    }
+
+    private void validateTitle(String title) {
+        if(StringUtils.isBlank(title)) {
+            throw new ApplicationException("Title can't be blank");
+        }
     }
 
     @Transactional
-    @Override
-    public boolean existById(Long id) {
-        return todoRepository.existsById(id);
-    }
-
-    @Transactional
-    @Override
-    public long count() {
-        return todoRepository.count();
+    public void updatePriority(Todo todo, Priority priority) {
+        todo = getById(todo.getId());
+        todo.setPriority(priority);
+        getRepository().save(todo);
     }
 
     @Transactional
     public List<Todo> findAllByPriorities(Collection<Priority> priorities) {
-        return todoRepository.findAllByPriorities(priorities);
+        return getRepository().findAllByPriorities(priorities);
     }
 }

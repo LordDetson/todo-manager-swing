@@ -88,7 +88,8 @@ public class ComponentForm<C> extends JPanel {
             formRow.addListener(createChangeListener());
             crudStyle.getValidatorFactory()
                     .ifPresent(validatorFactory -> formRow.addValidators(validatorFactory.factor(formRow.getField())));
-            statusBarItem.addLogger(formRow.getInputComponent(), formRow.getField().getCaption(), formRow.getLogger());
+            String fieldCaption = Translator.getFieldCaption(formRow.getField());
+            statusBarItem.addLogger(formRow.getInputComponent(), fieldCaption, formRow.getLogger());
         });
 
         applyButton.addActionListener(event -> {

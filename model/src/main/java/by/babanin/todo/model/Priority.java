@@ -32,7 +32,7 @@ import lombok.experimental.FieldNameConstants;
 @ToString(exclude = "todos")
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @FieldNameConstants
-public class Priority implements Persistent<Long> {
+public class Priority implements Persistent<Long>, Indexable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -43,9 +43,9 @@ public class Priority implements Persistent<Long> {
     @NonNull
     String name;
 
-    @Column(unique = true, nullable = false)
+    @Column(nullable = false)
     @NonNull
-    long weight;
+    long position;
 
     @OneToMany(mappedBy = "priority")
     Set<Todo> todos;
@@ -59,11 +59,11 @@ public class Priority implements Persistent<Long> {
             return false;
         }
         Priority priority = (Priority) o;
-        return weight == priority.weight && name.equals(priority.name);
+        return position == priority.position && name.equals(priority.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, weight);
+        return Objects.hash(name, position);
     }
 }

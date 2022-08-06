@@ -9,7 +9,7 @@ import java.util.stream.Stream;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.ReportableField;
 import by.babanin.todo.model.Todo;
-import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.representation.exception.RepresentationException;
 
 public class ComponentRepresentation<C> {
 
@@ -28,7 +28,7 @@ public class ComponentRepresentation<C> {
     public static <T> ComponentRepresentation<T> get(Class<T> componentClass) {
         ComponentRepresentation<T> representation = (ComponentRepresentation<T>) COMPONENT_REPRESENTATION_MAP.get(componentClass);
         if(representation == null) {
-            throw new ViewException("Component representation wasn't registered for " + componentClass.getName());
+            throw new RepresentationException("Component representation wasn't registered for " + componentClass.getName());
         }
         return representation;
     }
@@ -61,7 +61,7 @@ public class ComponentRepresentation<C> {
         return fields.stream()
                 .filter(field -> field.getName().equals(name))
                 .findFirst()
-                .orElseThrow(() -> new ViewException(name + " doesn't exist"));
+                .orElseThrow(() -> new RuntimeException(name + " doesn't exist"));
     }
 
     public Object getValueAt(C component, ReportField field) {

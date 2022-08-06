@@ -78,6 +78,10 @@ public class TableModel<C> extends AbstractTableModel {
         return Collections.unmodifiableList(list);
     }
 
+    protected List<C> getList() {
+        return list;
+    }
+
     public int indexOf(C component) {
         return list.indexOf(component);
     }

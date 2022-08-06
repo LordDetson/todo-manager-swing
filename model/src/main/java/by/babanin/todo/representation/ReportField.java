@@ -8,8 +8,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 
 import by.babanin.todo.model.ReportableField;
-import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.representation.exception.RepresentationException;
 
 public class ReportField {
 
@@ -43,16 +42,12 @@ public class ReportField {
         return field.getType();
     }
 
-    public String getCaption() {
-        return Translator.getFieldCaption(this);
-    }
-
     public Object getValue(Object o) {
         try {
             return getReadMethod().invoke(o);
         }
         catch(IllegalAccessException | InvocationTargetException e) {
-            throw new ViewException(e);
+            throw new RepresentationException(e);
         }
     }
 
@@ -64,10 +59,10 @@ public class ReportField {
                     return pd.getReadMethod();
                 }
             }
-            throw new ViewException(name + " field getter isn't exist");
+            throw new RepresentationException(name + " field getter isn't exist");
         }
         catch(IntrospectionException e) {
-            throw new ViewException(e);
+            throw new RepresentationException(e);
         }
     }
 }

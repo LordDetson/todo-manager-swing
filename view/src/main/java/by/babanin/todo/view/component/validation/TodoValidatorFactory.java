@@ -7,10 +7,11 @@ import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.translat.Translator;
 
 public class TodoValidatorFactory implements ValidatorFactory {
 
-    private static final int TITLE_LENGTH_LIMIT = 16;
+    private static final int TITLE_LENGTH_LIMIT = 32;
     private static final int DESCRIPTION_LENGTH_LIMIT = 1024;
 
     @Override
@@ -19,7 +20,7 @@ public class TodoValidatorFactory implements ValidatorFactory {
         ComponentRepresentation<Todo> representation = ComponentRepresentation.get(Todo.class);
         if(representation.getFields().contains(field)) {
             String fieldName = field.getName();
-            String fieldCaption = field.getCaption();
+            String fieldCaption = Translator.getFieldCaption(field);
             if(field.isMandatory()) {
                 validators.add(new MandatoryValueValidator(fieldCaption));
             }

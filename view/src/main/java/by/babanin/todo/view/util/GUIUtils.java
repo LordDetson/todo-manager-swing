@@ -35,6 +35,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings.DateArea;
 
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ResourceException;
+import by.babanin.todo.view.translat.Translator;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -187,7 +188,7 @@ public final class GUIUtils {
     public static TableColumn createTableColumn(ReportField field) {
         TableColumn column = new TableColumn(field.getIndex());
         column.setIdentifier(field.getName());
-        column.setHeaderValue(field.getCaption());
+        column.setHeaderValue(Translator.getFieldCaption(field));
         return column;
     }
 

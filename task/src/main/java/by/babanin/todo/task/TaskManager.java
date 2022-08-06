@@ -2,7 +2,7 @@ package by.babanin.todo.task;
 
 import java.util.concurrent.ExecutorService;
 
-import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.task.exception.TaskException;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -12,7 +12,7 @@ public class TaskManager {
 
     public static void setExecutorService(ExecutorService executorService) {
         if(TaskManager.executorService != null) {
-            throw new ViewException("Executor service already exist");
+            throw new TaskException("Executor service already exist");
         }
         TaskManager.executorService = executorService;
     }

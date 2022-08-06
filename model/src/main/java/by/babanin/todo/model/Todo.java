@@ -33,7 +33,7 @@ import lombok.experimental.FieldNameConstants;
 @ToString
 @FieldDefaults(level = AccessLevel.PRIVATE)
 @FieldNameConstants
-public class Todo implements Persistent<Long> {
+public class Todo implements Persistent<Long>, Indexable {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
@@ -70,6 +70,9 @@ public class Todo implements Persistent<Long> {
 
     @ReportableField(index = 6)
     LocalDate completionDate;
+
+    @Column(nullable = false)
+    long position;
 
     @Override
     public boolean equals(Object o) {

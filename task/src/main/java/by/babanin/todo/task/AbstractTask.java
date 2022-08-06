@@ -4,7 +4,7 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import by.babanin.todo.application.exception.ApplicationException;
+import by.babanin.todo.task.exception.TaskException;
 
 public abstract class AbstractTask<R> implements Task<R> {
 
@@ -20,7 +20,7 @@ public abstract class AbstractTask<R> implements Task<R> {
             EventQueue.invokeLater(() -> finishListeners.forEach(listener -> listener.accept(result)));
         }
         catch(Exception throwable) {
-            throw new ApplicationException(throwable);
+            throw new TaskException(throwable);
         }
     }
 

@@ -8,17 +8,15 @@ import by.babanin.todo.model.Persistent;
 
 public interface CrudService<E extends Persistent<I>, I> {
 
-    E save(E entity);
+    List<E> deleteAll();
 
-    void deleteAll();
+    List<E> deleteAll(Collection<E> entities);
 
-    void deleteAll(Collection<E> entities);
+    List<E> deleteAllById(Set<I> ids);
 
-    void deleteAllById(Set<I> ids);
+    E delete(E entity);
 
-    void delete(E entity);
-
-    void deleteById(I id);
+    E deleteById(I id);
 
     List<E> getAll();
 

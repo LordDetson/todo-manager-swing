@@ -19,7 +19,7 @@
     <dependencies>
         <dependency>
             <groupId>by.babanin.todo</groupId>
-            <artifactId>application</artifactId>
+            <artifactId>task</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
