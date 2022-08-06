@@ -1,5 +1,7 @@
 package by.babanin.todo.view.component.form;
 
+import java.awt.Dimension;
+
 import javax.swing.JComponent;
 import javax.swing.JTextField;
 
@@ -16,6 +18,7 @@ public class TextFormRow extends FormRow<String> {
     public TextFormRow(ReportField field) {
         super(field);
         textField = new JTextField(DEFAULT_COLUMNS);
+        textField.setMaximumSize(new Dimension(textField.getMaximumSize().width, textField.getPreferredSize().height));
         GUIUtils.addChangeListener(textField, e -> stateChanged());
     }
 

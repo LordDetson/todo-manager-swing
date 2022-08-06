@@ -201,6 +201,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         dialog.setTitle(Translator.toLocale(titleCode).formatted(Translator.getComponentCaption(componentClass)));
         dialog.pack();
         dialog.setLocationRelativeTo(frame);
+        dialog.setMinimumSize(dialog.getSize());
         dialog.setVisible(true);
     }
 

@@ -1,6 +1,7 @@
 package by.babanin.todo.view.component.statusbar;
 
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
@@ -48,7 +49,9 @@ public class LogStatusBarItem extends StatusBarItem {
                 JDialog dialog = new JDialog(window);
                 dialog.setContentPane(new CombinedLogPanel(combinedLogger));
                 dialog.setTitle(Translator.toLocale(TranslateCode.LOG_MESSAGES));
-                dialog.setSize(GUIUtils.getSmallFrameSize());
+                Dimension smallFrameSize = GUIUtils.getSmallFrameSize();
+                dialog.setMinimumSize(smallFrameSize);
+                dialog.setSize(smallFrameSize);
                 dialog.setLocationRelativeTo(window);
                 dialog.setVisible(true);
             }

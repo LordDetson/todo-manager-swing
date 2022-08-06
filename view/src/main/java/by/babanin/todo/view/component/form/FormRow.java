@@ -44,14 +44,6 @@ public abstract class FormRow<T> {
 
     public abstract JComponent getInputComponent();
 
-    /**
-     * Use to wrap input component
-     * @return input component by default
-     */
-    public JComponent wrap(JComponent inputComponent) {
-        return inputComponent;
-    }
-
     public abstract T getValue();
 
     public abstract void setValue(T value);

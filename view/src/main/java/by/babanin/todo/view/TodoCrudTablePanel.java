@@ -1,5 +1,6 @@
 package by.babanin.todo.view;
 
+import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.time.LocalDate;
@@ -93,7 +94,9 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
         Frame frame = JOptionPane.getFrameForComponent(this);
         JDialog dialog = new JDialog(frame, true);
         dialog.setContentPane(priorityPanel);
-        dialog.setSize(GUIUtils.getSmallFrameSize());
+        Dimension smallFrameSize = GUIUtils.getSmallFrameSize();
+        dialog.setMinimumSize(smallFrameSize);
+        dialog.setSize(smallFrameSize);
         dialog.setLocationRelativeTo(frame);
         dialog.setTitle(Translator.toLocale(TranslateCode.PRIORITY_FRAME_TITLE));
         dialog.setVisible(true);

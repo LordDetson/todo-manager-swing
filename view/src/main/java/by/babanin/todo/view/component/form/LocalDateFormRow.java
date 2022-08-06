@@ -1,5 +1,6 @@
 package by.babanin.todo.view.component.form;
 
+import java.awt.Dimension;
 import java.time.LocalDate;
 
 import javax.swing.JComponent;
@@ -16,6 +17,7 @@ public class LocalDateFormRow extends FormRow<LocalDate> {
     public LocalDateFormRow(ReportField field) {
         super(field);
         datePicker = GUIUtils.createDatePicker();
+        datePicker.setMaximumSize(new Dimension(datePicker.getMaximumSize().width, datePicker.getPreferredSize().height));
         datePicker.getSettings().setAllowEmptyDates(!field.isMandatory());
         datePicker.addDateChangeListener(dateChangeEvent -> stateChanged());
     }

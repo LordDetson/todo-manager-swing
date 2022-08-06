@@ -1,5 +1,6 @@
 package by.babanin.todo.view;
 
+import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.util.concurrent.ExecutorService;
 
@@ -60,7 +61,9 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
 
             JFrame mainFrame = new JFrame();
             mainFrame.setContentPane(todoPanel);
-            mainFrame.setSize(GUIUtils.getLargeFrameSize());
+            Dimension largeFrameSize = GUIUtils.getLargeFrameSize();
+            mainFrame.setMinimumSize(largeFrameSize);
+            mainFrame.setSize(largeFrameSize);
             mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
             mainFrame.setLocationRelativeTo(null);
             mainFrame.setTitle(Translator.toLocale(TranslateCode.TODO_FRAME_TITLE));

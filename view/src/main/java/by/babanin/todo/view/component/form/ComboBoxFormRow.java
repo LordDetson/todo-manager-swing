@@ -1,5 +1,6 @@
 package by.babanin.todo.view.component.form;
 
+import java.awt.Dimension;
 import java.util.List;
 
 import javax.swing.JComboBox;
@@ -16,6 +17,7 @@ public class ComboBoxFormRow<T> extends FormRow<T> {
     public ComboBoxFormRow(ReportField field) {
         super(field);
         this.comboBox = new JComboBox<>();
+        comboBox.setMaximumSize(new Dimension(comboBox.getMaximumSize().width, comboBox.getPreferredSize().height));
         comboBox.addItemListener(event -> stateChanged());
     }
 

@@ -2,10 +2,6 @@ package by.babanin.todo.view.component.form;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
-import java.awt.Window;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,7 +12,11 @@ import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JDialog;
+import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.SpringLayout;
 import javax.swing.event.ChangeListener;
 
 import by.babanin.todo.representation.ComponentRepresentation;
@@ -26,6 +26,7 @@ import by.babanin.todo.view.component.statusbar.LogStatusBarItem;
 import by.babanin.todo.view.component.statusbar.StatusBar;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.util.SpringUtilities;
 
 public class ComponentForm<C> extends JPanel {
 
@@ -36,7 +37,7 @@ public class ComponentForm<C> extends JPanel {
     private final List<FormRow<?>> formRows = new ArrayList<>();
     private final List<ApplyListener> applyListeners = new ArrayList<>();
     private final Map<ReportField, Object> values = new HashMap<>();
-    private Window owner;
+    private JDialog owner;
     private LogStatusBarItem statusBarItem;
     private JButton applyButton;
     private JButton cancelButton;
@@ -129,21 +130,18 @@ public class ComponentForm<C> extends JPanel {
         setLayout(borderLayout);
 
         JPanel formRowsPanel = new JPanel();
-        formRowsPanel.setLayout(new GridBagLayout());
-        for(int i = 0; i < formRows.size(); i++) {
-            FormRow<?> formRow = formRows.get(i);
-            GridBagConstraints constraints = new GridBagConstraints();
-            constraints.gridx = 0;
-            constraints.gridy = i;
-            constraints.fill = GridBagConstraints.NONE;
-            constraints.anchor = GridBagConstraints.LINE_START;
-            formRowsPanel.add(formRow.getLabel(), constraints);
-            constraints.gridx = 1;
-            constraints.gridy = i;
-            constraints.fill = GridBagConstraints.BOTH;
-            constraints.insets = new Insets(2, 8, 2, 0);
-            formRowsPanel.add(formRow.wrap(formRow.getInputComponent()), constraints);
+        formRowsPanel.setLayout(new SpringLayout());
+        for(FormRow<?> formRow : formRows) {
+            JLabel label = formRow.getLabel();
+            JComponent inputComponent = formRow.getInputComponent();
+            label.setLabelFor(inputComponent);
+            formRowsPanel.add(label);
+            formRowsPanel.add(inputComponent);
         }
+        SpringUtilities.makeCompactGrid(formRowsPanel,
+                formRows.size(), 2, //rows, cols
+                8, 4,        //initX, initY
+                4, 4);       //xPad, yPad
 
         StatusBar statusBar = new StatusBar();
         statusBar.add(statusBarItem);
@@ -157,15 +155,16 @@ public class ComponentForm<C> extends JPanel {
         buttonPanel.add(cancelButton);
 
         JPanel formWithStatusBarPanel = new JPanel(new BorderLayout());
-        formWithStatusBarPanel.setBorder(BorderFactory.createEmptyBorder(8, 10, 0, 10));
+        formWithStatusBarPanel.setBorder(BorderFactory.createEmptyBorder(0, 2, 0, 6));
         formWithStatusBarPanel.add(formRowsPanel, BorderLayout.CENTER);
         formWithStatusBarPanel.add(statusBar, BorderLayout.PAGE_END);
         add(formWithStatusBarPanel, BorderLayout.CENTER);
         add(buttonPanel, BorderLayout.PAGE_END);
     }
 
-    public void setOwner(Window owner) {
+    public void setOwner(JDialog owner) {
         this.owner = owner;
+        owner.getRootPane().setDefaultButton(applyButton);
     }
 
     public Optional<C> getComponent() {
