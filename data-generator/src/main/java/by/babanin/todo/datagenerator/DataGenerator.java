@@ -69,6 +69,11 @@ public class DataGenerator implements ApplicationListener<ContextRefreshedEvent>
                     buyProductsInTheStore.getTitle(),
                     buyProductsInTheStore.getDescription(),
                     buyProductsInTheStore.getPriority(),
+                    Status.IN_PROGRESS);
+            todoService.update(buyProductsInTheStore,
+                    buyProductsInTheStore.getTitle(),
+                    buyProductsInTheStore.getDescription(),
+                    buyProductsInTheStore.getPriority(),
                     Status.CLOSED);
         }
     }
