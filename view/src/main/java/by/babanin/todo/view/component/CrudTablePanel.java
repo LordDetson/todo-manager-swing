@@ -158,6 +158,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             crudListenersMap.get(CrudAction.READ)
                     .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
         }
+        task.addFinishListener(components -> actionEnabling());
         TaskManager.run(task);
     }
 
@@ -175,6 +176,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                 crudListenersMap.get(CrudAction.CREATE)
                         .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
             }
+            task.addFinishListener(component -> actionEnabling());
             TaskManager.run(task);
         };
     }
@@ -196,6 +198,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                 crudListenersMap.get(CrudAction.UPDATE)
                         .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
             }
+            task.addFinishListener(component -> actionEnabling());
             TaskManager.run(task);
         };
     }
@@ -232,6 +235,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                 crudListenersMap.get(CrudAction.DELETE)
                         .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
             }
+            task.addFinishListener(components -> actionEnabling());
             TaskManager.run(task);
         }
     }
