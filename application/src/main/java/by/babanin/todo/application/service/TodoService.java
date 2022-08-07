@@ -1,10 +1,8 @@
 package by.babanin.todo.application.service;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
-import java.util.StringJoiner;
 
 import javax.transaction.Transactional;
 
@@ -13,6 +11,7 @@ import org.springframework.stereotype.Component;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.repository.TodoRepository;
+import by.babanin.todo.application.status.StatusWorkflow;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
@@ -50,26 +49,15 @@ public class TodoService extends IndexableCrudService<Todo, Long> {
     @Transactional
     public Todo update(Todo todo, String title, String description, Priority priority, Status status) {
         validateTitle(title);
-        if(status == null) {
-            throw new ApplicationException("Status can't be null");
-        }
 
         todo = getById(todo.getId());
-        Status currentStatus = todo.getStatus();
-        if(currentStatus.compareTo(status) > 0) {
-            StringJoiner joiner = new StringJoiner(" > ");
-            Arrays.stream(Status.values())
-                    .map(Status::toString)
-                    .forEach(joiner::add);
-            throw new ApplicationException(status + " status cannot be applied. Status Workflow: " + joiner);
-        }
+        StatusWorkflow.validateStatus(todo, status);
 
         todo.setTitle(title);
         todo.setDescription(description);
         todo.setPriority(priority);
-        todo.setStatus(status);
-        if(status == Status.CLOSED) {
-            todo.setCompletionDate(LocalDate.now());
+        if(todo.getStatus() != status) {
+            todo = StatusWorkflow.get(todo).goNextStatus();
         }
         return getRepository().save(todo);
     }

@@ -137,9 +137,18 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     }
 
     protected void actionEnabling() {
+        editButton.setEnabled(canEdit());
+        deleteButton.setEnabled(canDelete());
+    }
+
+    protected boolean canEdit() {
         int selectionCount = table.getSelectionModel().getSelectedItemsCount();
-        editButton.setEnabled(selectionCount == 1);
-        deleteButton.setEnabled(selectionCount >= 1);
+        return selectionCount == 1;
+    }
+
+    protected boolean canDelete() {
+        int selectionCount = table.getSelectionModel().getSelectedItemsCount();
+        return selectionCount >= 1;
     }
 
     @SuppressWarnings("unchecked")

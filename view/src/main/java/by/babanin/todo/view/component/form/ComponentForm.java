@@ -79,6 +79,7 @@ public class ComponentForm<C> extends JPanel {
     private FormRow<?> createFormRow(ReportField field) {
         FormRow<Object> formRow = formRowFactory.factor(field);
         if(component != null) {
+            formRow.setComponent(component);
             formRow.setValue(componentRepresentation.getValueAt(component, field));
         }
         return formRow;

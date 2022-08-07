@@ -65,7 +65,11 @@ public class TableModel<C> extends AbstractTableModel {
     }
 
     public C get(int row) {
-        return list.get(row);
+        C component = null;
+        if(row >= 0) {
+            component = list.get(row);
+        }
+        return component;
     }
 
     public List<C> get(int[] indices) {

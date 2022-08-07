@@ -2,6 +2,7 @@ package by.babanin.todo.view.component.form;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.swing.JComponent;
 import javax.swing.JLabel;
@@ -26,6 +27,7 @@ public abstract class FormRow<T> {
     private final Logger logger = new Logger();
     private final ReportField field;
     private final JLabel label;
+    private Object component;
 
     protected FormRow(ReportField field) {
         this.field = field;
@@ -47,6 +49,14 @@ public abstract class FormRow<T> {
     public abstract T getValue();
 
     public abstract void setValue(T value);
+
+    public void setComponent(Object component) {
+        this.component = component;
+    }
+
+    public Optional<Object> getComponent() {
+        return Optional.ofNullable(component);
+    }
 
     public void addListener(ChangeListener listener) {
         listeners.add(listener);

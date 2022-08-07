@@ -14,6 +14,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 
 import by.babanin.todo.application.service.TodoService;
+import by.babanin.todo.application.status.StatusWorkflow;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
@@ -106,6 +107,15 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     protected void placeComponents() {
         super.placeComponents();
         addToolBarComponent(priorityButton);
+    }
+
+    @Override
+    protected boolean canEdit() {
+        boolean canEdit = super.canEdit();
+        if(canEdit) {
+            canEdit = !StatusWorkflow.get(getSelectedComponent()).isFinalStatus();
+        }
+        return canEdit;
     }
 
     @Override
