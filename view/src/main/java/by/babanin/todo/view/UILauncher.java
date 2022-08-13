@@ -54,22 +54,23 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         ComponentRepresentation.initializeComponentRepresentationMap();
 
         FlatDarculaLaf.setup();
-        EventQueue.invokeLater(() -> {
+        EventQueue.invokeLater(this::showMainFrame);
+    }
 
-            TodoCrudTablePanel todoPanel = new TodoCrudTablePanel();
-            todoPanel.load();
+    private void showMainFrame() {
+        JFrame mainFrame = new JFrame();
+        GUIUtils.setMainWindow(mainFrame);
 
-            JFrame mainFrame = new JFrame();
-            mainFrame.setContentPane(todoPanel);
-            Dimension largeFrameSize = GUIUtils.getLargeFrameSize();
-            mainFrame.setMinimumSize(largeFrameSize);
-            mainFrame.setSize(largeFrameSize);
-            mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-            mainFrame.setLocationRelativeTo(null);
-            mainFrame.setTitle(Translator.toLocale(TranslateCode.TODO_FRAME_TITLE));
-            mainFrame.setVisible(true);
+        TodoCrudTablePanel todoPanel = new TodoCrudTablePanel();
+        todoPanel.load();
+        mainFrame.setContentPane(todoPanel);
 
-            GUIUtils.setMainWindow(mainFrame);
-        });
+        Dimension largeFrameSize = GUIUtils.getLargeFrameSize();
+        mainFrame.setMinimumSize(largeFrameSize);
+        mainFrame.setSize(largeFrameSize);
+        mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
+        mainFrame.setLocationRelativeTo(null);
+        mainFrame.setTitle(Translator.toLocale(TranslateCode.TODO_FRAME_TITLE));
+        mainFrame.setVisible(true);
     }
 }
