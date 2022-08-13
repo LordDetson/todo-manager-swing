@@ -12,7 +12,7 @@
     <artifactId>view</artifactId>
 
     <properties>
-        <flatlaf.version>2.3</flatlaf.version>
+        <flatlaf.version>2.4</flatlaf.version>
         <lgooddatepicker.version>11.2.1</lgooddatepicker.version>
     </properties>
 
@@ -33,6 +33,11 @@
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
+            <version>${flatlaf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf-extras</artifactId>
             <version>${flatlaf.version}</version>
         </dependency>
         <dependency>

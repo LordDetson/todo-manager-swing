@@ -1,21 +1,13 @@
 package by.babanin.todo.view.util;
 
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.Objects;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-import javax.imageio.ImageIO;
-import javax.swing.Icon;
-import javax.swing.ImageIcon;
-
-import by.babanin.todo.view.exception.ResourceException;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class IconResources {
 
-    public static final String PNG = "png";
+    public static final String SVG = "svg";
 
     private static String iconsPath;
 
@@ -23,31 +15,16 @@ public class IconResources {
         IconResources.iconsPath = iconsPath;
     }
 
-    public static Icon getIcon(String name) {
-        return getIcon(name, PNG);
+    public static FlatSVGIcon getIcon(String name, int size) {
+        return getIcon(null, name, size, size);
     }
 
-    public static Icon getIcon(String name, String extension) {
-        return getIcon(null, name, extension);
-    }
-
-    public static Icon getIcon(String path, String name, String extension) {
+    public static FlatSVGIcon getIcon(String path, String name, int width, int height) {
         if(path == null || path.isBlank()) {
             path = "";
         }
         path = iconsPath + path;
-        InputStream resourceAsStream = getResourceAsStream(path, name, extension);
-        try {
-            BufferedImage image = ImageIO.read(resourceAsStream);
-            return new ImageIcon(image);
-        }
-        catch(IOException e) {
-            throw new ResourceException(e);
-        }
-    }
-
-    public static InputStream getResourceAsStream(String path, String name, String extension) {
-        InputStream imageStream = IconResources.class.getResourceAsStream(GUIUtils.buildResourcePath(path, name, extension));
-        return Objects.requireNonNull(imageStream);
+        path = GUIUtils.buildResourcePath(path, name, SVG);
+        return new FlatSVGIcon(path, width, height);
     }
 }

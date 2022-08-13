@@ -21,8 +21,8 @@ import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.task.todo.CreateTodoTask;
 import by.babanin.todo.task.Task;
+import by.babanin.todo.task.todo.CreateTodoTask;
 import by.babanin.todo.task.todo.UpdateTodoTask;
 import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CustomTableColumnModel;
@@ -36,7 +36,6 @@ import by.babanin.todo.view.renderer.StatusRenderer;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
-import by.babanin.todo.view.util.IconResources;
 import by.babanin.todo.view.util.ServiceHolder;
 
 public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
@@ -54,7 +53,7 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     protected void createUiComponents() {
         super.createUiComponents();
         priorityButton = new JButton();
-        priorityButton.setIcon(IconResources.getIcon("priority"));
+        priorityButton.setIcon(getCrudStyle().getIcon("priority_list"));
     }
 
     @Override

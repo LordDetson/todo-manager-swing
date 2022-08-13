@@ -33,7 +33,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
     private final TodoService todoService;
     private final ExecutorService executorService;
 
-    @Value("${application.resource.icons.path:/assets/icons/}")
+    @Value("${application.resource.icons.path:assets/icons/}")
     private String iconsPath;
 
     public UILauncher(ResourceBundleMessageSource messageSource, PriorityService priorityService, TodoService todoService,

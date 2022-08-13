@@ -7,9 +7,9 @@ import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.IconResources;
 
 public enum LogMessageType {
-    ERROR(TranslateCode.ERRORS, "red_exclamation_triangle"),
-    WARNING(TranslateCode.WARNINGS, "yellow_exclamation_triangle"),
-    INFORMATION(TranslateCode.INFORMATION, "circled_information"),
+    ERROR(TranslateCode.ERRORS, "error"),
+    WARNING(TranslateCode.WARNINGS, "warning"),
+    INFORMATION(TranslateCode.INFORMATION, "information"),
     ;
 
     private final String captionCode;
@@ -30,6 +30,6 @@ public enum LogMessageType {
     }
 
     public Icon getIcon() {
-        return IconResources.getIcon(iconName);
+        return IconResources.getIcon(iconName, 16);
     }
 }
