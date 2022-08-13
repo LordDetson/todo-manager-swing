@@ -21,11 +21,11 @@ import by.babanin.todo.application.service.CrudService;
 import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
+import by.babanin.todo.task.ExceptionListener;
 import by.babanin.todo.task.FinishListener;
 import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.Task;
 import by.babanin.todo.task.TaskManager;
-import by.babanin.todo.view.component.form.ApplyListener;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.translat.TranslateCode;
@@ -35,6 +35,7 @@ import by.babanin.todo.view.util.ServiceHolder;
 public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel {
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
+    private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
     private final Class<C> componentClass;
     private final transient FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
@@ -99,6 +100,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             selectRow(row);
         });
         addDeletionListener(result -> model.remove(result));
+        addExceptionListener(exception -> {
+            clear();
+            load();
+        });
     }
 
     public void addCreationListener(FinishListener<C> listener) {
@@ -120,6 +125,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private void addCrudListener(CrudAction crudAction, FinishListener<?> listener) {
         crudListenersMap.computeIfAbsent(crudAction, action -> new ArrayList<>());
         crudListenersMap.get(crudAction).add(listener);
+    }
+
+    public void addExceptionListener(ExceptionListener exceptionListener) {
+        exceptionListeners.add(exceptionListener);
     }
 
     protected void placeComponents() {
@@ -159,26 +168,31 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                     .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
         }
         task.addFinishListener(components -> actionEnabling());
+        exceptionListeners.forEach(task::addExceptionListener);
         TaskManager.run(task);
+    }
+
+    public void clear() {
+        table.clearSelection();
+        model.clear();
     }
 
     private void showCreationDialog(ActionEvent event) {
         ComponentForm<C> form = new ComponentForm<>(componentClass, formRowFactory, crudStyle);
-        form.addApplyListener(runCreationTask());
+        form.addApplyListener(this::runCreationTask);
         showComponentForm(form, TranslateCode.CREATION_DIALOG_TITLE);
     }
 
     @SuppressWarnings("unchecked")
-    private ApplyListener runCreationTask() {
-        return fieldValueMap -> {
-            Task<C> task = createCreationTask(fieldValueMap);
-            if(crudListenersMap.containsKey(CrudAction.CREATE)) {
-                crudListenersMap.get(CrudAction.CREATE)
-                        .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
-            }
-            task.addFinishListener(component -> actionEnabling());
-            TaskManager.run(task);
-        };
+    private void runCreationTask(Map<ReportField, ?> fieldValueMap) {
+        Task<C> task = createCreationTask(fieldValueMap);
+        if(crudListenersMap.containsKey(CrudAction.CREATE)) {
+            crudListenersMap.get(CrudAction.CREATE)
+                    .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
+        }
+        task.addFinishListener(component -> actionEnabling());
+        exceptionListeners.forEach(task::addExceptionListener);
+        TaskManager.run(task);
     }
 
     protected abstract Task<C> createCreationTask(Map<ReportField, ?> fieldValueMap);
@@ -186,21 +200,20 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private void showEditDialog(ActionEvent event) {
         C selectedComponent = getSelectedComponent();
         ComponentForm<C> form = new ComponentForm<>(componentClass, formRowFactory, crudStyle, selectedComponent);
-        form.addApplyListener(runUpdateTask(selectedComponent));
+        form.addApplyListener(fieldValueMap -> runUpdateTask(fieldValueMap, selectedComponent));
         showComponentForm(form, TranslateCode.EDIT_DIALOG_TITLE);
     }
 
     @SuppressWarnings("unchecked")
-    private ApplyListener runUpdateTask(C selectedComponent) {
-        return fieldValueMap -> {
-            Task<C> task = createUpdateTask(fieldValueMap, selectedComponent);
-            if(crudListenersMap.containsKey(CrudAction.UPDATE)) {
-                crudListenersMap.get(CrudAction.UPDATE)
-                        .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
-            }
-            task.addFinishListener(component -> actionEnabling());
-            TaskManager.run(task);
-        };
+    private void runUpdateTask(Map<ReportField, ?> fieldValueMap, C selectedComponent) {
+        Task<C> task = createUpdateTask(fieldValueMap, selectedComponent);
+        if(crudListenersMap.containsKey(CrudAction.UPDATE)) {
+            crudListenersMap.get(CrudAction.UPDATE)
+                    .forEach(finishListener -> task.addFinishListener((FinishListener<C>) finishListener));
+        }
+        task.addFinishListener(component -> actionEnabling());
+        exceptionListeners.forEach(task::addExceptionListener);
+        TaskManager.run(task);
     }
 
     protected abstract Task<C> createUpdateTask(Map<ReportField, ?> fieldValueMap, C selectedComponent);
@@ -236,6 +249,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                         .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
             }
             task.addFinishListener(components -> actionEnabling());
+            exceptionListeners.forEach(task::addExceptionListener);
             TaskManager.run(task);
         }
     }

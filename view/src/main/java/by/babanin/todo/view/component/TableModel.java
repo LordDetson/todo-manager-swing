@@ -101,4 +101,8 @@ public class TableModel<C> extends AbstractTableModel {
         list.removeAll(components);
         fireTableRowsDeleted(statistics.getMin(), statistics.getMax());
     }
+
+    public void clear() {
+        list.clear();
+    }
 }

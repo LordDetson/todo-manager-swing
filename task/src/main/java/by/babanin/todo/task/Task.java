@@ -10,5 +10,7 @@ public interface Task<R> extends Runnable {
 
     void removeFinishListener(FinishListener<R> listener);
 
-    void removeAllFinishListener();
+    void addExceptionListener(ExceptionListener listener);
+
+    void removeExceptionListener(ExceptionListener listener);
 }

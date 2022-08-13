@@ -4,11 +4,10 @@ import java.awt.EventQueue;
 import java.util.ArrayList;
 import java.util.List;
 
-import by.babanin.todo.task.exception.TaskException;
-
 public abstract class AbstractTask<R> implements Task<R> {
 
     private final List<FinishListener<R>> finishListeners = new ArrayList<>();
+    private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
     private String name;
 
     public abstract R execute();
@@ -19,8 +18,9 @@ public abstract class AbstractTask<R> implements Task<R> {
             R result = execute();
             EventQueue.invokeLater(() -> finishListeners.forEach(listener -> listener.accept(result)));
         }
-        catch(Exception throwable) {
-            throw new TaskException(throwable);
+        catch(Exception exception) {
+            EventQueue.invokeLater(() -> exceptionListeners.forEach(listener -> listener.accept(exception)));
+            throw exception;
         }
     }
 
@@ -45,7 +45,12 @@ public abstract class AbstractTask<R> implements Task<R> {
     }
 
     @Override
-    public void removeAllFinishListener() {
-        finishListeners.clear();
+    public void addExceptionListener(ExceptionListener listener) {
+        exceptionListeners.add(listener);
+    }
+
+    @Override
+    public void removeExceptionListener(ExceptionListener listener) {
+        exceptionListeners.remove(listener);
     }
 }
