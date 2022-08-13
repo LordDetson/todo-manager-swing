@@ -28,6 +28,7 @@ import by.babanin.todo.task.Task;
 import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormRowFactory;
+import by.babanin.todo.view.progress.ProgressDialog;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.ServiceHolder;
@@ -169,6 +170,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         }
         task.addFinishListener(components -> actionEnabling());
         exceptionListeners.forEach(task::addExceptionListener);
+        ProgressDialog.initiate(task);
         TaskManager.run(task);
     }
 
@@ -192,6 +194,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         }
         task.addFinishListener(component -> actionEnabling());
         exceptionListeners.forEach(task::addExceptionListener);
+        ProgressDialog.initiate(task);
         TaskManager.run(task);
     }
 
@@ -213,6 +216,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         }
         task.addFinishListener(component -> actionEnabling());
         exceptionListeners.forEach(task::addExceptionListener);
+        ProgressDialog.initiate(task);
         TaskManager.run(task);
     }
 
@@ -250,6 +254,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             }
             task.addFinishListener(components -> actionEnabling());
             exceptionListeners.forEach(task::addExceptionListener);
+            ProgressDialog.initiate(task);
             TaskManager.run(task);
         }
     }
