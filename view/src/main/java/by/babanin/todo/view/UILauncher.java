@@ -2,6 +2,7 @@ package by.babanin.todo.view;
 
 import java.awt.Dimension;
 import java.awt.EventQueue;
+import java.awt.Font;
 import java.util.concurrent.ExecutorService;
 
 import javax.swing.JFrame;
@@ -22,6 +23,7 @@ import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.exception.ExceptionHandler;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.util.FontResources;
 import by.babanin.todo.view.util.GUIUtils;
 import by.babanin.todo.view.util.IconResources;
 import by.babanin.todo.view.util.ServiceHolder;
@@ -36,6 +38,15 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
 
     @Value("${application.resource.icons.path:assets/icons/}")
     private String iconsPath;
+
+    @Value("${application.resource.fonts.path:assets/fonts/}")
+    private String fontsPath;
+
+    @Value("${application.resource.font:Rubik}")
+    private String fontName;
+
+    @Value("${application.resource.fonts.size:16}")
+    private int fontSize;
 
     public UILauncher(ResourceBundleMessageSource messageSource, PriorityService priorityService, TodoService todoService,
             ExecutorService executorService) {
@@ -54,6 +65,8 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         IconResources.setIconsPath(iconsPath);
         TaskManager.setExecutorService(executorService);
         ComponentRepresentation.initializeComponentRepresentationMap();
+        FontResources.registerAdditionalFonts(fontsPath);
+        FontResources.applyFontByDefault(new Font(fontName, Font.PLAIN, fontSize));
 
         FlatDarculaLaf.setup();
         EventQueue.invokeLater(this::showMainFrame);
