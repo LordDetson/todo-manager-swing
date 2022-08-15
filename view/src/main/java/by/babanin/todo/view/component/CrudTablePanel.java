@@ -20,6 +20,7 @@ import javax.swing.JToolBar;
 
 import by.babanin.todo.application.service.CrudService;
 import by.babanin.todo.model.Persistent;
+import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
 import by.babanin.todo.task.ExceptionListener;
@@ -39,7 +40,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
-    private final Class<C> componentClass;
+    private final transient ComponentRepresentation<C> representation;
     private final transient FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
 
@@ -48,11 +49,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private JButton editButton;
     private JButton deleteButton;
     private TableModel<C> model;
-    private CustomTableColumnModel<C> columnModel;
+    private CustomTableColumnModel columnModel;
     private JTable table;
 
     protected CrudTablePanel(Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
-        this.componentClass = componentClass;
+        this.representation = ComponentRepresentation.get(componentClass);
         this.formRowFactory = formRowFactory;
         this.crudStyle = crudStyle;
 
@@ -65,8 +66,12 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     protected void createUiComponents() {
         toolBar = new JToolBar();
-        model = createTableModel(componentClass);
-        columnModel = new CustomTableColumnModel<>(componentClass, crudStyle);
+        List<String> excludedFieldFromTable = crudStyle.getExcludedFieldFromTable();
+        List<ReportField> reportFields = representation.getFields().stream()
+                .filter(field -> !excludedFieldFromTable.contains(field.getName()))
+                .toList();
+        model = createTableModel(representation, reportFields);
+        columnModel = new CustomTableColumnModel(reportFields);
         table = new JTable();
 
         createButton = new JButton(crudStyle.getCreateButtonIcon());
@@ -74,11 +79,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         deleteButton = new JButton(crudStyle.getDeleteButtonIcon());
     }
 
-    protected TableModel<C> createTableModel(Class<C> componentClass) {
-        return new TableModel<>(componentClass);
+    protected TableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
+        return new TableModel<>(representation, fields);
     }
 
-    protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel<C> columnModel) {
+    protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel columnModel) {
         table.setModel(model);
         table.setColumnModel(columnModel);
     }
@@ -165,7 +170,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     @SuppressWarnings("unchecked")
     public void load() {
-        GetTask<C, I, CrudService<C, I>> task = new GetTask<>(ServiceHolder.getCrudService(componentClass));
+        GetTask<C, I, CrudService<C, I>> task = new GetTask<>(ServiceHolder.getCrudService(representation.getComponentClass()));
         if(crudListenersMap.containsKey(CrudAction.READ)) {
             crudListenersMap.get(CrudAction.READ)
                     .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
@@ -182,7 +187,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     }
 
     private void showCreationDialog(ActionEvent event) {
-        ComponentForm<C> form = new ComponentForm<>(componentClass, formRowFactory, crudStyle);
+        ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle);
         form.addApplyListener(this::runCreationTask);
         showComponentForm(form, TranslateCode.CREATION_DIALOG_TITLE);
     }
@@ -205,7 +210,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private void showEditDialog(ActionEvent event) {
         C selectedComponent = getSelectedComponent()
                 .orElseThrow(() -> new ViewException("Can't open edit dialog because component is not selected"));
-        ComponentForm<C> form = new ComponentForm<>(componentClass, formRowFactory, crudStyle, selectedComponent);
+        ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle, selectedComponent);
         form.addApplyListener(fieldValueMap -> runUpdateTask(fieldValueMap, selectedComponent));
         showComponentForm(form, TranslateCode.EDIT_DIALOG_TITLE);
     }
@@ -230,7 +235,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         JDialog dialog = new JDialog(frame, true);
         dialog.setContentPane(form);
         form.setOwner(dialog);
-        dialog.setTitle(Translator.toLocale(titleCode).formatted(Translator.getComponentCaption(componentClass)));
+        dialog.setTitle(Translator.toLocale(titleCode).formatted(Translator.getComponentCaption(representation.getComponentClass())));
         dialog.pack();
         dialog.setLocationRelativeTo(frame);
         dialog.setMinimumSize(dialog.getSize());
@@ -240,7 +245,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     @SuppressWarnings("unchecked")
     private void showDeleteConfirmDialog(ActionEvent event) {
         Frame frame = JOptionPane.getFrameForComponent(CrudTablePanel.this);
-        String componentPluralCaption = Translator.getComponentPluralCaption(componentClass);
+        String componentPluralCaption = Translator.getComponentPluralCaption(representation.getComponentClass());
         int result = JOptionPane.showConfirmDialog(frame,
                 Translator.toLocale(TranslateCode.DELETION_CONFIRM_MESSAGE).formatted(componentPluralCaption.toLowerCase()),
                 Translator.toLocale(TranslateCode.DELETE_DIALOG_TITLE).formatted(componentPluralCaption),
@@ -250,7 +255,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             List<I> ids = selectedComponents.stream()
                     .map(Persistent::getId)
                     .toList();
-            DeleteTask<C, I, CrudService<C, I>> task = new DeleteTask<>(ServiceHolder.getCrudService(componentClass), ids);
+            DeleteTask<C, I, CrudService<C, I>> task = new DeleteTask<>(ServiceHolder.getCrudService(representation.getComponentClass()), ids);
             if(crudListenersMap.containsKey(CrudAction.DELETE)) {
                 crudListenersMap.get(CrudAction.DELETE)
                         .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
@@ -262,8 +267,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         }
     }
 
-    protected Class<C> getComponentClass() {
-        return componentClass;
+    public ComponentRepresentation<C> getRepresentation() {
+        return representation;
     }
 
     protected CrudStyle getCrudStyle() {

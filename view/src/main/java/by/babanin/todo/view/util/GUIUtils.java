@@ -185,8 +185,8 @@ public final class GUIUtils {
         return datePicker;
     }
 
-    public static TableColumn createTableColumn(ReportField field) {
-        TableColumn column = new TableColumn(field.getIndex());
+    public static TableColumn createTableColumn(ReportField field, int modelIndex) {
+        TableColumn column = new TableColumn(modelIndex);
         column.setIdentifier(field.getName());
         column.setHeaderValue(Translator.getFieldCaption(field));
         return column;

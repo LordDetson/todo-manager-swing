@@ -4,10 +4,9 @@ import java.util.Map;
 
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.model.Priority;
-import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.task.priority.CreatePriorityTask;
 import by.babanin.todo.task.Task;
+import by.babanin.todo.task.priority.CreatePriorityTask;
 import by.babanin.todo.task.priority.UpdatePriorityTask;
 import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
@@ -25,14 +24,12 @@ public class PriorityCrudTablePanel extends MovableCrudTablePanel<Priority, Long
     @Override
     protected Task<Priority> createCreationTask(Map<ReportField, ?> fieldValueMap) {
         PriorityService service = ServiceHolder.getPriorityService();
-        ComponentRepresentation<Priority> representation = ComponentRepresentation.get(getComponentClass());
-        return new CreatePriorityTask(service, representation, fieldValueMap);
+        return new CreatePriorityTask(service, getRepresentation(), fieldValueMap);
     }
 
     @Override
     protected Task<Priority> createUpdateTask(Map<ReportField, ?> fieldValueMap, Priority selectedComponent) {
         PriorityService service = ServiceHolder.getPriorityService();
-        ComponentRepresentation<Priority> representation = ComponentRepresentation.get(getComponentClass());
-        return new UpdatePriorityTask(service, representation, fieldValueMap, selectedComponent);
+        return new UpdatePriorityTask(service, getRepresentation(), fieldValueMap, selectedComponent);
     }
 }

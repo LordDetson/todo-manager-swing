@@ -16,10 +16,12 @@ import by.babanin.todo.representation.ReportField;
 public class TableModel<C> extends AbstractTableModel {
 
     private final List<C> list = new ArrayList<>();
-    private final transient ComponentRepresentation<C> componentRepresentation;
+    private final transient ComponentRepresentation<C> representation;
+    private final List<ReportField> fields;
 
-    public TableModel(Class<C> componentClass) {
-        this.componentRepresentation = ComponentRepresentation.get(componentClass);
+    public TableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
+        this.representation = representation;
+        this.fields = Collections.unmodifiableList(fields);
     }
 
     @Override
@@ -29,19 +31,19 @@ public class TableModel<C> extends AbstractTableModel {
 
     @Override
     public int getColumnCount() {
-        return componentRepresentation.getFields().size();
+        return fields.size();
     }
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
         C component = list.get(rowIndex);
-        ReportField field = componentRepresentation.getFields().get(columnIndex);
-        return componentRepresentation.getValueAt(component, field);
+        ReportField field = fields.get(columnIndex);
+        return representation.getValueAt(component, field);
     }
 
     @Override
     public Class<?> getColumnClass(int columnIndex) {
-        return componentRepresentation.getFields().get(columnIndex).getType();
+        return fields.get(columnIndex).getType();
     }
 
     @Override

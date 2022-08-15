@@ -19,7 +19,6 @@ import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
-import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.Task;
 import by.babanin.todo.task.todo.CreateTodoTask;
@@ -58,7 +57,7 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     @Override
-    protected void setupTable(JTable table, TableModel<Todo> model, CustomTableColumnModel<Todo> columnModel) {
+    protected void setupTable(JTable table, TableModel<Todo> model, CustomTableColumnModel columnModel) {
         super.setupTable(table, model, columnModel);
         table.setDefaultRenderer(Priority.class, new PriorityRenderer());
         table.setDefaultRenderer(Status.class, new StatusRenderer());
@@ -123,14 +122,12 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     @Override
     protected Task<Todo> createCreationTask(Map<ReportField, ?> fieldValueMap) {
         TodoService service = ServiceHolder.getTodoService();
-        ComponentRepresentation<Todo> representation = ComponentRepresentation.get(getComponentClass());
-        return new CreateTodoTask(service, representation, fieldValueMap);
+        return new CreateTodoTask(service, getRepresentation(), fieldValueMap);
     }
 
     @Override
     protected Task<Todo> createUpdateTask(Map<ReportField, ?> fieldValueMap, Todo selectedComponent) {
         TodoService service = ServiceHolder.getTodoService();
-        ComponentRepresentation<Todo> representation = ComponentRepresentation.get(getComponentClass());
-        return new UpdateTodoTask(service, representation, fieldValueMap, selectedComponent);
+        return new UpdateTodoTask(service, getRepresentation(), fieldValueMap, selectedComponent);
     }
 }

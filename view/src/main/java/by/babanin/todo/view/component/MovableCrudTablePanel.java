@@ -1,6 +1,7 @@
 package by.babanin.todo.view.component;
 
 import java.awt.event.ActionEvent;
+import java.util.List;
 
 import javax.swing.JButton;
 import javax.swing.JTable;
@@ -8,6 +9,8 @@ import javax.swing.JTable;
 import by.babanin.todo.application.service.IndexableCrudService;
 import by.babanin.todo.model.Indexable;
 import by.babanin.todo.model.Persistent;
+import by.babanin.todo.representation.ComponentRepresentation;
+import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.SwapTask;
 import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.form.FormRowFactory;
@@ -32,8 +35,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     }
 
     @Override
-    protected IndexableTableModel<C> createTableModel(Class<C> componentClass) {
-        return new IndexableTableModel<>(componentClass);
+    protected IndexableTableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
+        return new IndexableTableModel<>(representation, fields);
     }
 
     @Override
@@ -79,7 +82,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
         int selectedIndex = model.indexOf(selectedComponent);
         int directionCount = direction == Direction.UP ? -1 : 1;
         int nextIndex = selectedIndex + directionCount;
-        IndexableCrudService<C, I> service = (IndexableCrudService<C, I>) ServiceHolder.getCrudService(getComponentClass());
+        Class<C> componentClass = getRepresentation().getComponentClass();
+        IndexableCrudService<C, I> service = (IndexableCrudService<C, I>) ServiceHolder.getCrudService(componentClass);
         SwapTask<C, I, IndexableCrudService<C, I>> task = new SwapTask<>(service, selectedIndex, nextIndex);
         task.addFinishListener(unused -> {
             model.swap(selectedIndex, nextIndex);

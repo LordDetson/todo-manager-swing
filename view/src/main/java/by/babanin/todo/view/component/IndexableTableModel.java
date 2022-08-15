@@ -1,14 +1,17 @@
 package by.babanin.todo.view.component;
 
 import java.util.Collections;
+import java.util.List;
 
 import by.babanin.todo.model.Indexable;
+import by.babanin.todo.representation.ComponentRepresentation;
+import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ViewException;
 
 public class IndexableTableModel<C extends Indexable> extends TableModel<C> {
 
-    public IndexableTableModel(Class<C> componentClass) {
-        super(componentClass);
+    public IndexableTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
+        super(representation, fields);
     }
 
     public void swap(int index1, int index2) {
