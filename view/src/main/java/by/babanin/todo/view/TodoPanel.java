@@ -31,6 +31,7 @@ public class TodoPanel extends JPanel {
 
     private void addListeners() {
         crudTablePanel.getTable().getSelectionModel().addListSelectionListener(event -> showTodoDescription());
+        crudTablePanel.addEditListener(todo -> showTodoDescription());
     }
 
     private void placeComponents() {
