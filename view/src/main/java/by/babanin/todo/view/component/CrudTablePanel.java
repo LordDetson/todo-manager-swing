@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import javax.swing.JButton;
 import javax.swing.JDialog;
@@ -28,6 +29,7 @@ import by.babanin.todo.task.Task;
 import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormRowFactory;
+import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.progress.ProgressDialog;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
@@ -64,7 +66,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     protected void createUiComponents() {
         toolBar = new JToolBar();
         model = createTableModel(componentClass);
-        columnModel = new CustomTableColumnModel<>(componentClass);
+        columnModel = new CustomTableColumnModel<>(componentClass, crudStyle);
         table = new JTable();
 
         createButton = new JButton(crudStyle.getCreateButtonIcon());
@@ -201,7 +203,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     protected abstract Task<C> createCreationTask(Map<ReportField, ?> fieldValueMap);
 
     private void showEditDialog(ActionEvent event) {
-        C selectedComponent = getSelectedComponent();
+        C selectedComponent = getSelectedComponent()
+                .orElseThrow(() -> new ViewException("Can't open edit dialog because component is not selected"));
         ComponentForm<C> form = new ComponentForm<>(componentClass, formRowFactory, crudStyle, selectedComponent);
         form.addApplyListener(fieldValueMap -> runUpdateTask(fieldValueMap, selectedComponent));
         showComponentForm(form, TranslateCode.EDIT_DIALOG_TITLE);
@@ -267,8 +270,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         return crudStyle;
     }
 
-    public C getSelectedComponent() {
-        return model.get(table.getSelectedRow());
+    public Optional<C> getSelectedComponent() {
+        return Optional.ofNullable(model.get(table.getSelectedRow()));
     }
 
     public List<C> getSelectedComponents() {

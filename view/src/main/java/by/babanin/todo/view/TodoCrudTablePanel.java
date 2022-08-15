@@ -46,7 +46,8 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
         super(Todo.class, new TodoFormRowFactory(), new CrudStyle()
                 .setValidatorFactory(new TodoValidatorFactory())
                 .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
-                .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate));
+                .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate)
+                .excludeFieldFromTable(Fields.description));
     }
 
     @Override
@@ -112,7 +113,9 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     protected boolean canEdit() {
         boolean canEdit = super.canEdit();
         if(canEdit) {
-            canEdit = !StatusWorkflow.get(getSelectedComponent()).isFinalStatus();
+            canEdit = getSelectedComponent()
+                    .map(todo -> !StatusWorkflow.get(todo).isFinalStatus())
+                    .orElse(false);
         }
         return canEdit;
     }

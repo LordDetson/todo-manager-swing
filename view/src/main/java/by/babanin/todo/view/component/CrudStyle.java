@@ -29,6 +29,7 @@ public class CrudStyle implements Serializable {
     private transient ValidatorFactory validatorFactory;
     private final List<String> excludedFieldFromCreationForm = new ArrayList<>();
     private final List<String> excludedFieldFromEditForm = new ArrayList<>();
+    private final List<String> excludedFieldFromTable = new ArrayList<>();
 
     public Icon getCreateButtonIcon() {
         return getIcon(createButtonIconName);
@@ -116,6 +117,15 @@ public class CrudStyle implements Serializable {
 
     public CrudStyle excludeFieldFromEditForm(String... fields) {
         this.excludedFieldFromEditForm.addAll(List.of(fields));
+        return this;
+    }
+
+    public List<String> getExcludedFieldFromTable() {
+        return Collections.unmodifiableList(excludedFieldFromTable);
+    }
+
+    public CrudStyle excludeFieldFromTable(String... fields) {
+        this.excludedFieldFromTable.addAll(List.of(fields));
         return this;
     }
 }

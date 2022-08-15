@@ -76,7 +76,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         JFrame mainFrame = new JFrame();
         GUIUtils.setMainWindow(mainFrame);
 
-        TodoCrudTablePanel todoPanel = new TodoCrudTablePanel();
+        TodoPanel todoPanel = new TodoPanel();
         todoPanel.load();
         mainFrame.setContentPane(todoPanel);
 

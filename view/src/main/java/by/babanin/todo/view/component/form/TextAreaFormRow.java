@@ -39,5 +39,6 @@ public class TextAreaFormRow extends FormRow<String> {
     @Override
     public void setValue(String value) {
         textArea.setText(value);
+        textArea.setCaretPosition(0);
     }
 }

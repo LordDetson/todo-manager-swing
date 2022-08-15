@@ -30,6 +30,7 @@ public class TranslateCode {
     public static final String EXCEPTION_OK_BUTTON_TEXT = "exception.ok.button.text";
     public static final String EXCEPTION_SAVE_BUTTON_TEXT = "exception.save.button.text";
     public static final String EXCEPTION_SHOW_DETAILS_BUTTON_TEXT = "exception.showDetails.button.text";
+    public static final String NO_DESCRIPTION_TO_SHOW = "message.no.description.to.show";
 
     public static final String TODO_STATUS = "todo.status.%s";
     public static final String FIELD_CAPTION = "%s.%s.caption";

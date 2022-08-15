@@ -11,6 +11,7 @@ import by.babanin.todo.model.Persistent;
 import by.babanin.todo.task.SwapTask;
 import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.form.FormRowFactory;
+import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.util.ServiceHolder;
 
 public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable, I> extends CrudTablePanel<C, I> {
@@ -73,7 +74,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
 
     private void moveComponent(Direction direction) {
         IndexableTableModel<C> model = getModel();
-        C selectedComponent = getSelectedComponent();
+        C selectedComponent = getSelectedComponent()
+                .orElseThrow(() -> new ViewException("Can't move component because component is not selected"));
         int selectedIndex = model.indexOf(selectedComponent);
         int directionCount = direction == Direction.UP ? -1 : 1;
         int nextIndex = selectedIndex + directionCount;
