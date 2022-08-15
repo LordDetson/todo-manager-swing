@@ -37,18 +37,7 @@ services:
       - POSTGRES_PASSWORD=sonar
     volumes:
       - postgresql:/var/lib/postgresql
-      - postgresql_data:/var/lib/postgresql/data
-
-  mysql:
-    image: mysql/mysql-server:8.0-amd64
-    volumes:
-      - '//c/Servers and other/mysql_home:/var/lib/mysql'
-    ports:
-      - '3306:3306'
-    environment:
-      - MYSQL_ROOT_HOST=%
-      - MYSQL_ROOT_PASSWORD=root
-      - MYSQL_DATABASE=todo
+      - postgresql_data:/var/lib/postgresql/data1
 
 networks:
   sonarnet:
