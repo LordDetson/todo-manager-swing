@@ -39,7 +39,7 @@
                             <goal>repackage</goal>
                         </goals>
                         <configuration>
-                            <mainClass>by.babanin.todo.Application</mainClass>
+                            <mainClass>by.babanin.todo.DataGenerationLauncher</mainClass>
                             <finalName>${project.client.name}-${artifactId}-${version}</finalName>
                         </configuration>
                     </execution>
