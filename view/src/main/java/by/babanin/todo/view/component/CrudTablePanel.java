@@ -75,8 +75,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         table = new JTable();
 
         createButton = new JButton(crudStyle.getCreateButtonIcon());
+        createButton.setToolTipText(crudStyle.getCreateButtonToolTip());
         editButton = new JButton(crudStyle.getEditButtonIcon());
+        editButton.setToolTipText(crudStyle.getEditButtonToolTip());
         deleteButton = new JButton(crudStyle.getDeleteButtonIcon());
+        deleteButton.setToolTipText(crudStyle.getDeleteButtonToolTip());
     }
 
     protected TableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {

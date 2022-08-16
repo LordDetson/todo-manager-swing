@@ -31,7 +31,9 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
         super.createUiComponents();
         CrudStyle crudStyle = getCrudStyle();
         moveUpButton = new JButton(crudStyle.getMoveUpButtonIcon());
+        moveUpButton.setToolTipText(crudStyle.getMoveUpButtonToolTip());
         moveDownButton = new JButton(crudStyle.getMoveDownButtonIcon());
+        moveDownButton.setToolTipText(crudStyle.getMoveDownButtonToolTip());
     }
 
     @Override

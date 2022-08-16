@@ -54,6 +54,7 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
         super.createUiComponents();
         priorityButton = new JButton();
         priorityButton.setIcon(getCrudStyle().getIcon("priority_list"));
+        priorityButton.setToolTipText(Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES));
     }
 
     @Override

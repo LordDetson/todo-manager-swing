@@ -1,5 +1,7 @@
 package by.babanin.todo.view.component;
 
+import static by.babanin.todo.view.translat.TranslateCode.*;
+
 import java.awt.Color;
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -14,6 +16,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter;
 
 import by.babanin.todo.view.component.validation.ValidatorFactory;
+import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.IconResources;
 
 public class CrudStyle implements Serializable {
@@ -25,6 +28,11 @@ public class CrudStyle implements Serializable {
     private String deleteButtonIconName = "minus";
     private String moveUpButtonIconName = "chevron_up";
     private String moveDownButtonIconName = "chevron_down";
+    private String createButtonToolTipCode = TOOLTIP_BUTTON_CREATE;
+    private String editButtonToolTipCode = TOOLTIP_BUTTON_EDIT;
+    private String deleteButtonToolTipCode = TOOLTIP_BUTTON_DELETE;
+    private String moveUpButtonToolTipCode = TOOLTIP_BUTTON_MOVE_UP;
+    private String moveDownButtonToolTipCode = TOOLTIP_BUTTON_MOVE_DOWN;
     private int iconSize = DEFAULT_ICON_SIZE;
     private transient ValidatorFactory validatorFactory;
     private final List<String> excludedFieldFromCreationForm = new ArrayList<>();
@@ -77,6 +85,51 @@ public class CrudStyle implements Serializable {
         colorFilter.add(Color.BLACK, UIManager.getDefaults().getColor("Button.foreground"));
         icon.setColorFilter(colorFilter);
         return icon;
+    }
+
+    public String getCreateButtonToolTip() {
+        return Translator.toLocale(createButtonToolTipCode);
+    }
+
+    public CrudStyle setCreateButtonToolTipCode(String createButtonToolTipCode) {
+        this.createButtonToolTipCode = createButtonToolTipCode;
+        return this;
+    }
+
+    public String getEditButtonToolTip() {
+        return Translator.toLocale(editButtonToolTipCode);
+    }
+
+    public CrudStyle setEditButtonToolTipCode(String editButtonToolTipCode) {
+        this.editButtonToolTipCode = editButtonToolTipCode;
+        return this;
+    }
+
+    public String getDeleteButtonToolTip() {
+        return Translator.toLocale(deleteButtonToolTipCode);
+    }
+
+    public CrudStyle setDeleteButtonToolTipCode(String deleteButtonToolTipCode) {
+        this.deleteButtonToolTipCode = deleteButtonToolTipCode;
+        return this;
+    }
+
+    public String getMoveUpButtonToolTip() {
+        return Translator.toLocale(moveUpButtonToolTipCode);
+    }
+
+    public CrudStyle setMoveUpButtonToolTipCode(String moveUpButtonToolTipCode) {
+        this.moveUpButtonToolTipCode = moveUpButtonToolTipCode;
+        return this;
+    }
+
+    public String getMoveDownButtonToolTip() {
+        return Translator.toLocale(moveDownButtonToolTipCode);
+    }
+
+    public CrudStyle setMoveDownButtonToolTipCode(String moveDownButtonToolTipCode) {
+        this.moveDownButtonToolTipCode = moveDownButtonToolTipCode;
+        return this;
     }
 
     public CrudStyle setMoveDownButtonIconName(String moveDownButtonIconName) {
