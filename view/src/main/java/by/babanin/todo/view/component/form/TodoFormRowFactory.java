@@ -1,9 +1,14 @@
 package by.babanin.todo.view.component.form;
 
+import java.time.LocalDate;
+
+import com.github.lgooddatepicker.zinternaltools.DateVetoPolicyMinimumMaximumDate;
+
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.component.datepicker.CustomDatePicker;
 import by.babanin.todo.view.exception.ViewException;
 
 public class TodoFormRowFactory implements FormRowFactory {
@@ -28,7 +33,9 @@ public class TodoFormRowFactory implements FormRowFactory {
                 formRow = new StatusComboBoxFormRow(field);
             }
             else if(fieldName.equals(Fields.plannedDate)) {
-                formRow = new LocalDateFormRow(field);
+                CustomDatePicker datePicker = new CustomDatePicker();
+                datePicker.getSettings().setVetoPolicy(new DateVetoPolicyMinimumMaximumDate(LocalDate.now(), LocalDate.MAX));
+                formRow = new LocalDateFormRow(datePicker, field);
             }
             return (FormRow<Object>) formRow;
         }

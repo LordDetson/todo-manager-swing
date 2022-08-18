@@ -1,6 +1,5 @@
 package by.babanin.todo.view.util;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dialog;
@@ -23,11 +22,8 @@ import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
-import javax.swing.JTextField;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
-import javax.swing.UIDefaults;
-import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -35,10 +31,6 @@ import javax.swing.event.DocumentListener;
 import javax.swing.table.TableColumn;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
-
-import com.github.lgooddatepicker.components.DatePicker;
-import com.github.lgooddatepicker.components.DatePickerSettings;
-import com.github.lgooddatepicker.components.DatePickerSettings.DateArea;
 
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ResourceException;
@@ -149,49 +141,6 @@ public final class GUIUtils {
         if(d != null) {
             d.addDocumentListener(dl);
         }
-    }
-
-    public static DatePicker createDatePicker() {
-        UIDefaults defaults = UIManager.getDefaults();
-
-        Color panelBackground = defaults.getColor("Panel.background");
-        Color buttonBackground = defaults.getColor("Button.background");
-        Color buttonForeground = defaults.getColor("Button.foreground");
-        Color textFieldBackground = defaults.getColor("TextField.background");
-        Color textFieldForeground = defaults.getColor("TextField.foreground");
-
-        DatePickerSettings dateSettings = new DatePickerSettings();
-
-        dateSettings.setColor(DateArea.BackgroundOverallCalendarPanel, panelBackground);
-        dateSettings.setColor(DateArea.CalendarBackgroundNormalDates, panelBackground);
-        dateSettings.setColor(DateArea.CalendarBorderSelectedDate, panelBackground);
-        dateSettings.setColor(DateArea.BackgroundMonthAndYearMenuLabels, panelBackground);
-        dateSettings.setColor(DateArea.BackgroundTodayLabel, panelBackground);
-        dateSettings.setColor(DateArea.BackgroundClearLabel, panelBackground);
-
-        dateSettings.setColor(DateArea.BackgroundCalendarPanelLabelsOnHover, buttonBackground);
-        dateSettings.setColor(DateArea.CalendarBackgroundSelectedDate, buttonBackground);
-        dateSettings.setColorBackgroundWeekdayLabels(buttonBackground, true);
-        dateSettings.setColorBackgroundWeekNumberLabels(buttonBackground, true);
-
-        dateSettings.setColor(DateArea.CalendarDefaultTextHighlightedDates, buttonForeground);
-        dateSettings.setColor(DateArea.CalendarTextNormalDates, buttonForeground);
-        dateSettings.setColor(DateArea.CalendarTextWeekdays, buttonForeground);
-        dateSettings.setColor(DateArea.CalendarTextWeekNumbers, buttonForeground);
-
-        dateSettings.setColor(DateArea.TextFieldBackgroundInvalidDate, textFieldBackground);
-        dateSettings.setColor(DateArea.TextFieldBackgroundValidDate, textFieldBackground);
-        dateSettings.setColor(DateArea.TextFieldBackgroundVetoedDate, textFieldBackground);
-
-        dateSettings.setColor(DateArea.DatePickerTextValidDate, textFieldForeground);
-        dateSettings.setColor(DateArea.DatePickerTextVetoedDate, textFieldForeground);
-
-        dateSettings.setAllowKeyboardEditing(false);
-        dateSettings.setBorderCalendarPopup(new JTextField().getBorder());
-
-        DatePicker datePicker = new DatePicker(dateSettings);
-        datePicker.getComponentDateTextField().setBorder(new JTextField().getBorder());
-        return datePicker;
     }
 
     public static TableColumn createTableColumn(ReportField field, int modelIndex) {

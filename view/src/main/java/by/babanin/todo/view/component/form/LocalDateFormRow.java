@@ -5,21 +5,19 @@ import java.time.LocalDate;
 
 import javax.swing.JComponent;
 
-import com.github.lgooddatepicker.components.DatePicker;
-
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.todo.view.component.datepicker.CustomDatePicker;
 
 public class LocalDateFormRow extends FormRow<LocalDate> {
 
-    private final DatePicker datePicker;
+    private final CustomDatePicker datePicker;
 
-    public LocalDateFormRow(ReportField field) {
+    public LocalDateFormRow(CustomDatePicker datePicker, ReportField field) {
         super(field);
-        datePicker = GUIUtils.createDatePicker();
-        datePicker.setMaximumSize(new Dimension(datePicker.getMaximumSize().width, datePicker.getPreferredSize().height));
-        datePicker.getSettings().setAllowEmptyDates(!field.isMandatory());
-        datePicker.addDateChangeListener(dateChangeEvent -> stateChanged());
+        this.datePicker = datePicker;
+        this.datePicker.setMaximumSize(new Dimension(datePicker.getMaximumSize().width, datePicker.getPreferredSize().height));
+        this.datePicker.getSettings().setAllowEmptyDates(!field.isMandatory());
+        this.datePicker.addDateChangeListener(dateChangeEvent -> stateChanged());
     }
 
     @Override
