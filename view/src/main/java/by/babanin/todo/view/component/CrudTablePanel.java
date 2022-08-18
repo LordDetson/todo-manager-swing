@@ -114,24 +114,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     protected void addListeners() {
         table.getSelectionModel().addListSelectionListener(event -> actionEnabling());
 
-        addCreationListener(result -> {
-            model.add(result);
-            selectComponent(result);
-        });
-        addLoadListener(result -> {
-            model.addAll(result);
-            selectFirstRow();
-        });
-        addEditListener(result -> {
-            int row = table.getSelectedRow();
-            model.set(row, result);
-            selectRow(row);
-        });
-        addDeletionListener(result -> model.remove(result));
-        addExceptionListener(exception -> {
-            clear();
-            load();
-        });
+        addCreationListener(this::handleCreation);
+        addLoadListener(this::handleLoad);
+        addEditListener(this::handleEdit);
+        addDeletionListener(this::handleDeletion);
+        addExceptionListener(this::handleException);
     }
 
     public void addCreationListener(FinishListener<C> listener) {
@@ -157,6 +144,30 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     public void addExceptionListener(ExceptionListener exceptionListener) {
         exceptionListeners.add(exceptionListener);
+    }
+
+    protected void handleCreation(C result) {
+        model.add(result);
+        selectComponent(result);
+    }
+
+    protected void handleLoad(List<C> result) {
+        model.addAll(result);
+        selectFirstRow();
+    }
+
+    protected void handleEdit(C result) {
+        int row = table.getSelectedRow();
+        model.set(row, result);
+        selectRow(row);
+    }
+
+    protected void handleDeletion(List<C> result) {
+        model.remove(result);
+    }
+
+    protected void handleException(Exception exception) {
+        reload();
     }
 
     protected void placeComponents() {
@@ -204,6 +215,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     public void clear() {
         table.clearSelection();
         model.clear();
+    }
+
+    public void reload() {
+        clear();
+        load();
     }
 
     private void showCreationDialog() {

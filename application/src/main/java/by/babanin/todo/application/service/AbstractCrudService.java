@@ -76,7 +76,7 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public List<E> getAll() {
-        return Collections.unmodifiableList(repository.findAll(Sort.by(Direction.ASC, Fields.position)));
+        return repository.findAll(Sort.by(Direction.ASC, Fields.position));
     }
 
     @Transactional

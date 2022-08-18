@@ -75,6 +75,12 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
         table.setDefaultRenderer(LocalDate.class, new LocalDataRenderer());
     }
 
+    @Override
+    protected void handleCreation(Todo result) {
+        getModel().add((int) result.getPosition(), result);
+        selectComponent(result);
+    }
+
     private void showPriorityDialog() {
         PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
         priorityPanel.addEditListener(priority -> {

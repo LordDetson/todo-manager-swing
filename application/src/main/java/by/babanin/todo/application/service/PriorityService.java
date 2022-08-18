@@ -13,7 +13,7 @@ import by.babanin.todo.application.repository.PriorityRepository;
 import by.babanin.todo.model.Priority;
 
 @Component
-public class PriorityService extends IndexableCrudService<Priority, Long> {
+public class PriorityService extends AbstractIndexableCrudService<Priority, Long> {
 
     private static final String FORBIDDEN_SYMBOLS_FOR_NAME = "~`!@#$%^&*()_+='\";:<>?,./|\\0123456789";
     private final TodoService todoService;
@@ -38,9 +38,8 @@ public class PriorityService extends IndexableCrudService<Priority, Long> {
         validateName(name);
         Priority priority = Priority.builder()
                 .name(name)
-                .position(count())
                 .build();
-        return getRepository().save(priority);
+        return insert(count(), priority);
     }
 
     @Transactional

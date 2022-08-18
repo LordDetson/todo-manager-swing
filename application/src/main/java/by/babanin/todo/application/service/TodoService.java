@@ -17,7 +17,7 @@ import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
 
 @Component
-public class TodoService extends IndexableCrudService<Todo, Long> {
+public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
 
     public TodoService(TodoRepository todoRepository) {
         super(todoRepository);
@@ -41,9 +41,8 @@ public class TodoService extends IndexableCrudService<Todo, Long> {
                 .status(Status.OPEN)
                 .creationDate(LocalDate.now())
                 .plannedDate(plannedDate)
-                .position(count())
                 .build();
-        return getRepository().save(todo);
+        return insert(0, todo);
     }
 
     @Transactional

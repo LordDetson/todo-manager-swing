@@ -7,7 +7,7 @@ import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JTable;
 
-import by.babanin.todo.application.service.IndexableCrudService;
+import by.babanin.todo.application.service.AbstractIndexableCrudService;
 import by.babanin.todo.model.Indexable;
 import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ComponentRepresentation;
@@ -91,8 +91,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
         int directionCount = direction == Direction.UP ? -1 : 1;
         int nextIndex = selectedIndex + directionCount;
         Class<C> componentClass = getRepresentation().getComponentClass();
-        IndexableCrudService<C, I> service = (IndexableCrudService<C, I>) ServiceHolder.getCrudService(componentClass);
-        SwapTask<C, I, IndexableCrudService<C, I>> task = new SwapTask<>(service, selectedIndex, nextIndex);
+        AbstractIndexableCrudService<C, I> service = (AbstractIndexableCrudService<C, I>) ServiceHolder.getCrudService(componentClass);
+        SwapTask<C, I, AbstractIndexableCrudService<C, I>> task = new SwapTask<>(service, selectedIndex, nextIndex);
         task.addFinishListener(unused -> {
             model.swap(selectedIndex, nextIndex);
             selectRow(nextIndex);

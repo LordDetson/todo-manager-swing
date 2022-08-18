@@ -61,6 +61,11 @@ public class TableModel<C> extends AbstractTableModel {
         addAll(Collections.singletonList(component));
     }
 
+    public void add(int index, C component) {
+        list.add(index, component);
+        fireTableRowsInserted(index, index);
+    }
+
     public void set(int index, C component) {
         list.set(index, component);
         fireTableRowsUpdated(index, index);

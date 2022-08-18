@@ -1,10 +1,10 @@
 package by.babanin.todo.task;
 
-import by.babanin.todo.application.service.IndexableCrudService;
+import by.babanin.todo.application.service.AbstractIndexableCrudService;
 import by.babanin.todo.model.Indexable;
 import by.babanin.todo.model.Persistent;
 
-public class SwapTask<C extends Persistent<I> & Indexable, I, S extends IndexableCrudService<C, I>> extends ServiceTask<C, I, S, Void> {
+public class SwapTask<C extends Persistent<I> & Indexable, I, S extends AbstractIndexableCrudService<C, I>> extends ServiceTask<C, I, S, Void> {
 
     private final long position1;
     private final long position2;
