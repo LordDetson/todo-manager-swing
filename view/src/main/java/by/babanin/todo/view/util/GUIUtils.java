@@ -9,15 +9,22 @@ import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.KeyEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.PrintWriter;
 import java.io.StringWriter;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.Objects;
 
+import javax.swing.Action;
 import javax.swing.JComponent;
+import javax.swing.JDialog;
 import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
+import javax.swing.JRootPane;
 import javax.swing.JTextField;
+import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.UIDefaults;
 import javax.swing.UIManager;
@@ -35,6 +42,7 @@ import com.github.lgooddatepicker.components.DatePickerSettings.DateArea;
 
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ResourceException;
+import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.Translator;
 import lombok.experimental.UtilityClass;
 
@@ -47,6 +55,7 @@ public final class GUIUtils {
     private static final double SCALE_BASE = 100;
 
     private static JFrame mainWindow;
+    private static KeyCash vks;
 
     public static Dimension getFullScreenSize() {
         return Toolkit.getDefaultToolkit().getScreenSize();
@@ -261,5 +270,47 @@ public final class GUIUtils {
 
     public static JFrame getMainWindow() {
         return mainWindow;
+    }
+
+    public static String getMnemonicKeyDescription(int mnemonicKey) {
+        return "(Alt+" + GUIUtils.getVKText(mnemonicKey) + ")";
+    }
+
+    public static String getVKText(int keyCode) {
+        KeyCash vkCollect = getKeyCash();
+        Integer key = keyCode;
+        String name;
+        int expectedModifiers = (Modifier.PUBLIC | Modifier.STATIC | Modifier.FINAL);
+
+        Field[] fields = KeyEvent.class.getDeclaredFields();
+        for(Field field : fields) {
+            try {
+                if(field.getModifiers() == expectedModifiers
+                        && field.getType() == Integer.TYPE
+                        && field.getName().startsWith("VK_")
+                        && field.getInt(KeyEvent.class) == keyCode) {
+                    name = field.getName();
+                    vkCollect.put(name, key);
+                    return name.substring(3);
+                }
+            }
+            catch(IllegalAccessException e) {
+                assert (false);
+            }
+        }
+        throw new ViewException("Unknown key code");
+    }
+
+    private static KeyCash getKeyCash() {
+        if(vks == null) {
+            vks = new KeyCash();
+        }
+        return vks;
+    }
+
+    public static void addDialogKeyAction(JDialog dialog, KeyStroke keyStroke, String actionKey, Action action) {
+        JRootPane rootPane = dialog.getRootPane();
+        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
+        rootPane.getActionMap().put(actionKey, action);
     }
 }

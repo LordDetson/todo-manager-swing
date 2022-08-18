@@ -2,12 +2,16 @@ package by.babanin.todo.view.component.form;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -16,6 +20,7 @@ import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.KeyStroke;
 import javax.swing.SpringLayout;
 import javax.swing.event.ChangeListener;
 
@@ -26,10 +31,12 @@ import by.babanin.todo.view.component.statusbar.LogStatusBarItem;
 import by.babanin.todo.view.component.statusbar.StatusBar;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.util.GUIUtils;
 import by.babanin.todo.view.util.SpringUtilities;
 
 public class ComponentForm<C> extends JPanel {
 
+    private static final String DIALOG_CLOSING_ACTION_KEY = "closeDialog";
     private final transient ComponentRepresentation<C> componentRepresentation;
     private final transient FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
@@ -39,6 +46,7 @@ public class ComponentForm<C> extends JPanel {
     private final Map<ReportField, Object> values = new HashMap<>();
     private JDialog owner;
     private LogStatusBarItem statusBarItem;
+    private Action closeDialogAction;
     private JButton applyButton;
     private JButton cancelButton;
 
@@ -60,9 +68,9 @@ public class ComponentForm<C> extends JPanel {
     protected void createUiComponents() {
         formRows.addAll(createFormRows());
         statusBarItem = new LogStatusBarItem();
-        applyButton = new JButton(Translator.toLocale(TranslateCode.APPLY_BUTTON_TEXT));
-        applyButton.setEnabled(false);
-        cancelButton = new JButton(Translator.toLocale(TranslateCode.CANCEL_BUTTON_TEXT));
+        applyButton = new JButton(createApplyAction());
+        closeDialogAction = createCloseDialogAction();
+        cancelButton = new JButton(closeDialogAction);
     }
 
     private List<? extends FormRow<?>> createFormRows() {
@@ -74,6 +82,33 @@ public class ComponentForm<C> extends JPanel {
                 .filter(field -> !excludedFields.contains(field.getName()))
                 .map(this::createFormRow)
                 .toList();
+    }
+
+    private Action createApplyAction() {
+        Action action = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                collectValues(values);
+                applyListeners.forEach(applyListener -> applyListener.accept(values));
+                closeDialog();
+            }
+        };
+        action.putValue(Action.NAME, Translator.toLocale(TranslateCode.APPLY_BUTTON_TEXT));
+        action.setEnabled(false);
+        return action;
+    }
+
+    private Action createCloseDialogAction() {
+        Action action = new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                closeDialog();
+            }
+        };
+        action.putValue(Action.NAME, Translator.toLocale(TranslateCode.CANCEL_BUTTON_TEXT));
+        return action;
     }
 
     private FormRow<?> createFormRow(ReportField field) {
@@ -93,13 +128,6 @@ public class ComponentForm<C> extends JPanel {
             String fieldCaption = Translator.getFieldCaption(formRow.getField());
             statusBarItem.addLogger(formRow.getInputComponent(), fieldCaption, formRow.getLogger());
         });
-
-        applyButton.addActionListener(event -> {
-            collectValues(values);
-            applyListeners.forEach(applyListener -> applyListener.accept(values));
-            hideWindow();
-        });
-        cancelButton.addActionListener(event -> hideWindow());
     }
 
     private ChangeListener createChangeListener() {
@@ -122,8 +150,8 @@ public class ComponentForm<C> extends JPanel {
         formRows.forEach(formRow -> values.put(formRow.getField(), formRow.getValue()));
     }
 
-    private void hideWindow() {
-        owner.setVisible(false);
+    private void closeDialog() {
+        owner.dispose();
     }
 
     protected void placeComponents() {
@@ -166,6 +194,9 @@ public class ComponentForm<C> extends JPanel {
     public void setOwner(JDialog owner) {
         this.owner = owner;
         owner.getRootPane().setDefaultButton(applyButton);
+        KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        GUIUtils.addDialogKeyAction(owner, escapeStroke, DIALOG_CLOSING_ACTION_KEY, closeDialogAction);
+        statusBarItem.addLogShowingAction(owner);
     }
 
     public Optional<C> getComponent() {

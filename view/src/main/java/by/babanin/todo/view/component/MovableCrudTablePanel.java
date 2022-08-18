@@ -1,8 +1,9 @@
 package by.babanin.todo.view.component;
 
-import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.List;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JTable;
 
@@ -19,6 +20,8 @@ import by.babanin.todo.view.util.ServiceHolder;
 
 public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable, I> extends CrudTablePanel<C, I> {
 
+    private Action moveUpAction;
+    private Action moveDownAction;
     private JButton moveUpButton;
     private JButton moveDownButton;
 
@@ -30,22 +33,25 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     protected void createUiComponents() {
         super.createUiComponents();
         CrudStyle crudStyle = getCrudStyle();
-        moveUpButton = new JButton(crudStyle.getMoveUpButtonIcon());
-        moveUpButton.setToolTipText(crudStyle.getMoveUpButtonToolTip());
-        moveDownButton = new JButton(crudStyle.getMoveDownButtonIcon());
-        moveDownButton.setToolTipText(crudStyle.getMoveDownButtonToolTip());
+        moveUpAction = new RunnableAction(
+                crudStyle.getMoveUpButtonIcon(),
+                crudStyle.getMoveUpButtonToolTip(),
+                KeyEvent.VK_UP,
+                this::moveUp
+        );
+        moveDownAction = new RunnableAction(
+                crudStyle.getMoveDownButtonIcon(),
+                crudStyle.getMoveDownButtonToolTip(),
+                KeyEvent.VK_DOWN,
+                this::moveDown
+        );
+        moveUpButton = new JButton(moveUpAction);
+        moveDownButton = new JButton(moveDownAction);
     }
 
     @Override
     protected IndexableTableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
         return new IndexableTableModel<>(representation, fields);
-    }
-
-    @Override
-    protected void addListeners() {
-        super.addListeners();
-        moveUpButton.addActionListener(this::moveUp);
-        moveDownButton.addActionListener(this::moveDown);
     }
 
     @Override
@@ -60,8 +66,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
         super.actionEnabling();
         JTable table = getTable();
         int selectionCount = table.getSelectionModel().getSelectedItemsCount();
-        moveUpButton.setEnabled(selectionCount == 1 && table.getSelectedRow() != 0);
-        moveDownButton.setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
+        moveUpAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != 0);
+        moveDownAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
     }
 
     @Override
@@ -69,11 +75,11 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
         return (IndexableTableModel<C>) super.getModel();
     }
 
-    private void moveUp(ActionEvent event) {
+    private void moveUp() {
         moveComponent(Direction.UP);
     }
 
-    private void moveDown(ActionEvent event) {
+    private void moveDown() {
         moveComponent(Direction.DOWN);
     }
 

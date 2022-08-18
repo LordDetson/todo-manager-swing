@@ -3,15 +3,19 @@ package by.babanin.todo.view;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.application.status.StatusWorkflow;
@@ -26,6 +30,7 @@ import by.babanin.todo.task.todo.UpdateTodoTask;
 import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
+import by.babanin.todo.view.component.RunnableAction;
 import by.babanin.todo.view.component.TableModel;
 import by.babanin.todo.view.component.form.TodoFormRowFactory;
 import by.babanin.todo.view.component.validation.TodoValidatorFactory;
@@ -39,7 +44,8 @@ import by.babanin.todo.view.util.ServiceHolder;
 
 public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
-    private JButton priorityButton;
+    private static final String PRIORITIES_DIALOG_CLOSING_ACTION_KEY = "closePrioritiesDialog";
+    private JButton showPrioritiesButton;
 
     public TodoCrudTablePanel() {
         super(Todo.class, new TodoFormRowFactory(), new CrudStyle()
@@ -52,9 +58,13 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     @Override
     protected void createUiComponents() {
         super.createUiComponents();
-        priorityButton = new JButton();
-        priorityButton.setIcon(getCrudStyle().getIcon("priority_list"));
-        priorityButton.setToolTipText(Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES));
+        Action showPrioritiesAction = new RunnableAction(
+                getCrudStyle().getIcon("priority_list"),
+                Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES),
+                KeyEvent.VK_P,
+                this::showPriorityDialog
+        );
+        showPrioritiesButton = new JButton(showPrioritiesAction);
     }
 
     @Override
@@ -65,13 +75,7 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
         table.setDefaultRenderer(LocalDate.class, new LocalDataRenderer());
     }
 
-    @Override
-    protected void addListeners() {
-        super.addListeners();
-        priorityButton.addActionListener(this::showPriorityDialog);
-    }
-
-    private void showPriorityDialog(ActionEvent event) {
+    private void showPriorityDialog() {
         PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
         priorityPanel.addEditListener(priority -> {
             List<Todo> todos = ServiceHolder.getTodoService().findAllByPriorities(Collections.singleton(priority));
@@ -100,13 +104,25 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
         dialog.setSize(smallFrameSize);
         dialog.setLocationRelativeTo(frame);
         dialog.setTitle(Translator.toLocale(TranslateCode.PRIORITY_FRAME_TITLE));
+        addPrioritiesDialogClosingAction(dialog);
         dialog.setVisible(true);
+    }
+
+    private static void addPrioritiesDialogClosingAction(JDialog dialog) {
+        KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        GUIUtils.addDialogKeyAction(dialog, escapeStroke, PRIORITIES_DIALOG_CLOSING_ACTION_KEY, new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        });
     }
 
     @Override
     protected void placeComponents() {
         super.placeComponents();
-        addToolBarComponent(priorityButton);
+        addToolBarComponent(showPrioritiesButton);
     }
 
     @Override

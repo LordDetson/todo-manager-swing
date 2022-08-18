@@ -1,9 +1,12 @@
 package by.babanin.todo.view.component.statusbar;
 
 import java.awt.Component;
+import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -17,6 +20,8 @@ import java.util.StringJoiner;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JDialog;
+import javax.swing.JRootPane;
+import javax.swing.KeyStroke;
 
 import by.babanin.todo.view.component.logger.CombinedLogPanel;
 import by.babanin.todo.view.component.logger.CombinedLogger;
@@ -30,10 +35,12 @@ import by.babanin.todo.view.util.GUIUtils;
 
 public class LogStatusBarItem extends StatusBarItem {
 
+    private static final String LOG_SHOWING_ACTION_KEY = "showLog";
+    private static final String LOG_CLOSING_ACTION_KEY = "closeLog";
     private final Map<LogOwner, Logger> loggerMap = new LinkedHashMap<>();
     private final transient CombinedLogger combinedLogger = new CombinedLogger();
 
-    private final AbstractAction showLogAction;
+    private final Action showLogAction;
 
     public LogStatusBarItem() {
         showLogAction = createShowLogAction();
@@ -46,14 +53,26 @@ public class LogStatusBarItem extends StatusBarItem {
             @Override
             public void actionPerformed(ActionEvent event) {
                 Window window = GUIUtils.getWindowOwner((Component) event.getSource());
-                JDialog dialog = new JDialog(window);
+                JDialog dialog = new JDialog(window, ModalityType.APPLICATION_MODAL);
                 dialog.setContentPane(new CombinedLogPanel(combinedLogger));
                 dialog.setTitle(Translator.toLocale(TranslateCode.LOG_MESSAGES));
                 Dimension smallFrameSize = GUIUtils.getSmallFrameSize();
                 dialog.setMinimumSize(smallFrameSize);
                 dialog.setSize(smallFrameSize);
                 dialog.setLocationRelativeTo(window);
+                addCloseLogAction(dialog);
                 dialog.setVisible(true);
+            }
+
+            private void addCloseLogAction(JDialog dialog) {
+                KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+                GUIUtils.addDialogKeyAction(dialog, escapeStroke, LOG_CLOSING_ACTION_KEY, new AbstractAction() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        dialog.dispose();
+                    }
+                });
             }
         };
     }
@@ -149,6 +168,13 @@ public class LogStatusBarItem extends StatusBarItem {
             }
             showLogAction.setEnabled(true);
         }
+    }
+
+    public void addLogShowingAction(JDialog dialog) {
+        JRootPane rootPane = dialog.getRootPane();
+        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.ALT_DOWN_MASK);
+        rootPane.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(keyStroke, LOG_SHOWING_ACTION_KEY);
+        rootPane.getActionMap().put(LOG_SHOWING_ACTION_KEY, showLogAction);
     }
 
     private record LogOwner(Component component, String title) {

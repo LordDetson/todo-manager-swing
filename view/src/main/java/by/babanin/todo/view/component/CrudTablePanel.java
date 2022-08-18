@@ -3,13 +3,14 @@ package by.babanin.todo.view.component;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
-import java.awt.event.ActionEvent;
+import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import javax.swing.Action;
 import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
@@ -45,6 +46,9 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private final CrudStyle crudStyle;
 
     private JToolBar toolBar;
+
+    private Action showEditDialogAction;
+    private Action showDeleteConfirmDialogAction;
     private JButton createButton;
     private JButton editButton;
     private JButton deleteButton;
@@ -74,12 +78,28 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         columnModel = new CustomTableColumnModel(reportFields);
         table = new JTable();
 
-        createButton = new JButton(crudStyle.getCreateButtonIcon());
-        createButton.setToolTipText(crudStyle.getCreateButtonToolTip());
-        editButton = new JButton(crudStyle.getEditButtonIcon());
-        editButton.setToolTipText(crudStyle.getEditButtonToolTip());
-        deleteButton = new JButton(crudStyle.getDeleteButtonIcon());
-        deleteButton.setToolTipText(crudStyle.getDeleteButtonToolTip());
+        Action showCreationDialogAction = new RunnableAction(
+                crudStyle.getCreateButtonIcon(),
+                crudStyle.getCreateButtonToolTip(),
+                KeyEvent.VK_C,
+                this::showCreationDialog
+        );
+        showEditDialogAction = new RunnableAction(
+                crudStyle.getEditButtonIcon(),
+                crudStyle.getEditButtonToolTip(),
+                KeyEvent.VK_E,
+                this::showEditDialog
+        );
+        showDeleteConfirmDialogAction = new RunnableAction(
+                crudStyle.getDeleteButtonIcon(),
+                crudStyle.getDeleteButtonToolTip(),
+                KeyEvent.VK_D,
+                this::showDeleteConfirmDialog
+        );
+
+        createButton = new JButton(showCreationDialogAction);
+        editButton = new JButton(showEditDialogAction);
+        deleteButton = new JButton(showDeleteConfirmDialogAction);
     }
 
     protected TableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
@@ -93,9 +113,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     protected void addListeners() {
         table.getSelectionModel().addListSelectionListener(event -> actionEnabling());
-        createButton.addActionListener(this::showCreationDialog);
-        editButton.addActionListener(this::showEditDialog);
-        deleteButton.addActionListener(this::showDeleteConfirmDialog);
 
         addCreationListener(result -> {
             model.add(result);
@@ -157,8 +174,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     }
 
     protected void actionEnabling() {
-        editButton.setEnabled(canEdit());
-        deleteButton.setEnabled(canDelete());
+        showEditDialogAction.setEnabled(canEdit());
+        showDeleteConfirmDialogAction.setEnabled(canDelete());
     }
 
     protected boolean canEdit() {
@@ -189,7 +206,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         model.clear();
     }
 
-    private void showCreationDialog(ActionEvent event) {
+    private void showCreationDialog() {
         ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle);
         form.addApplyListener(this::runCreationTask);
         showComponentForm(form, TranslateCode.CREATION_DIALOG_TITLE);
@@ -210,7 +227,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     protected abstract Task<C> createCreationTask(Map<ReportField, ?> fieldValueMap);
 
-    private void showEditDialog(ActionEvent event) {
+    private void showEditDialog() {
         C selectedComponent = getSelectedComponent()
                 .orElseThrow(() -> new ViewException("Can't open edit dialog because component is not selected"));
         ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle, selectedComponent);
@@ -246,7 +263,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     }
 
     @SuppressWarnings("unchecked")
-    private void showDeleteConfirmDialog(ActionEvent event) {
+    private void showDeleteConfirmDialog() {
         Frame frame = JOptionPane.getFrameForComponent(CrudTablePanel.this);
         String componentPluralCaption = Translator.getComponentPluralCaption(representation.getComponentClass());
         int result = JOptionPane.showConfirmDialog(frame,
