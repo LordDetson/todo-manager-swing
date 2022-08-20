@@ -20,6 +20,7 @@ import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.task.TaskManager;
+import by.babanin.todo.view.component.custom.UICustomizer;
 import by.babanin.todo.view.exception.ExceptionHandler;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
@@ -66,9 +67,10 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         TaskManager.setExecutorService(executorService);
         ComponentRepresentation.initializeComponentRepresentationMap();
         FontResources.registerAdditionalFonts(fontsPath);
-        FontResources.applyFontByDefault(new Font(fontName, Font.PLAIN, fontSize));
 
         FlatDarculaLaf.setup();
+        UICustomizer.customize();
+        FontResources.applyFontByDefault(new Font(fontName, Font.PLAIN, fontSize));
         EventQueue.invokeLater(this::showMainFrame);
     }
 
