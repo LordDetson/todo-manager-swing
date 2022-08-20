@@ -3,6 +3,7 @@ package by.babanin.todo.view.component;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
+import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -326,6 +327,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     public void selectRow(int row) {
         table.getSelectionModel().setSelectionInterval(row, row);
+        table.scrollRectToVisible(new Rectangle(table.getCellRect(row, 0, true)));
     }
 
     public void selectFirstRow() {
