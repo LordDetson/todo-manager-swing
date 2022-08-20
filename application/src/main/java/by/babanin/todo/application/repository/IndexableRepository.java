@@ -15,4 +15,6 @@ public interface IndexableRepository<E extends Persistent<I> & Indexable, I> ext
     Optional<E> findByPosition(long position);
 
     List<E> findByPositionGreaterThanOrderByPositionAsc(long position);
+
+    List<E> findByPositionGreaterThanEqualAndPositionLessThan(long from, long to);
 }

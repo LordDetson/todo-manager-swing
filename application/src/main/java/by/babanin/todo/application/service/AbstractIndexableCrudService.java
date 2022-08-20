@@ -45,7 +45,7 @@ public abstract class AbstractIndexableCrudService<E extends Persistent<I> & Ind
     @Transactional
     @Override
     public E insert(long position, E entity) {
-        List<E> subList = getAll().subList((int) position, (int) count());
+        List<E> subList = getSubList(position, count());
         entity.setPosition(position);
         entity = getRepository().save(entity);
         subList.forEach(item -> item.setPosition(item.getPosition() + 1));
@@ -64,5 +64,17 @@ public abstract class AbstractIndexableCrudService<E extends Persistent<I> & Ind
         entity1.setPosition(position2);
         entity2.setPosition(position1);
         repository.saveAll(List.of(entity1, entity2));
+    }
+
+    @Transactional
+    @Override
+    public List<E> getSubList(long from, long to) {
+        if(from < 0 || to < 0) {
+            throw new ApplicationException("Position can't be less than 0");
+        }
+        if(from > to) {
+            throw new ApplicationException("The 'from' position should be less then or equal the 'to' position");
+        }
+        return getRepository().findByPositionGreaterThanEqualAndPositionLessThan(from, to);
     }
 }
