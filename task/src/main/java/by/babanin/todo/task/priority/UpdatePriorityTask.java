@@ -20,6 +20,6 @@ public class UpdatePriorityTask extends SaveTask<Priority, Long, PriorityService
 
     @Override
     public Priority execute() {
-        return getService().rename(oldPriority, getValue(Fields.name));
+        return getService().rename(oldPriority.getId(), getValue(Fields.name));
     }
 }

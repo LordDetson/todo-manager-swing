@@ -28,7 +28,7 @@ public class PriorityValidatorFactory implements ValidatorFactory {
             validators.add(new UniqueNameValidator(representation.getComponentClass(),
                     name -> ServiceHolder.getPriorityService().findByName(name).isPresent()));
             validators.add(new LengthLimitValidation(fieldCaption, NAME_LENGTH_LIMIT));
-            validators.add(new ForbiddenSymbolsValidator(fieldCaption, "~`!@#$%^&*()_+='\";:<>?,./|\\0123456789"));
+            validators.add(new ForbiddenSymbolsValidator(fieldCaption, ServiceHolder.getPriorityService().getForbiddenSymbolsForName()));
             String unprioritized = Translator.toLocale(TranslateCode.PRIORITY_UNPRIORITIZED);
             validators.add(new ReservedWordsValidator(Collections.singletonList(unprioritized)));
         }

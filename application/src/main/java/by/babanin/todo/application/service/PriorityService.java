@@ -1,6 +1,8 @@
 package by.babanin.todo.application.service;
 
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 import java.util.Optional;
 
 import javax.transaction.Transactional;
@@ -15,7 +17,7 @@ import by.babanin.todo.model.Priority;
 @Component
 public class PriorityService extends AbstractIndexableCrudService<Priority, Long> {
 
-    private static final String FORBIDDEN_SYMBOLS_FOR_NAME = "~`!@#$%^&*()_+='\";:<>?,./|\\0123456789";
+    private static final String FORBIDDEN_SYMBOLS_FOR_NAME = "~`!@#$%^&*_+='\";:()<>[]{}?,./|\\0123456789";
     private final TodoService todoService;
 
     public PriorityService(PriorityRepository priorityRepository, TodoService todoService) {
@@ -35,17 +37,22 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
 
     @Transactional
     public Priority create(String name) {
+        return create(name, count());
+    }
+
+    @Transactional
+    public Priority create(String name, long position) {
         validateName(name);
         Priority priority = Priority.builder()
                 .name(name)
                 .build();
-        return insert(count(), priority);
+        return insert(position, priority);
     }
 
     @Transactional
-    public Priority rename(Priority priority, String name) {
+    public Priority rename(Long id, String name) {
         validateName(name);
-        priority = getById(priority.getId());
+        Priority priority = getById(id);
         priority.setName(name);
         return getRepository().save(priority);
     }
@@ -54,14 +61,14 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
         if(StringUtils.isBlank(name)) {
             throw new ApplicationException("Name can't be blank");
         }
-        if(StringUtils.isNotBlank(name)) {
-            for(char forbiddenSymbol : FORBIDDEN_SYMBOLS_FOR_NAME.toCharArray()) {
-                for(char symbol : name.toCharArray()) {
-                    if(forbiddenSymbol == symbol) {
-                        throw new ApplicationException("Name must not contain characters " + FORBIDDEN_SYMBOLS_FOR_NAME);
-                    }
-                }
+        List<String> forbiddenSymbolsForName = getForbiddenSymbolsForName();
+        for(String forbiddenSymbol : forbiddenSymbolsForName) {
+            if(name.contains(forbiddenSymbol)) {
+                throw new ApplicationException("Name must not contain characters " + forbiddenSymbolsForName);
             }
+        }
+        if(name.contains("\n")) {
+            throw new ApplicationException("Name must not have a newline character");
         }
         Optional<Priority> found = findByName(name);
         if(found.isPresent()) {
@@ -72,5 +79,9 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
     @Transactional
     public Optional<Priority> findByName(String name) {
         return getRepository().findByName(name);
+    }
+
+    public List<String> getForbiddenSymbolsForName() {
+        return Arrays.asList(FORBIDDEN_SYMBOLS_FOR_NAME.split(""));
     }
 }

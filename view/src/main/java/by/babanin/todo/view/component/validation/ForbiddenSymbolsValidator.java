@@ -1,5 +1,7 @@
 package by.babanin.todo.view.component.validation;
 
+import java.util.List;
+
 import org.apache.commons.lang3.StringUtils;
 
 import by.babanin.todo.view.component.logger.LogMessageType;
@@ -10,13 +12,13 @@ import by.babanin.todo.view.translat.Translator;
 public class ForbiddenSymbolsValidator implements Validator {
 
     private final String fieldCaption;
-    private final String forbiddenSymbols;
+    private final List<String> forbiddenSymbols;
 
-    public ForbiddenSymbolsValidator(String fieldCaption, String forbiddenSymbols) {
+    public ForbiddenSymbolsValidator(String fieldCaption, List<String> forbiddenSymbols) {
         if(StringUtils.isBlank(fieldCaption)) {
             throw new ViewException("fieldCaption can't be blank");
         }
-        if(StringUtils.isBlank(forbiddenSymbols)) {
+        if(forbiddenSymbols != null && !forbiddenSymbols.isEmpty()) {
             throw new ViewException("forbiddenSymbols can't be blank");
         }
         this.fieldCaption = fieldCaption;
@@ -43,11 +45,9 @@ public class ForbiddenSymbolsValidator implements Validator {
 
     private boolean containsForbiddenSymbol(String name) {
         if(StringUtils.isNotBlank(name)) {
-            for(char forbiddenSymbol : forbiddenSymbols.toCharArray()) {
-                for(char symbol : name.toCharArray()) {
-                    if(forbiddenSymbol == symbol) {
-                        return true;
-                    }
+            for(String forbiddenSymbol : forbiddenSymbols) {
+                if(name.contains(forbiddenSymbol)) {
+                    return true;
                 }
             }
         }
