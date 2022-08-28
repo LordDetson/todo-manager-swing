@@ -25,7 +25,8 @@ public interface CrudService<E extends Persistent<I>, I> {
     E getById(I id);
 
     default boolean exist(E entity) {
-        return existById(entity.getId());
+        I id = entity.getId();
+        return id != null && existById(id);
     }
 
     boolean existById(I id);
