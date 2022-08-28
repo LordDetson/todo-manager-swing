@@ -48,13 +48,10 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public List<E> deleteAllById(Set<I> ids) {
-        List<E> prioritiesToDelete = getAllById(ids);
-        if(prioritiesToDelete.isEmpty()) {
-            throw new ApplicationException("Doesn't have such ids");
-        }
-        updateReferencesBeforeDelete(prioritiesToDelete);
+        List<E> entitiesToDelete = getAllById(ids);
+        updateReferencesBeforeDelete(entitiesToDelete);
         repository.deleteAllById(ids);
-        return prioritiesToDelete;
+        return entitiesToDelete;
     }
 
     protected void updateReferencesBeforeDelete(Collection<E> entitiesToDelete) {
@@ -70,7 +67,10 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public E deleteById(I id) {
-        return deleteAllById(Collections.singleton(id)).get(0);
+        E entityToDelete = getById(id);
+        updateReferencesBeforeDelete(Collections.singleton(entityToDelete));
+        repository.deleteById(id);
+        return entityToDelete;
     }
 
     @Transactional
@@ -88,10 +88,8 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public E getById(I id) {
-        if(!existById(id)) {
-            throw new ApplicationException("No such component by " + id + " id");
-        }
-        return repository.getReferenceById(id);
+        return repository.findById(id)
+                .orElseThrow(() -> new ApplicationException("No such component by " + id + " id"));
     }
 
     @Transactional

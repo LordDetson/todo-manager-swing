@@ -32,14 +32,25 @@ public abstract class AbstractIndexableCrudService<E extends Persistent<I> & Ind
                 .mapToLong(E::getPosition)
                 .min();
         prioritiesToDelete = super.deleteAllById(ids);
-        if(minPosition.isPresent()) {
-            List<E> greaterPositionEntities = getRepository().findByPositionGreaterThanOrderByPositionAsc(minPosition.getAsLong());
-            for(int i = 0; i < greaterPositionEntities.size(); i++) {
-                greaterPositionEntities.get(i).setPosition(i + minPosition.getAsLong());
-            }
-            getRepository().saveAll(greaterPositionEntities);
-        }
+        minPosition.ifPresent(this::restorePositions);
         return prioritiesToDelete;
+    }
+
+    @Override
+    public E deleteById(I id) {
+        E priorityToDelete = getById(id);
+        long minPosition = priorityToDelete.getPosition();
+        priorityToDelete = super.deleteById(id);
+        restorePositions(minPosition);
+        return priorityToDelete;
+    }
+
+    private void restorePositions(long minPosition) {
+        List<E> greaterPositionEntities = getRepository().findByPositionGreaterThanOrderByPositionAsc(minPosition);
+        for(int i = 0; i < greaterPositionEntities.size(); i++) {
+            greaterPositionEntities.get(i).setPosition(i + minPosition);
+        }
+        getRepository().saveAll(greaterPositionEntities);
     }
 
     @Transactional
