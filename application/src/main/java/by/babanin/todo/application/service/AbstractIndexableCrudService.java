@@ -1,5 +1,6 @@
 package by.babanin.todo.application.service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.OptionalLong;
 import java.util.Set;
@@ -59,7 +60,10 @@ public abstract class AbstractIndexableCrudService<E extends Persistent<I> & Ind
         if(exist(entity)) {
             throw new ApplicationException("The entity is already exist");
         }
-        List<E> subList = getSubList(position, count());
+        long count = count();
+        List<E> subList = position != count
+                ? getSubList(position, count)
+                : Collections.emptyList();
         entity.setPosition(position);
         entity = getRepository().save(entity);
         subList.forEach(item -> item.setPosition(item.getPosition() + 1));
