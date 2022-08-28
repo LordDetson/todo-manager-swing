@@ -69,7 +69,7 @@
                         </goals>
                         <configuration>
                             <mainClass>by.babanin.todo.Application</mainClass>
-                            <finalName>${project.client.name} ${version}</finalName>
+                            <finalName>${project.client.name} ${project.version}</finalName>
                         </configuration>
                     </execution>
                 </executions>
