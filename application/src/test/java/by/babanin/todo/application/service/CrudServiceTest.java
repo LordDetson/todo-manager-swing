@@ -27,14 +27,16 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
     @Autowired
     private JpaRepository<E, I> repository;
 
-    @Autowired
     private TestEntitiesHolder<E, I> testEntitiesHolder;
 
     @BeforeEach
     void setupEach() {
+        testEntitiesHolder = newTestEntitiesHolder();
         List<E> entities = repository.saveAll(testEntitiesHolder.getEntities());
         testEntitiesHolder.setEntities(entities);
     }
+
+    protected abstract TestEntitiesHolder<E,I> newTestEntitiesHolder();
 
     @AfterEach
     void tearDownEach() {
