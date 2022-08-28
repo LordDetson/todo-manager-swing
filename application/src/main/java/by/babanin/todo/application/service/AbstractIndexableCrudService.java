@@ -83,11 +83,21 @@ public abstract class AbstractIndexableCrudService<E extends Persistent<I> & Ind
     @Transactional
     @Override
     public List<E> getSubList(long from, long to) {
-        if(from < 0 || to < 0) {
-            throw new ApplicationException("Position can't be less than 0");
+        if(from < 0) {
+            throw new ApplicationException("The 'from' position can't be less than 0");
         }
-        if(from > to) {
-            throw new ApplicationException("The 'from' position should be less then or equal the 'to' position");
+        if(to <= 0) {
+            throw new ApplicationException("The 'to' position can't be less than or equal 0");
+        }
+        long count = getRepository().count();
+        if(from >= count) {
+            throw new ApplicationException("The 'from' position can't be more than or equal " + count);
+        }
+        if(to > count) {
+            throw new ApplicationException("The 'to' position can't be more than " + count);
+        }
+        if(from >= to) {
+            throw new ApplicationException("The 'from' position should be less then the 'to' position");
         }
         return getRepository().findByPositionGreaterThanEqualAndPositionLessThan(from, to);
     }
