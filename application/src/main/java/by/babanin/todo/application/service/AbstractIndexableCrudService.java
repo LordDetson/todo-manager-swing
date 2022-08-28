@@ -56,6 +56,9 @@ public abstract class AbstractIndexableCrudService<E extends Persistent<I> & Ind
     @Transactional
     @Override
     public E insert(long position, E entity) {
+        if(exist(entity)) {
+            throw new ApplicationException("The entity is already exist");
+        }
         List<E> subList = getSubList(position, count());
         entity.setPosition(position);
         entity = getRepository().save(entity);
