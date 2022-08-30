@@ -44,7 +44,7 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
         String priorityName = getTestEntityHolder().getFakeEntities().get(0).getName();
         List<Priority> entities = new ArrayList<>(getTestEntityHolder().getEntities());
         long position = entities.get(entities.size() - 3).getPosition();
-        Priority priority = getService().create(priorityName, position);
+        Priority priority = getService().create(position, priorityName);
 
         entities.add((int) position, priority);
         assertAll(
@@ -97,7 +97,7 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
         long position = -1;
 
         PriorityService service = getService();
-        assertThrows(ApplicationException.class, () -> service.create(name, position));
+        assertThrows(ApplicationException.class, () -> service.create(position, name));
     }
 
     @Test
@@ -106,7 +106,7 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
         long position = getRepository().count() + 1;
 
         PriorityService service = getService();
-        assertThrows(ApplicationException.class, () -> service.create(name, position));
+        assertThrows(ApplicationException.class, () -> service.create(position, name));
     }
 
     @Test

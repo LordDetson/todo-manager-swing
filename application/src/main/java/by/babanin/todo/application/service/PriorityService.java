@@ -37,11 +37,11 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
 
     @Transactional
     public Priority create(String name) {
-        return create(name, count());
+        return create(count(), name);
     }
 
     @Transactional
-    public Priority create(String name, long position) {
+    public Priority create(long position, String name) {
         validateName(name);
         Priority priority = Priority.builder()
                 .name(name)
