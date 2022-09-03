@@ -11,6 +11,8 @@ import java.util.stream.Collectors;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.data.repository.CrudRepository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.exception.TestException;
@@ -117,6 +119,7 @@ abstract class IndexableCrudServiceTest<E extends Persistent<I> & Indexable, I, 
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void swap() {
         List<E> expected = new ArrayList<>(getTestEntityHolder().getEntities());
         long position1 = expected.get(0).getPosition();

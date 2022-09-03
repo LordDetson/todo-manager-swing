@@ -7,6 +7,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.holder.PrioritiesHolder;
@@ -105,6 +107,7 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void rename() {
         String newName = getTestEntityHolder().getFakeEntities().get(0).getName();
         List<Priority> entities = getTestEntityHolder().getEntities();
@@ -123,16 +126,21 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void renameWithExistedName() {
         Priority priority = getTestEntityHolder().getEntities().get(0);
         Long id = priority.getId();
         String name = getTestEntityHolder().getEntities().get(0).getName();
 
         PriorityService service = getService();
-        assertThrows(ApplicationException.class, () -> service.rename(id, name));
+        assertAll(
+                () -> assertThrows(ApplicationException.class, () -> service.rename(id, name)),
+                () -> assertEquals(priority.getName(), service.getById(id).getName())
+        );
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void renameWithForbiddenSymbol() {
         Priority priority = getTestEntityHolder().getEntities().get(0);
         Long id = priority.getId();
@@ -142,19 +150,27 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
                 .map(forbiddenSymbol -> name + forbiddenSymbol)
                 .toList();
 
-        names.forEach(newName -> assertThrows(ApplicationException.class, () -> service.rename(id, newName)));
+        names.forEach(newName -> assertAll(
+                () -> assertThrows(ApplicationException.class, () -> service.rename(id, newName)),
+                () -> assertEquals(priority.getName(), service.getById(id).getName())
+        ));
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void renameWithEmptyName() {
-        Long id = getTestEntityHolder().getEntities().get(0).getId();
+        Priority priority = getTestEntityHolder().getEntities().get(0);
+        Long id = priority.getId();
         List<String> names = new ArrayList<>();
         names.add(null);
         names.add("");
         names.add(" ");
 
         PriorityService service = getService();
-        names.forEach(name -> assertThrows(ApplicationException.class, () -> service.rename(id, name)));
+        names.forEach(name -> assertAll(
+                () -> assertThrows(ApplicationException.class, () -> service.rename(id, name)),
+                () -> assertEquals(priority.getName(), service.getById(id).getName())
+        ));
     }
 
     @Test
