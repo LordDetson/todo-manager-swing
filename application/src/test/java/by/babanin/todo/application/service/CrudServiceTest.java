@@ -12,6 +12,7 @@ import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -19,6 +20,7 @@ import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.holder.TestEntitiesHolder;
 import by.babanin.todo.model.Persistent;
 
+@DataJpaTest
 abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService<E, I>> {
 
     @Autowired

@@ -7,17 +7,12 @@ import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase;
-import org.springframework.boot.test.autoconfigure.jdbc.AutoConfigureTestDatabase.Replace;
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.holder.PrioritiesHolder;
 import by.babanin.todo.application.holder.TestEntitiesHolder;
 import by.babanin.todo.model.Priority;
 
-@DataJpaTest
-@AutoConfigureTestDatabase(replace = Replace.NONE)
 class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, PriorityService> {
 
     @Override
