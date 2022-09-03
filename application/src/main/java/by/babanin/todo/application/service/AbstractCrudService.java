@@ -38,6 +38,9 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public List<E> deleteAll(Collection<E> entities) {
+        if(entities == null || entities.isEmpty()) {
+            throw new ApplicationException("Entities list is empty");
+        }
         Set<I> ids = entities.stream()
                 .map(E::getId)
                 .collect(Collectors.toUnmodifiableSet());
@@ -47,7 +50,13 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public List<E> deleteAllById(Set<I> ids) {
+        if(ids == null || ids.isEmpty()) {
+            throw new ApplicationException("ID list is empty");
+        }
         List<E> entitiesToDelete = getAllById(ids);
+        if(entitiesToDelete.isEmpty()) {
+            throw new ApplicationException("No such component by ids");
+        }
         updateReferencesBeforeDelete(entitiesToDelete);
         repository.deleteAllById(ids);
         return entitiesToDelete;
