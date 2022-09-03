@@ -44,7 +44,7 @@ public class Todo implements Persistent<Long>, Indexable {
     @NonNull
     String title;
 
-    @Column(nullable = false, length = 1024)
+    @Column(length = 1024)
     @ReportableField(index = 1)
     String description;
 
