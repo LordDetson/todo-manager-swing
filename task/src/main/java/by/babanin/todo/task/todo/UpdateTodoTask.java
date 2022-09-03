@@ -10,22 +10,21 @@ import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.SaveTask;
 
 public class UpdateTodoTask extends SaveTask<Todo, Long, TodoService, Todo> {
-    private final Todo oldTodo;
+    private final Todo todo;
 
     public UpdateTodoTask(TodoService service, ComponentRepresentation<Todo> representation, Map<ReportField, ?> fieldValueMap,
-            Todo oldTodo) {
+            Todo todo) {
         super(service, representation, fieldValueMap);
-        this.oldTodo = oldTodo;
+        this.todo = todo;
     }
 
     @Override
 
     public Todo execute() {
-        return getService().update(oldTodo,
-                getValue(Fields.title),
-                getValue(Fields.description),
-                getValue(Fields.priority),
-                getValue(Fields.status)
-        );
+        todo.setTitle(getValue(Fields.title));
+        todo.setDescription(getValue(Fields.description));
+        todo.setPriority(getValue(Fields.priority));
+        todo.setStatus(getValue(Fields.status));
+        return getService().save(todo);
     }
 }

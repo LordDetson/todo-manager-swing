@@ -31,7 +31,10 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
 
     @Override
     protected void updateReferencesBeforeDelete(Collection<Priority> entitiesToDelete) {
-        todoService.findAllByPriorities(entitiesToDelete).forEach(todo -> todoService.updatePriority(todo, null));
+        todoService.findAllByPriorities(entitiesToDelete).forEach(todo -> {
+            todo.setPriority(null);
+            todoService.save(todo);
+        });
     }
 
     @Transactional

@@ -35,28 +35,25 @@ public class DataGenerator implements ApplicationListener<ContextRefreshedEvent>
         Priority normal = priorityService.create("Normal");
         Priority low = priorityService.create("Low");
         for(int i = 0; i < iterations; i++) {
-            todoService.create("Email team for update", """
+            todoService.create(todoService.count(), "Email team for update", """
                         The project has changed the requirements for some features.
                         I need to write a letter about this to our team.
                         """,
                     high, LocalDate.now().plusDays(2));
-            todoService.create("Update project plane", """
+            todoService.create(todoService.count(), "Update project plane", """
                         1. Send an email update to the team.
                         2. Call the design agency to finalize mockups.
                         3. Touch base with recruiters about the new role.
                         4. Meet with the engineering team.""",
                     normal, LocalDate.now().plusDays(7));
-            Todo contactServiceCenter = todoService.create("Contact service center", """
+            Todo contactServiceCenter = todoService.create(todoService.count(), "Contact service center", """
                         Unable to restore access to my account.
                         Report a problem, get a list of troubleshooting steps.
                         """,
                     low, LocalDate.now().plusMonths(1));
-            todoService.update(contactServiceCenter,
-                    contactServiceCenter.getTitle(),
-                    contactServiceCenter.getDescription(),
-                    contactServiceCenter.getPriority(),
-                    Status.IN_PROGRESS);
-            Todo buyProductsInTheStore = todoService.create("Buy products in the store", """
+            contactServiceCenter.setStatus(Status.IN_PROGRESS);
+            todoService.save(contactServiceCenter);
+            Todo buyProductsInTheStore = todoService.create(todoService.count(), "Buy products in the store", """
                         10 eggs
                         Milk 1 liter
                         Cheese 300 grams
@@ -65,16 +62,10 @@ public class DataGenerator implements ApplicationListener<ContextRefreshedEvent>
                         Candies
                         """,
                     null, LocalDate.now());
-            todoService.update(buyProductsInTheStore,
-                    buyProductsInTheStore.getTitle(),
-                    buyProductsInTheStore.getDescription(),
-                    buyProductsInTheStore.getPriority(),
-                    Status.IN_PROGRESS);
-            todoService.update(buyProductsInTheStore,
-                    buyProductsInTheStore.getTitle(),
-                    buyProductsInTheStore.getDescription(),
-                    buyProductsInTheStore.getPriority(),
-                    Status.CLOSED);
+            buyProductsInTheStore.setStatus(Status.IN_PROGRESS);
+            buyProductsInTheStore = todoService.save(buyProductsInTheStore);
+            buyProductsInTheStore.setStatus(Status.CLOSED);
+            todoService.save(buyProductsInTheStore);
         }
     }
 
