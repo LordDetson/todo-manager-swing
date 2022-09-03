@@ -13,7 +13,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import by.babanin.todo.application.exception.ApplicationException;
@@ -85,7 +84,7 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
         List<E> notExistedEntities = testEntitiesHolder.getFakeEntities();
 
         assertAll(
-                () -> assertThrows(EmptyResultDataAccessException.class, () -> service.deleteAll(notExistedEntities)),
+                () -> assertThrows(ApplicationException.class, () -> service.deleteAll(notExistedEntities)),
                 () -> assertEquals(testEntitiesHolder.getEntities().size(), repository.count())
         );
     }
@@ -119,7 +118,7 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
                 .collect(Collectors.toUnmodifiableSet());
 
         assertAll(
-                () -> assertThrows(EmptyResultDataAccessException.class, () -> service.deleteAllById(notExistedIds)),
+                () -> assertThrows(ApplicationException.class, () -> service.deleteAllById(notExistedIds)),
                 () -> assertEquals(testEntitiesHolder.getEntities().size(), repository.count())
         );
     }
