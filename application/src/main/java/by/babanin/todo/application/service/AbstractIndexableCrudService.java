@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.OptionalLong;
 import java.util.Set;
 
-import javax.transaction.Transactional;
+import org.springframework.transaction.annotation.Transactional;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.repository.IndexableRepository;
@@ -84,7 +84,7 @@ public abstract class AbstractIndexableCrudService<E extends Persistent<I> & Ind
         repository.saveAll(List.of(entity1, entity2));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<E> getSubList(long from, long to) {
         if(from < 0) {

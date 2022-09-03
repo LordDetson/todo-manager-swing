@@ -5,16 +5,15 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 
-import javax.transaction.Transactional;
-
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.repository.PriorityRepository;
 import by.babanin.todo.model.Priority;
 
-@Component
+@Service
 public class PriorityService extends AbstractIndexableCrudService<Priority, Long> {
 
     private static final String FORBIDDEN_SYMBOLS_FOR_NAME = "~`!@#$%^&*_+='\";:()<>[]{}?,./|\\0123456789";
@@ -32,7 +31,10 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
 
     @Override
     protected void updateReferencesBeforeDelete(Collection<Priority> entitiesToDelete) {
-        todoService.findAllByPriorities(entitiesToDelete).forEach(todo -> todoService.updatePriority(todo, null));
+        todoService.findAllByPriorities(entitiesToDelete).forEach(todo -> {
+            todo.setPriority(null);
+            todoService.save(todo);
+        });
     }
 
     @Transactional
@@ -76,7 +78,7 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
         }
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     public Optional<Priority> findByName(String name) {
         return getRepository().findByName(name);
     }

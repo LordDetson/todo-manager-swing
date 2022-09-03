@@ -4,10 +4,9 @@ import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
-import javax.transaction.Transactional;
-
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.repository.TodoRepository;
@@ -16,7 +15,7 @@ import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
 
-@Component
+@Service
 public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
 
     public TodoService(TodoRepository todoRepository) {

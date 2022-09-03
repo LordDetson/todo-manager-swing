@@ -6,11 +6,10 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import javax.transaction.Transactional;
-
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.transaction.annotation.Transactional;
 
 import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.model.Persistent;
@@ -73,32 +72,32 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
         return entityToDelete;
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<E> getAll() {
         return repository.findAll(Sort.by(Direction.ASC, Fields.position));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public List<E> getAllById(Set<I> ids) {
         return repository.findAllById(ids);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public E getById(I id) {
         return repository.findById(id)
                 .orElseThrow(() -> new ApplicationException("No such component by " + id + " id"));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public boolean existById(I id) {
         return repository.existsById(id);
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
     @Override
     public long count() {
         return repository.count();
