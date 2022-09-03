@@ -18,7 +18,7 @@ public class ForbiddenSymbolsValidator implements Validator {
         if(StringUtils.isBlank(fieldCaption)) {
             throw new ViewException("fieldCaption can't be blank");
         }
-        if(forbiddenSymbols != null && !forbiddenSymbols.isEmpty()) {
+        if(forbiddenSymbols == null || forbiddenSymbols.isEmpty()) {
             throw new ViewException("forbiddenSymbols can't be blank");
         }
         this.fieldCaption = fieldCaption;
