@@ -17,7 +17,7 @@ public class TableModel<C> extends AbstractTableModel {
 
     private final List<C> list = new ArrayList<>();
     private final transient ComponentRepresentation<C> representation;
-    private final List<ReportField> fields;
+    private final transient List<ReportField> fields;
 
     public TableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
         this.representation = representation;

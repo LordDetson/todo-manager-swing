@@ -10,7 +10,7 @@ import by.babanin.todo.view.util.GUIUtils;
 
 public class RunnableAction extends AbstractAction {
 
-    private final Runnable runnable;
+    private final transient Runnable runnable;
 
     public RunnableAction(Icon icon, String toolTip, int mnemonicKey, Runnable runnable) {
         this.runnable = runnable;

@@ -20,8 +20,8 @@ import by.babanin.todo.view.util.ServiceHolder;
 
 public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable, I> extends CrudTablePanel<C, I> {
 
-    private Action moveUpAction;
-    private Action moveDownAction;
+    private transient Action moveUpAction;
+    private transient Action moveDownAction;
     private JButton moveUpButton;
     private JButton moveDownButton;
 

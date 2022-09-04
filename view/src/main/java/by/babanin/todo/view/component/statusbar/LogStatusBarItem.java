@@ -40,7 +40,7 @@ public class LogStatusBarItem extends StatusBarItem {
     private final Map<LogOwner, Logger> loggerMap = new LinkedHashMap<>();
     private final transient CombinedLogger combinedLogger = new CombinedLogger();
 
-    private final Action showLogAction;
+    private final transient Action showLogAction;
 
     public LogStatusBarItem() {
         showLogAction = createShowLogAction();

@@ -46,7 +46,7 @@ public class ComponentForm<C> extends JPanel {
     private final Map<ReportField, Object> values = new HashMap<>();
     private JDialog owner;
     private LogStatusBarItem statusBarItem;
-    private Action closeDialogAction;
+    private transient Action closeDialogAction;
     private JButton applyButton;
     private JButton cancelButton;
 

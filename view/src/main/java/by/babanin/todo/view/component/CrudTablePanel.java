@@ -48,8 +48,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     private JToolBar toolBar;
 
-    private Action showEditDialogAction;
-    private Action showDeleteConfirmDialogAction;
+    private transient Action showEditDialogAction;
+    private transient Action showDeleteConfirmDialogAction;
     private JButton createButton;
     private JButton editButton;
     private JButton deleteButton;
