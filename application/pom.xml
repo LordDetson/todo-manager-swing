@@ -12,7 +12,7 @@
     <artifactId>application</artifactId>
 
     <properties>
-        <sonar.coverage.exclusions>**/repository/**/*</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>**/exception/**/*, **/repository/**/*</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
@@ -55,6 +55,12 @@
                         </goals>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude>**/exception/**/*</exclude>
+                        <exclude>**/repository/**/*</exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
