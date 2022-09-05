@@ -11,6 +11,10 @@
 
     <artifactId>data-generator</artifactId>
 
+    <properties>
+        <sonar.coverage.exclusions>**/*</sonar.coverage.exclusions>
+    </properties>
+
     <dependencies>
         <dependency>
             <groupId>by.babanin.todo</groupId>
