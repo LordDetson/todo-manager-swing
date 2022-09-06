@@ -23,7 +23,6 @@ import javax.swing.JFrame;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -102,9 +101,6 @@ public final class GUIUtils {
         Objects.requireNonNull(changeListener);
         DocumentListener dl = new DocumentListener() {
 
-            private int lastChange = 0;
-            private int lastNotifiedChange = 0;
-
             @Override
             public void insertUpdate(DocumentEvent e) {
                 changedUpdate(e);
@@ -117,13 +113,7 @@ public final class GUIUtils {
 
             @Override
             public void changedUpdate(DocumentEvent e) {
-                lastChange++;
-                SwingUtilities.invokeLater(() -> {
-                    if(lastNotifiedChange != lastChange) {
-                        lastNotifiedChange = lastChange;
-                        changeListener.stateChanged(new ChangeEvent(text));
-                    }
-                });
+                changeListener.stateChanged(new ChangeEvent(text));
             }
         };
         text.addPropertyChangeListener("document", (PropertyChangeEvent e) -> {
