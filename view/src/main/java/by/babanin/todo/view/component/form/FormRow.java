@@ -93,6 +93,9 @@ public abstract class FormRow<T> {
             task.addFinishListener(this::handleValidationResults);
             TaskManager.run(task);
         }
+        else {
+            fireInputEvent(true, false);
+        }
     }
 
     private void handleValidationResults(List<ValidationResult> validationResults) {
@@ -102,6 +105,10 @@ public abstract class FormRow<T> {
                 .noneMatch(result -> result.hasMessages(LogMessageType.ERROR));
         boolean hasWarning = validationResults.stream()
                 .anyMatch(result -> result.hasMessages(LogMessageType.WARNING));
+        fireInputEvent(valid, hasWarning);
+    }
+
+    private void fireInputEvent(boolean valid, boolean hasWarning) {
         InputEvent event = new InputEvent(getInputComponent());
         event.setValid(valid);
         event.setHasWarning(hasWarning);
