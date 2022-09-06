@@ -32,12 +32,12 @@ public class TextAreaFormRow extends FormRow<String> {
     }
 
     @Override
-    public String getValue() {
+    public String getNewValue() {
         return textArea.getText();
     }
 
     @Override
-    public void setValue(String value) {
+    public void setNewValue(String value) {
         textArea.setText(value);
         textArea.setCaretPosition(0);
     }

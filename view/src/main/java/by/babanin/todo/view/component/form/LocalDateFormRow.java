@@ -26,12 +26,12 @@ public class LocalDateFormRow extends FormRow<LocalDate> {
     }
 
     @Override
-    public LocalDate getValue() {
+    public LocalDate getNewValue() {
         return datePicker.getDate();
     }
 
     @Override
-    public void setValue(LocalDate value) {
+    public void setNewValue(LocalDate value) {
         datePicker.setDate(value);
     }
 }

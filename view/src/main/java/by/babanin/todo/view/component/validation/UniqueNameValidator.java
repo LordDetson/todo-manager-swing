@@ -18,10 +18,10 @@ public class UniqueNameValidator implements Validator {
     }
 
     @Override
-    public ValidationResult validate(Object value) {
+    public ValidationResult validate(Object currentValue, Object newValue) {
         ValidationResult result = new ValidationResult();
-        if(value != null) {
-            if(value instanceof String name) {
+        if(newValue != null && (currentValue == null || !currentValue.equals(newValue))) {
+            if(newValue instanceof String name) {
                 if(Boolean.TRUE.equals(existsNameFunction.apply(name))) {
                     String uniqueNameMessage = Translator.toLocale(TranslateCode.UNIQUE_NAME)
                             .formatted(name, Translator.getComponentCaption(componentType).toLowerCase());
@@ -29,7 +29,7 @@ public class UniqueNameValidator implements Validator {
                 }
             }
             else {
-                throw new ViewException(value.getClass().getSimpleName() + " value type should be String");
+                throw new ViewException(newValue.getClass().getSimpleName() + " value type should be String");
             }
         }
         return result;

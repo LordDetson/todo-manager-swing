@@ -46,12 +46,21 @@ public abstract class FormRow<T> {
 
     public abstract JComponent getInputComponent();
 
-    public abstract T getValue();
+    @SuppressWarnings("unchecked")
+    public T getCurrentValue() {
+        if(component != null) {
+            return (T) field.getValue(component);
+        }
+        return null;
+    }
 
-    public abstract void setValue(T value);
+    public abstract T getNewValue();
+
+    public abstract void setNewValue(T value);
 
     public void setComponent(Object component) {
         this.component = component;
+        setNewValue(getCurrentValue());
     }
 
     public Optional<Object> getComponent() {
@@ -67,7 +76,7 @@ public abstract class FormRow<T> {
     }
 
     protected void stateChanged() {
-        validate(getValue());
+        validate(getCurrentValue(), getNewValue());
     }
 
     public Logger getLogger() {
@@ -78,9 +87,9 @@ public abstract class FormRow<T> {
         this.validators.addAll(validators);
     }
 
-    public void validate(Object value) {
+    public void validate(T currentValue, T newValue) {
         if(!validators.isEmpty()) {
-            ValidationTask task = new ValidationTask(value, validators);
+            ValidationTask task = new ValidationTask(currentValue, newValue, validators);
             task.addFinishListener(this::handleValidationResults);
             TaskManager.run(task);
         }

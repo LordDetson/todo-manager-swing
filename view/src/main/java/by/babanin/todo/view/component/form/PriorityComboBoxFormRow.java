@@ -23,14 +23,14 @@ public class PriorityComboBoxFormRow extends ComboBoxFormRow<Priority> {
         GetTask<Priority, Long, PriorityService> task = new GetTask<>(ServiceHolder.getPriorityService());
         task.addFinishListener(items -> {
             setItems(items);
-            setValue(selectedPriority);
+            setNewValue(selectedPriority);
         });
         TaskManager.run(task);
     }
 
     @Override
-    public void setValue(Priority value) {
-        super.setValue(value);
+    public void setNewValue(Priority value) {
+        super.setNewValue(value);
         this.selectedPriority = value;
     }
 }

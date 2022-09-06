@@ -7,18 +7,20 @@ import by.babanin.todo.task.AbstractTask;
 
 public class ValidationTask extends AbstractTask<List<ValidationResult>> {
 
-    private final Object value;
+    private final Object currentValue;
+    private final Object newValue;
     private final List<Validator> validators = new ArrayList<>();
 
-    public ValidationTask(Object value, List<Validator> validators) {
-        this.value = value;
+    public ValidationTask(Object currentValue, Object newValue, List<Validator> validators) {
+        this.currentValue = currentValue;
+        this.newValue = newValue;
         this.validators.addAll(validators);
     }
 
     @Override
     public List<ValidationResult> execute() {
         return validators.stream()
-                .map(validator -> validator.validate(value))
+                .map(validator -> validator.validate(currentValue, newValue))
                 .filter(ValidationResult::isNotEmpty)
                 .toList();
     }

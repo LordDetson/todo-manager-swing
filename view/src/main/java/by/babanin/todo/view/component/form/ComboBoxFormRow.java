@@ -28,12 +28,12 @@ public class ComboBoxFormRow<T> extends FormRow<T> {
 
     @Override
     @SuppressWarnings("unchecked")
-    public T getValue() {
+    public T getNewValue() {
         return (T) comboBox.getSelectedItem();
     }
 
     @Override
-    public void setValue(T value) {
+    public void setNewValue(T value) {
         comboBox.setSelectedItem(value);
     }
 

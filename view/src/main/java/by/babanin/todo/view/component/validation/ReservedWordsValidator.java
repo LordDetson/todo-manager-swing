@@ -16,9 +16,9 @@ public class ReservedWordsValidator implements Validator {
     }
 
     @Override
-    public ValidationResult validate(Object value) {
+    public ValidationResult validate(Object currentValue, Object newValue) {
         ValidationResult result = new ValidationResult();
-        if(value instanceof String name && reservedWords.contains(name)) {
+        if(newValue instanceof String name && reservedWords.contains(name)) {
             StringJoiner joiner = new StringJoiner(", ");
             reservedWords.forEach(joiner::add);
             result.put(LogMessageType.ERROR, "\"" + name + "\" is forbidden to use. Reserved words: " + joiner);

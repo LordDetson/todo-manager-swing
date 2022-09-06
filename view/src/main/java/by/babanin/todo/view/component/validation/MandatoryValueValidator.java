@@ -17,9 +17,9 @@ public class MandatoryValueValidator implements Validator {
     }
 
     @Override
-    public ValidationResult validate(Object value) {
+    public ValidationResult validate(Object currentValue, Object newValue) {
         ValidationResult result = new ValidationResult();
-        if(value == null) {
+        if(newValue == null) {
             result.put(LogMessageType.ERROR, fieldCaption + " can't be empty");
         }
         return result;

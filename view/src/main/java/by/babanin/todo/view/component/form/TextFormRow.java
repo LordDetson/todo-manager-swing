@@ -28,7 +28,7 @@ public class TextFormRow extends FormRow<String> {
     }
 
     @Override
-    public String getValue() {
+    public String getNewValue() {
         String text = textField.getText().trim();
         if(StringUtils.isBlank(text)) {
             text = null;
@@ -37,7 +37,7 @@ public class TextFormRow extends FormRow<String> {
     }
 
     @Override
-    public void setValue(String value) {
+    public void setNewValue(String value) {
         textField.setText(value);
     }
 }

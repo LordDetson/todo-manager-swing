@@ -115,7 +115,6 @@ public class ComponentForm<C> extends JPanel {
         FormRow<Object> formRow = formRowFactory.factor(field);
         if(component != null) {
             formRow.setComponent(component);
-            formRow.setValue(componentRepresentation.getValueAt(component, field));
         }
         return formRow;
     }
@@ -138,7 +137,7 @@ public class ComponentForm<C> extends JPanel {
             if(valid) {
                 enable = formRows.stream()
                         .filter(formRow -> formRow.getField().isMandatory())
-                        .allMatch(formRow -> formRow.getValue() != null) &&
+                        .allMatch(formRow -> formRow.getNewValue() != null) &&
                         formRows.stream()
                                 .allMatch(formRow -> formRow.getLogger().isValid());
             }
@@ -147,7 +146,7 @@ public class ComponentForm<C> extends JPanel {
     }
 
     private void collectValues(Map<ReportField, Object> values) {
-        formRows.forEach(formRow -> values.put(formRow.getField(), formRow.getValue()));
+        formRows.forEach(formRow -> values.put(formRow.getField(), formRow.getNewValue()));
     }
 
     private void closeDialog() {

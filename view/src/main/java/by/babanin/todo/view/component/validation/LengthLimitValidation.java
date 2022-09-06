@@ -30,17 +30,17 @@ public class LengthLimitValidation implements Validator {
     }
 
     @Override
-    public ValidationResult validate(Object value) {
+    public ValidationResult validate(Object currentValue, Object newValue) {
         ValidationResult result = new ValidationResult();
-        if(value != null) {
-            if(value instanceof String name) {
+        if(newValue != null) {
+            if(newValue instanceof String name) {
                 if(name.length() > maxLength) {
                     String lengthLimitMessage = Translator.toLocale(TranslateCode.LENGTH_LIMIT).formatted(fieldCaption, maxLength);
                     result.put(LogMessageType.ERROR, lengthLimitMessage);
                 }
             }
             else {
-                throw new ViewException(value.getClass().getSimpleName() + " value type should be String");
+                throw new ViewException(newValue.getClass().getSimpleName() + " value type should be String");
             }
         }
         return result;
