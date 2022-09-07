@@ -44,7 +44,7 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
 
     @Transactional
     public Priority create(long position, String name) {
-        validateName(name);
+        validateName(name, null);
         Priority priority = Priority.builder()
                 .name(name)
                 .build();
@@ -53,13 +53,13 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
 
     @Transactional
     public Priority rename(Long id, String name) {
-        validateName(name);
         Priority priority = getById(id);
+        validateName(name, priority);
         priority.setName(name);
         return getRepository().save(priority);
     }
 
-    private void validateName(String name) {
+    private void validateName(String name, Priority priority) {
         if(StringUtils.isBlank(name)) {
             throw new ApplicationException("Name can't be blank");
         }
@@ -73,7 +73,7 @@ public class PriorityService extends AbstractIndexableCrudService<Priority, Long
             throw new ApplicationException("Name must not have a newline character");
         }
         Optional<Priority> found = findByName(name);
-        if(found.isPresent()) {
+        if(found.isPresent() && !found.get().equals(priority)) {
             throw new ApplicationException(name + " priority name already exist");
         }
     }

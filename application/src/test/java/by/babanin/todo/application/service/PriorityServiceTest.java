@@ -128,15 +128,28 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void renameWithExistedName() {
-        Priority priority = getTestEntityHolder().getEntities().get(0);
+        List<Priority> entities = getTestEntityHolder().getEntities();
+        Priority priority = entities.get(0);
         Long id = priority.getId();
-        String name = getTestEntityHolder().getEntities().get(0).getName();
+        String name = entities.get(1).getName();
 
         PriorityService service = getService();
         assertAll(
                 () -> assertThrows(ApplicationException.class, () -> service.rename(id, name)),
                 () -> assertEquals(priority.getName(), service.getById(id).getName())
         );
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void renameWithSameName() {
+        List<Priority> entities = getTestEntityHolder().getEntities();
+        Priority priority = entities.get(0);
+        Long id = priority.getId();
+
+        PriorityService service = getService();
+        Priority result = service.rename(id, priority.getName());
+        assertEquals(priority.getName(), result.getName());
     }
 
     @Test
