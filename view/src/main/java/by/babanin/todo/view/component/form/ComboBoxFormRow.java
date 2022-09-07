@@ -13,12 +13,17 @@ public class ComboBoxFormRow<T> extends FormRow<T> {
 
     private final JComboBox<T> comboBox;
     private boolean allowNone;
+    private boolean ignoreStatusChange;
 
     public ComboBoxFormRow(ReportField field) {
         super(field);
         this.comboBox = new JComboBox<>();
         comboBox.setMaximumSize(new Dimension(comboBox.getMaximumSize().width, comboBox.getPreferredSize().height));
-        comboBox.addItemListener(event -> stateChanged());
+        comboBox.addItemListener(event -> {
+            if(!ignoreStatusChange) {
+                stateChanged();
+            }
+        });
     }
 
     @Override
@@ -50,6 +55,16 @@ public class ComboBoxFormRow<T> extends FormRow<T> {
         if(allowNone) {
             comboBox.addItem(null);
         }
+        ignoreStatusChange();
         items.forEach(comboBox::addItem);
+        enableStatusChange();
+    }
+
+    protected void ignoreStatusChange() {
+        ignoreStatusChange = true;
+    }
+
+    protected void enableStatusChange() {
+        ignoreStatusChange = false;
     }
 }
