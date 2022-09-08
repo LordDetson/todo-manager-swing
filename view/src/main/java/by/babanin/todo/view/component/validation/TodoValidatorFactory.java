@@ -26,9 +26,11 @@ public class TodoValidatorFactory implements ValidatorFactory {
             }
             if(fieldName.equals(Fields.title)) {
                 validators.add(new LengthLimitValidation(fieldCaption, TITLE_LENGTH_LIMIT));
+                validators.add(new AsciiPrintableValidator(fieldCaption));
             }
             else if(fieldName.equals(Fields.description)) {
                 validators.add(new LengthLimitValidation(fieldCaption, DESCRIPTION_LENGTH_LIMIT));
+                validators.add(new AsciiPrintableValidator(fieldCaption));
             }
         }
         return validators;

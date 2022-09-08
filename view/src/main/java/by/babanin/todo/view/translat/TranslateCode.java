@@ -27,6 +27,7 @@ public class TranslateCode {
     public static final String UNIQUE_NAME = "message.uniqueName";
     public static final String LENGTH_LIMIT = "message.lengthLimit";
     public static final String FORBIDDEN_SYMBOLS = "message.forbiddenSymbols";
+    public static final String NON_ASCII_PRINTABLE = "message.nonAsciiPrintable";
     public static final String EXCEPTION_OK_BUTTON_TEXT = "exception.ok.button.text";
     public static final String EXCEPTION_SAVE_BUTTON_TEXT = "exception.save.button.text";
     public static final String EXCEPTION_SHOW_DETAILS_BUTTON_TEXT = "exception.showDetails.button.text";
