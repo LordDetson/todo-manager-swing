@@ -1,11 +1,13 @@
 package by.babanin.todo.view.component.logger;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Optional;
 import java.util.Set;
 
 import by.babanin.todo.view.translat.TranslateCode;
@@ -64,7 +66,8 @@ public class Logger {
     }
 
     public List<String> getLog(LogMessageType type) {
-        List<String> result = logs.get(type);
+        List<String> result = Optional.ofNullable(logs.get(type))
+                .orElse(Collections.emptyList());
 
         if(moreLinesIgnored.contains(type)) {
             result = new ArrayList<>(result);
