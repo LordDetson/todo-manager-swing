@@ -3,6 +3,7 @@ package by.babanin.todo.application.service;
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.StringJoiner;
 
 import org.apache.commons.lang3.StringUtils;
@@ -56,20 +57,24 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
 
     @Transactional
     public Todo save(Todo todo) {
-        validateTitle(todo.getTitle());
-        validatePriority(todo.getPriority());
-        validatePannedDate(todo.getPlannedDate());
-
         Todo todoFromDB = getById(todo.getId());
-        StatusWorkflow.validateStatus(todoFromDB, todo.getStatus());
-
-        todoFromDB.setTitle(todo.getTitle());
-        todoFromDB.setDescription(todo.getDescription());
-        todoFromDB.setPriority(todo.getPriority());
-        if(todoFromDB.getStatus() != todo.getStatus()) {
+        if(!Objects.equals(todoFromDB.getTitle(), todo.getTitle())) {
+            validateTitle(todo.getTitle());
+            todoFromDB.setTitle(todo.getTitle());
+        }
+        if(!Objects.equals(todoFromDB.getPriority(), todo.getPriority())) {
+            validatePriority(todo.getPriority());
+            todoFromDB.setPriority(todo.getPriority());
+        }
+        if(!Objects.equals(todoFromDB.getPlannedDate(), todo.getPlannedDate())) {
+            validatePannedDate(todo.getPlannedDate());
+            todoFromDB.setPlannedDate(todo.getPlannedDate());
+        }
+        if(!Objects.equals(todoFromDB.getStatus(), todo.getStatus())) {
+            StatusWorkflow.validateStatus(todoFromDB, todo.getStatus());
             todoFromDB = StatusWorkflow.get(todoFromDB).goNextStatus();
         }
-        todoFromDB.setPlannedDate(todo.getPlannedDate());
+        todoFromDB.setDescription(todo.getDescription());
         return getRepository().save(todoFromDB);
     }
 
