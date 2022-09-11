@@ -1,4 +1,4 @@
-package by.babanin.todo.config;
+package by.babanin.todo.view.config;
 
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -9,7 +9,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
 
 @Configuration
-public class ApplicationConfiguration {
+public class ViewConfiguration {
 
     @Value("${application.translation.properties.baseName}")
     private String propertiesBasename;
