@@ -7,6 +7,7 @@ import org.springframework.boot.builder.SpringApplicationBuilder;
 public class Application {
 
     public static void main(String[] args) {
+        System.setProperty("spring.config.additional-location", "classpath:view.properties");
         new SpringApplicationBuilder(Application.class)
                 .headless(false)
                 .run(args);
