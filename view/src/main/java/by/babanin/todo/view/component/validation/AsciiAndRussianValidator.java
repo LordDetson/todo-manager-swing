@@ -1,17 +1,17 @@
 package by.babanin.todo.view.component.validation;
 
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.CharUtils;
 
 import by.babanin.todo.view.component.logger.LogMessageType;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
-public class AsciiPrintableValidator implements Validator {
+public class AsciiAndRussianValidator implements Validator {
 
     private final String fieldCaption;
 
-    public AsciiPrintableValidator(String fieldCaption) {
+    public AsciiAndRussianValidator(String fieldCaption) {
         this.fieldCaption = fieldCaption;
     }
 
@@ -20,7 +20,7 @@ public class AsciiPrintableValidator implements Validator {
         ValidationResult result = new ValidationResult();
         if(newValue != null) {
             if(newValue instanceof String str) {
-                if(!StringUtils.isAsciiPrintable(str)) {
+                if(!containsAsciiAndRussian(str)) {
                     String message = Translator.toLocale(TranslateCode.NON_ASCII_PRINTABLE).formatted(fieldCaption);
                     result.put(LogMessageType.WARNING, message);
                 }
@@ -30,5 +30,19 @@ public class AsciiPrintableValidator implements Validator {
             }
         }
         return result;
+    }
+
+    public boolean containsAsciiAndRussian(final CharSequence cs) {
+        if (cs == null) {
+            return false;
+        }
+        final int sz = cs.length();
+        for (int i = 0; i < sz; i++) {
+            char c = cs.charAt(i);
+            if (!CharUtils.isAscii(c) && (c < 'А' || c > 'я')) {
+                return false;
+            }
+        }
+        return true;
     }
 }

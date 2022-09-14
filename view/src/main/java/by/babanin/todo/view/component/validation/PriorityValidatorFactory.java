@@ -31,7 +31,7 @@ public class PriorityValidatorFactory implements ValidatorFactory {
             validators.add(new ForbiddenSymbolsValidator(fieldCaption, ServiceHolder.getPriorityService().getForbiddenSymbolsForName()));
             String unprioritized = Translator.toLocale(TranslateCode.PRIORITY_UNPRIORITIZED);
             validators.add(new ReservedWordsValidator(Collections.singletonList(unprioritized)));
-            validators.add(new AsciiPrintableValidator(fieldCaption));
+            validators.add(new AsciiAndRussianValidator(fieldCaption));
         }
         return validators;
     }
