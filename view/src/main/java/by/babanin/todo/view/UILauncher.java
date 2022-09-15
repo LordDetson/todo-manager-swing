@@ -23,7 +23,7 @@ import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.custom.UICustomizer;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.FontResources;
+import by.babanin.todo.font.FontResources;
 import by.babanin.todo.view.util.GUIUtils;
 import by.babanin.todo.view.util.IconResources;
 import by.babanin.todo.view.util.ServiceHolder;

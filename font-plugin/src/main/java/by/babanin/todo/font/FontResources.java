@@ -1,4 +1,4 @@
-package by.babanin.todo.view.util;
+package by.babanin.todo.font;
 
 import java.awt.Font;
 import java.awt.FontFormatException;
@@ -9,27 +9,27 @@ import java.util.Arrays;
 
 import javax.swing.UIManager;
 
-import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.font.exception.FontResourcesException;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
 public class FontResources {
 
     public static void registerAdditionalFonts(String fontsPath) {
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-Black.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-BlackItalic.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-Bold.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-BoldItalic.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-ExtraBold.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-ExtraBoldItalic.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-Italic.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-Light.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-LightItalic.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-Medium.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-MediumItalic.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-Regular.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-SemiBold.ttf");
-        registerAdditionalFont(fontsPath, "Rubik/static/Rubik-SemiBoldItalic.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Black.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-BlackItalic.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Bold.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-BoldItalic.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-ExtraBold.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-ExtraBoldItalic.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Italic.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Light.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-LightItalic.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Medium.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-MediumItalic.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Regular.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-SemiBold.ttf");
+        registerAdditionalFont(fontsPath, "rubik/static/Rubik-SemiBoldItalic.ttf");
     }
 
     private static void registerAdditionalFont(String fontsPath, String name) {
@@ -40,7 +40,7 @@ public class FontResources {
             }
         }
         catch(IOException | FontFormatException e) {
-            throw new ViewException(e);
+            throw new FontResourcesException(e);
         }
     }
 
@@ -55,7 +55,7 @@ public class FontResources {
             }
         }
         else {
-            throw new ViewException(fontName + " doesn't exist");
+            throw new FontResourcesException(fontName + " doesn't exist");
         }
     }
 }
