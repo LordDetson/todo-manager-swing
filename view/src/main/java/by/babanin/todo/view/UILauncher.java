@@ -25,7 +25,7 @@ import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.font.FontResources;
 import by.babanin.todo.view.util.GUIUtils;
-import by.babanin.todo.view.util.IconResources;
+import by.babanin.todo.image.IconResources;
 import by.babanin.todo.view.util.ServiceHolder;
 
 @Component

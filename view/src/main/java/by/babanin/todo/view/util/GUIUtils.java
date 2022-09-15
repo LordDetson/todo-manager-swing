@@ -32,7 +32,6 @@ import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.exception.ResourceException;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.Translator;
 import lombok.experimental.UtilityClass;
@@ -77,23 +76,6 @@ public final class GUIUtils {
         dimension.width = (int) (dimension.width * widthScale / SCALE_BASE);
         dimension.height = (int) (dimension.height * heightScale / SCALE_BASE);
         return dimension;
-    }
-
-    public static String buildResourcePath(String path, String name, String extension) {
-        StringBuilder resourcePathBuilder = new StringBuilder();
-        if(path != null && !path.isBlank()) {
-            resourcePathBuilder.append(path);
-        }
-        if(name != null && !name.isBlank()) {
-            resourcePathBuilder.append(name);
-        }
-        else {
-            throw new ResourceException("name can't be empty");
-        }
-        if(extension != null && !extension.isBlank()) {
-            resourcePathBuilder.append(".").append(extension);
-        }
-        return resourcePathBuilder.toString();
     }
 
     public static void addChangeListener(JTextComponent text, ChangeListener changeListener) {

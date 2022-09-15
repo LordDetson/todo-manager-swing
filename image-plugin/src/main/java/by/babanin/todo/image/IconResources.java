@@ -1,4 +1,4 @@
-package by.babanin.todo.view.util;
+package by.babanin.todo.image;
 
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 
@@ -24,7 +24,7 @@ public class IconResources {
             path = "";
         }
         path = iconsPath + path;
-        path = GUIUtils.buildResourcePath(path, name, SVG);
+        path = ResourceUtils.buildResourcePath(path, name, SVG);
         return new FlatSVGIcon(path, width, height);
     }
 }

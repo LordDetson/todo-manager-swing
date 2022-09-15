@@ -39,7 +39,7 @@ import org.apache.commons.lang3.StringUtils;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
-import by.babanin.todo.view.util.IconResources;
+import by.babanin.todo.image.IconResources;
 
 public final class ExceptionDialog extends JDialog {
 

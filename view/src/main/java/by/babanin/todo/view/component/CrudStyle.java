@@ -17,7 +17,7 @@ import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter;
 
 import by.babanin.todo.view.component.validation.ValidatorFactory;
 import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.IconResources;
+import by.babanin.todo.image.IconResources;
 
 public class CrudStyle implements Serializable {
 
