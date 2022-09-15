@@ -3,6 +3,7 @@ package by.babanin.todo.view.exception;
 import java.awt.BorderLayout;
 import java.awt.Dialog;
 import java.awt.Dimension;
+import java.awt.EventQueue;
 import java.awt.Insets;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -30,6 +31,7 @@ import javax.swing.JTextArea;
 import javax.swing.JToggleButton;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.SwingUtilities;
 import javax.swing.WindowConstants;
 
 import org.apache.commons.lang3.StringUtils;
@@ -60,11 +62,11 @@ public final class ExceptionDialog extends JDialog {
     private JPanel buttonsPanel;
     private JScrollPane detailsPanel;
 
-    public ExceptionDialog(Throwable throwable) {
+    private ExceptionDialog(Throwable throwable) {
         super(GUIUtils.getActiveWindow(), Translator.toLocale(TranslateCode.ERROR), Dialog.DEFAULT_MODALITY_TYPE);
         String msg = throwable.getMessage();
         if(StringUtils.isBlank(msg)) {
-            msg = "An unexpected error occurred: " + throwable.getClass().getSimpleName();
+            msg = "Unexpected error occurred: " + throwable.getClass().getSimpleName();
         }
         this.message = msg;
         this.details = GUIUtils.stacktraceToString(throwable);
@@ -209,8 +211,18 @@ public final class ExceptionDialog extends JDialog {
                 writer.flush();
             }
             catch(FileNotFoundException e) {
-                ExceptionHandler.getInstance().handle(e);
+                throw new ViewException(e);
             }
+        }
+    }
+
+    public static void display(Throwable throwable) {
+        ExceptionDialog exceptionDialog = new ExceptionDialog(throwable);
+        if(SwingUtilities.isEventDispatchThread()) {
+            exceptionDialog.setVisible(true);
+        }
+        else {
+            EventQueue.invokeLater(() -> exceptionDialog.setVisible(true));
         }
     }
 }

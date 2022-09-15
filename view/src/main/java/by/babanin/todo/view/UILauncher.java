@@ -21,7 +21,6 @@ import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.custom.UICustomizer;
-import by.babanin.todo.view.exception.ExceptionHandler;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.FontResources;
@@ -59,7 +58,6 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
-        Thread.setDefaultUncaughtExceptionHandler(ExceptionHandler.getInstance());
         Translator.setMessageSource(messageSource);
         ServiceHolder.setPriorityService(priorityService);
         ServiceHolder.setTodoService(todoService);

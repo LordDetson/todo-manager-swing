@@ -48,9 +48,12 @@ public class LoggingAspect {
                     resultString);
             return result;
         }
-        catch(Throwable e) {
-            log.error("Illegal argument {} in {} {}.{}()", argsString, returnTypeName, withinTypeName, methodName);
-            throw e;
+        catch(Throwable throwable) {
+            String exceptionName = throwable.getClass().getSimpleName();
+            String message = throwable.getMessage();
+            log.error("Method {} {}.{}() threw {}: {} with arguments = {}", returnTypeName, withinTypeName,
+                    methodName, exceptionName, message, argsString);
+            throw throwable;
         }
     }
 
