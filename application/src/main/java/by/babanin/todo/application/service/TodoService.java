@@ -85,11 +85,13 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
     }
 
     private void validatePriority(Priority priority) {
-        if(priority != null && priority.getId() == null) {
-            throw new ApplicationException("Priority should have id");
-        }
-        if(priority != null && priority.getId() != null && !priorityRepository.existsById(priority.getId())) {
-            throw new ApplicationException("Priority should be persisted");
+        if(priority != null) {
+            if(priority.getId() == null) {
+                throw new ApplicationException("Priority should have id");
+            }
+            else if(!priorityRepository.existsById(priority.getId())) {
+                throw new ApplicationException("Priority should be persisted");
+            }
         }
     }
 
@@ -105,8 +107,7 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
             throw new ApplicationException("Priorities list is empty");
         }
         List<Priority> notExistedPriorities = priorities.stream()
-                .filter(priority -> priority.getId() == null
-                        || (priority.getId() != null && !priorityRepository.existsById(priority.getId())))
+                .filter(priority -> priority.getId() == null || !priorityRepository.existsById(priority.getId()))
                 .toList();
         if(!notExistedPriorities.isEmpty()) {
             StringJoiner joiner = new StringJoiner(", ");
