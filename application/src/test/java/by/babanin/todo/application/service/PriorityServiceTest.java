@@ -2,11 +2,13 @@ package by.babanin.todo.application.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -14,8 +16,12 @@ import by.babanin.todo.application.exception.ApplicationException;
 import by.babanin.todo.application.holder.PrioritiesHolder;
 import by.babanin.todo.application.holder.TestEntitiesHolder;
 import by.babanin.todo.model.Priority;
+import by.babanin.todo.model.Todo;
 
 class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, PriorityService> {
+
+    @Autowired
+    private TodoService todoService;
 
     @Override
     protected TestEntitiesHolder<Priority, Long> newTestEntitiesHolder() {
@@ -210,5 +216,17 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
                 () -> assertNotNull(foundPriority),
                 () -> assertTrue(foundPriority.isEmpty())
         );
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void deleteWithLinkedTodos() {
+        Priority priority = getTestEntityHolder().getEntities().get(0);
+        Todo todo = todoService.create("Test1", "Desciption", priority, LocalDate.now());
+
+        getService().delete(priority);
+
+        assertNull(todoService.getById(todo.getId()).getPriority());
+        todoService.deleteAll();
     }
 }
