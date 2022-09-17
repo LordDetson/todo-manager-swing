@@ -204,6 +204,7 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
     }
 
     @Test
+    @Transactional(propagation = Propagation.NEVER)
     void save() {
         List<Todo> entities = getTestEntityHolder().getEntities();
         Todo todo = entities.get(0);
@@ -233,6 +234,7 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
                 () -> assertEquals(todo.getCompletionDate(), result.getCompletionDate()),
                 () -> checkPositions(getRepository(), entities)
         );
+        priorityService.deleteAll();
     }
 
     @Test
