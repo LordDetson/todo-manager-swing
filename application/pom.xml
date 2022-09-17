@@ -12,7 +12,7 @@
     <artifactId>application</artifactId>
 
     <properties>
-        <sonar.coverage.exclusions>**/exception/**/*, **/repository/**/*</sonar.coverage.exclusions>
+        <sonar.coverage.exclusions>**/exception/**/*, **/repository/**/*, **/aspect/**/*</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
