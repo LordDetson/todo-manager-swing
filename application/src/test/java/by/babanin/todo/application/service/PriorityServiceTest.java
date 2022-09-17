@@ -229,4 +229,16 @@ class PriorityServiceTest extends IndexableCrudServiceTest<Priority, Long, Prior
         assertNull(todoService.getById(todo.getId()).getPriority());
         todoService.deleteAll();
     }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void deleteAllWithLinkedTodos() {
+        Priority priority = getTestEntityHolder().getEntities().get(0);
+        Todo todo = todoService.create("Test1", "Desciption", priority, LocalDate.now());
+
+        getService().deleteAll();
+
+        assertNull(todoService.getById(todo.getId()).getPriority());
+        todoService.deleteAll();
+    }
 }

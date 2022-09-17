@@ -31,6 +31,7 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Override
     public List<E> deleteAll() {
         List<E> entities = getAll();
+        updateReferencesBeforeDelete(entities);
         repository.deleteAll();
         return entities;
     }
