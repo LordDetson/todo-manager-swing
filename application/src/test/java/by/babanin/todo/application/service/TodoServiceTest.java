@@ -274,11 +274,13 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
     @Test
     @Transactional(propagation = Propagation.NEVER)
     void saveWithEmptyPriority() {
-        Todo todo = getTestEntityHolder().getEntities().get(0);
+        Priority priority = priorityService.create("Test");
+        Todo todo = getService().create("Test", "Description", priority, LocalDate.now());
         todo.setPriority(null);
 
         Todo result = getService().save(todo);
         assertNull(result.getPriority());
+        priorityService.deleteAll();
     }
 
     @Test
