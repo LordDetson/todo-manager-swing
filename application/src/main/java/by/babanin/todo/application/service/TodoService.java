@@ -58,20 +58,24 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
     @Transactional
     public Todo save(Todo todo) {
         Todo todoFromDB = getById(todo.getId());
-        if(!Objects.equals(todoFromDB.getTitle(), todo.getTitle())) {
-            validateTitle(todo.getTitle());
-            todoFromDB.setTitle(todo.getTitle());
+        String title = todo.getTitle();
+        if(!Objects.equals(todoFromDB.getTitle(), title)) {
+            validateTitle(title);
+            todoFromDB.setTitle(title);
         }
-        if(!Objects.equals(todoFromDB.getPriority(), todo.getPriority())) {
-            validatePriority(todo.getPriority());
-            todoFromDB.setPriority(todo.getPriority());
+        Priority priority = todo.getPriority();
+        if(!Objects.equals(todoFromDB.getPriority(), priority)) {
+            validatePriority(priority);
+            todoFromDB.setPriority(priority);
         }
-        if(!Objects.equals(todoFromDB.getPlannedDate(), todo.getPlannedDate())) {
-            validatePannedDate(todo.getPlannedDate());
-            todoFromDB.setPlannedDate(todo.getPlannedDate());
+        LocalDate plannedDate = todo.getPlannedDate();
+        if(!Objects.equals(todoFromDB.getPlannedDate(), plannedDate)) {
+            validatePannedDate(plannedDate);
+            todoFromDB.setPlannedDate(plannedDate);
         }
-        if(!Objects.equals(todoFromDB.getStatus(), todo.getStatus())) {
-            StatusWorkflow.validateStatus(todoFromDB, todo.getStatus());
+        Status status = todo.getStatus();
+        if(!Objects.equals(todoFromDB.getStatus(), status)) {
+            StatusWorkflow.validateStatus(todoFromDB, status);
             todoFromDB = StatusWorkflow.get(todoFromDB).goNextStatus();
         }
         todoFromDB.setDescription(todo.getDescription());
