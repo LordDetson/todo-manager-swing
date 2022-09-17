@@ -59,11 +59,11 @@ public class Priority implements Persistent<Long>, Indexable {
             return false;
         }
         Priority priority = (Priority) o;
-        return position == priority.position && name.equals(priority.name);
+        return name.equals(priority.name);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(name, position);
+        return Objects.hash(name);
     }
 }
