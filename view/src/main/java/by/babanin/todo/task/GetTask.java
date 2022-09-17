@@ -20,7 +20,7 @@ public class GetTask<E extends Persistent<I>, I, S extends CrudService<E, I>> ex
     }
 
     @Override
-    public List<E> execute() {
+    public List<E> body() {
         S service = getService();
         if(ids.isEmpty()) {
             return service.getAll();

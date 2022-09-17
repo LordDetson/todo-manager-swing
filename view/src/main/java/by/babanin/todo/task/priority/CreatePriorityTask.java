@@ -17,7 +17,7 @@ public class CreatePriorityTask extends SaveTask<Priority, Long, PriorityService
     }
 
     @Override
-    public Priority execute() {
+    public Priority body() {
         return getService().create(getValue(Fields.name));
     }
 }

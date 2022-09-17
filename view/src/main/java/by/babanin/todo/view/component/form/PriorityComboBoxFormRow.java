@@ -4,7 +4,6 @@ import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.GetTask;
-import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.renderer.PriorityComboBoxRenderer;
 import by.babanin.todo.view.util.ServiceHolder;
 
@@ -25,6 +24,6 @@ public class PriorityComboBoxFormRow extends ComboBoxFormRow<Priority> {
             setNewValue(getCurrentValue());
             enableStatusChange();
         });
-        TaskManager.run(task);
+        task.execute();
     }
 }

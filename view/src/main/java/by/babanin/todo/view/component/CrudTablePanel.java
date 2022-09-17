@@ -25,15 +25,13 @@ import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
-import by.babanin.todo.task.ExceptionListener;
-import by.babanin.todo.task.FinishListener;
+import by.babanin.todo.task.listener.ExceptionListener;
+import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.Task;
-import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.progress.ProgressDialog;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.ServiceHolder;
@@ -209,8 +207,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         }
         task.addFinishListener(components -> actionEnabling());
         exceptionListeners.forEach(task::addExceptionListener);
-        ProgressDialog.initiate(task);
-        TaskManager.run(task);
+        task.execute();
     }
 
     public void clear() {
@@ -238,8 +235,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         }
         task.addFinishListener(component -> actionEnabling());
         exceptionListeners.forEach(task::addExceptionListener);
-        ProgressDialog.initiate(task);
-        TaskManager.run(task);
+        task.execute();
     }
 
     protected abstract Task<C> createCreationTask(Map<ReportField, ?> fieldValueMap);
@@ -261,8 +257,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         }
         task.addFinishListener(component -> actionEnabling());
         exceptionListeners.forEach(task::addExceptionListener);
-        ProgressDialog.initiate(task);
-        TaskManager.run(task);
+        task.execute();
     }
 
     protected abstract Task<C> createUpdateTask(Map<ReportField, ?> fieldValueMap, C selectedComponent);
@@ -299,8 +294,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             }
             task.addFinishListener(components -> actionEnabling());
             exceptionListeners.forEach(task::addExceptionListener);
-            ProgressDialog.initiate(task);
-            TaskManager.run(task);
+            task.execute();
         }
     }
 

@@ -18,7 +18,7 @@ public class ValidationTask extends AbstractTask<List<ValidationResult>> {
     }
 
     @Override
-    public List<ValidationResult> execute() {
+    public List<ValidationResult> body() {
         return validators.stream()
                 .map(validator -> validator.validate(currentValue, newValue))
                 .filter(ValidationResult::isNotEmpty)

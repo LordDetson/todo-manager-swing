@@ -13,7 +13,6 @@ import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.SwapTask;
-import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.util.ServiceHolder;
@@ -97,6 +96,6 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
             model.swap(selectedIndex, nextIndex);
             selectRow(nextIndex);
         });
-        TaskManager.run(task);
+        task.execute();
     }
 }

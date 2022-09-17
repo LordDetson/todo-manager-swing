@@ -1,8 +1,5 @@
 package by.babanin.todo.view.config;
 
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -21,10 +18,5 @@ public class ViewConfiguration {
         rs.setDefaultEncoding("UTF-8");
         rs.setUseCodeAsDefaultMessage(true);
         return rs;
-    }
-
-    @Bean
-    public ExecutorService executorService() {
-        return Executors.newSingleThreadExecutor();
     }
 }

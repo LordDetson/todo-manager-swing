@@ -20,7 +20,7 @@ public class UpdateTodoTask extends SaveTask<Todo, Long, TodoService, Todo> {
 
     @Override
 
-    public Todo execute() {
+    public Todo body() {
         todo.setTitle(getValue(Fields.title));
         todo.setDescription(getValue(Fields.description));
         todo.setPriority(getValue(Fields.priority));

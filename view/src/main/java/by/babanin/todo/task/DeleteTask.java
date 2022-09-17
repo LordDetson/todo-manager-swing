@@ -18,7 +18,7 @@ public class DeleteTask<E extends Persistent<I>, I, S extends CrudService<E, I>>
     }
 
     @Override
-    public List<E> execute() {
+    public List<E> body() {
         return getService().deleteAllById(ids);
     }
 }

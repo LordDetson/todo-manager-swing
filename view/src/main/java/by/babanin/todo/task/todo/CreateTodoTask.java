@@ -16,7 +16,7 @@ public class CreateTodoTask extends SaveTask<Todo, Long, TodoService, Todo> {
     }
 
     @Override
-    public Todo execute() {
+    public Todo body() {
         return getService().create(
                 getValue(Fields.title),
                 getValue(Fields.description),

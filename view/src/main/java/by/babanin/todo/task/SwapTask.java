@@ -16,7 +16,7 @@ public class SwapTask<C extends Persistent<I> & Indexable, I, S extends Abstract
     }
 
     @Override
-    public Void execute() {
+    public Void body() {
         getService().swap(position1, position2);
         return null;
     }

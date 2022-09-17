@@ -19,7 +19,6 @@
         <module>model</module>
         <module>application</module>
         <module>view</module>
-        <module>task</module>
         <module>data-generator</module>
         <module>font-plugin</module>
         <module>image-plugin</module>

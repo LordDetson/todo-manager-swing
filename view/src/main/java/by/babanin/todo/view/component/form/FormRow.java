@@ -12,7 +12,6 @@ import javax.swing.event.ChangeListener;
 import com.formdev.flatlaf.FlatClientProperties;
 
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.task.TaskManager;
 import by.babanin.todo.view.component.logger.LogMessageType;
 import by.babanin.todo.view.component.logger.Logger;
 import by.babanin.todo.view.component.validation.ValidationResult;
@@ -91,7 +90,7 @@ public abstract class FormRow<T> {
         if(!validators.isEmpty()) {
             ValidationTask task = new ValidationTask(currentValue, newValue, validators);
             task.addFinishListener(this::handleValidationResults);
-            TaskManager.run(task);
+            task.execute();
         }
         else {
             fireInputEvent(true, false);
