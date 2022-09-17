@@ -21,6 +21,11 @@
     <dependencies>
         <dependency>
             <groupId>by.babanin.todo</groupId>
+            <artifactId>application</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>by.babanin.todo</groupId>
             <artifactId>font-plugin</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
