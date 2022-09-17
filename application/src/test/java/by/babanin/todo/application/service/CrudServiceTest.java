@@ -2,6 +2,7 @@ package by.babanin.todo.application.service;
 
 import static org.junit.jupiter.api.Assertions.*;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
@@ -93,6 +94,15 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
     }
 
     @Test
+    void deleteAllWithEmptyList() {
+        List<List<E>> lists = new ArrayList<>();
+        lists.add(null);
+        lists.add(Collections.emptyList());
+
+        lists.forEach(list -> assertThrows(ApplicationException.class, () -> service.deleteAll(list)));
+    }
+
+    @Test
     void deleteAllById() {
         List<E> allList = testEntitiesHolder.getEntities();
         List<E> entitiesToDelete = List.of(
@@ -127,6 +137,15 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
     }
 
     @Test
+    void deleteAllByIdWithEmptyList() {
+        List<Set<I>> lists = new ArrayList<>();
+        lists.add(null);
+        lists.add(Collections.emptySet());
+
+        lists.forEach(list -> assertThrows(ApplicationException.class, () -> service.deleteAllById(list)));
+    }
+
+    @Test
     void deleteByEntity() {
         List<E> allList = testEntitiesHolder.getEntities();
         E entityToDelete = allList.get(0);
@@ -153,6 +172,11 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
     }
 
     @Test
+    void deleteWithEmptyEntity() {
+        assertThrows(ApplicationException.class, () -> service.delete(null));
+    }
+
+    @Test
     void deleteById() {
         List<E> allList = testEntitiesHolder.getEntities();
         E entityToDelete = allList.get(0);
@@ -176,6 +200,11 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
                 () -> assertThrows(ApplicationException.class, () -> service.deleteById(notExistedId)),
                 () -> assertEquals(testEntitiesHolder.getEntities().size(), repository.count())
         );
+    }
+
+    @Test
+    void deleteByIdWithEmptyEntity() {
+        assertThrows(ApplicationException.class, () -> service.delete(null));
     }
 
     @Test
@@ -265,6 +294,15 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
     }
 
     @Test
+    void getAllByIdWithEmptyList() {
+        List<Set<I>> sets = new ArrayList<>();
+        sets.add(null);
+        sets.add(Collections.emptySet());
+
+        sets.forEach(set -> assertThrows(ApplicationException.class, () -> service.getAllById(set)));
+    }
+
+    @Test
     void getById() {
         E expected = testEntitiesHolder.getEntities().get(0);
 
@@ -284,6 +322,11 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
     }
 
     @Test
+    void getByEmptyId() {
+        assertThrows(ApplicationException.class, () -> service.getById(null));
+    }
+
+    @Test
     void existById() {
         E entity = testEntitiesHolder.getEntities().get(0);
 
@@ -299,6 +342,11 @@ abstract class CrudServiceTest<E extends Persistent<I>, I, S extends CrudService
         boolean actual = service.existById(notExistedId);
 
         assertFalse(actual);
+    }
+
+    @Test
+    void existByEmptyId() {
+        assertThrows(ApplicationException.class, () -> service.existById(null));
     }
 
     S getService() {

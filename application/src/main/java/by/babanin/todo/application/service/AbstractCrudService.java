@@ -51,9 +51,6 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public List<E> deleteAllById(Set<I> ids) {
-        if(ids == null || ids.isEmpty()) {
-            throw new ApplicationException("ID list is empty");
-        }
         List<E> entitiesToDelete = getAllById(ids);
         if(entitiesToDelete.isEmpty()) {
             throw new ApplicationException("No such component by ids");
@@ -70,6 +67,9 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional
     @Override
     public E delete(E entity) {
+        if(entity == null) {
+            throw new ApplicationException("Entity is empty");
+        }
         return deleteById(entity.getId());
     }
 
@@ -91,12 +91,18 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional(readOnly = true)
     @Override
     public List<E> getAllById(Set<I> ids) {
+        if(ids == null || ids.isEmpty()) {
+            throw new ApplicationException("ID list is empty");
+        }
         return repository.findAllById(ids);
     }
 
     @Transactional(readOnly = true)
     @Override
     public E getById(I id) {
+        if(id == null) {
+            throw new ApplicationException("ID is empty");
+        }
         return repository.findById(id)
                 .orElseThrow(() -> new ApplicationException("No such component by " + id + " id"));
     }
@@ -104,6 +110,9 @@ public abstract class AbstractCrudService<E extends Persistent<I>, I> implements
     @Transactional(readOnly = true)
     @Override
     public boolean existById(I id) {
+        if(id == null) {
+            throw new ApplicationException("ID is empty");
+        }
         return repository.existsById(id);
     }
 
