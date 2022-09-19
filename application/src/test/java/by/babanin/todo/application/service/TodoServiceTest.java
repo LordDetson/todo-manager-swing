@@ -212,12 +212,17 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
         String description = todo.getDescription() + "edited";
         Priority priority = priorityService.create("High");
         Status status = StatusWorkflow.get(todo).getNextStatus();
+        LocalDate creationDate = todo.getCreationDate();
         LocalDate plannedDate = todo.getPlannedDate().plusDays(1);
+        LocalDate completionDate = todo.getCompletionDate();
         todo.setTitle(title);
         todo.setDescription(description);
         todo.setPriority(priority);
         todo.setStatus(status);
+        todo.setCreationDate(LocalDate.now().plusDays(1));
         todo.setPlannedDate(plannedDate);
+        todo.setCompletionDate(LocalDate.now().plusDays(1));
+        todo.setPosition(100L);
 
         Todo result = getService().save(todo);
 
@@ -229,9 +234,9 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
                 () -> assertEquals(todo.getDescription(), result.getDescription()),
                 () -> assertEquals(todo.getPriority(), result.getPriority()),
                 () -> assertEquals(todo.getStatus(), result.getStatus()),
-                () -> assertEquals(todo.getCreationDate(), result.getCreationDate()),
+                () -> assertEquals(creationDate, result.getCreationDate()),
                 () -> assertEquals(todo.getPlannedDate(), result.getPlannedDate()),
-                () -> assertEquals(todo.getCompletionDate(), result.getCompletionDate()),
+                () -> assertEquals(completionDate, result.getCompletionDate()),
                 () -> checkPositions(getRepository(), entities)
         );
         priorityService.deleteAll();
