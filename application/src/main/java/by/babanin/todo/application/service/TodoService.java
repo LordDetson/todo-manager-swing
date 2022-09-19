@@ -58,6 +58,9 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
     @Transactional
     public Todo save(Todo todo) {
         Todo todoFromDB = getById(todo.getId());
+        if(StatusWorkflow.get(todoFromDB).isFinalStatus()) {
+            throw new ApplicationException("\"" + todo.getTitle() + "\" todo is no longer editable because it's final");
+        }
         String title = todo.getTitle();
         if(!Objects.equals(todoFromDB.getTitle(), title)) {
             validateTitle(title);
@@ -75,7 +78,7 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
         }
         Status status = todo.getStatus();
         if(!Objects.equals(todoFromDB.getStatus(), status)) {
-            StatusWorkflow.validateStatus(todoFromDB, status);
+            validateStatus(todoFromDB, status);
             todoFromDB = StatusWorkflow.get(todoFromDB).goNextStatus();
         }
         todoFromDB.setDescription(todo.getDescription());
@@ -102,6 +105,13 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
     private void validatePannedDate(LocalDate plannedDate) {
         if(plannedDate.isBefore(LocalDate.now())) {
             throw new ApplicationException("Planned date can't be before today");
+        }
+    }
+
+    private void validateStatus(Todo todo, Status newStatus) {
+        StatusWorkflow statusWorkflow = StatusWorkflow.get(todo);
+        if(newStatus != statusWorkflow.getNextStatus()) {
+            throw new ApplicationException(newStatus + " status can't be applied because it isn't next status");
         }
     }
 
