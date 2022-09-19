@@ -9,11 +9,7 @@ public class IconResources {
 
     public static final String SVG = "svg";
 
-    private static String iconsPath;
-
-    public static void setIconsPath(String iconsPath) {
-        IconResources.iconsPath = iconsPath;
-    }
+    public static final String ICONS_PATH = "assets/icons/";
 
     public static FlatSVGIcon getIcon(String name, int size) {
         return getIcon(null, name, size, size);
@@ -23,7 +19,7 @@ public class IconResources {
         if(path == null || path.isBlank()) {
             path = "";
         }
-        path = iconsPath + path;
+        path = ICONS_PATH + path;
         path = ResourceUtils.buildResourcePath(path, name, SVG);
         return new FlatSVGIcon(path, width, height);
     }

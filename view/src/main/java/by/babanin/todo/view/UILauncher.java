@@ -18,7 +18,6 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.font.FontResources;
-import by.babanin.todo.image.IconResources;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.view.component.custom.UICustomizer;
 import by.babanin.todo.view.translat.TranslateCode;
@@ -32,9 +31,6 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
     private final ResourceBundleMessageSource messageSource;
     private final PriorityService priorityService;
     private final TodoService todoService;
-
-    @Value("${application.resource.icons.path:assets/icons/}")
-    private String iconsPath;
 
     @Value("${application.resource.font:Rubik}")
     private String fontName;
@@ -53,7 +49,6 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         Translator.setMessageSource(messageSource);
         ServiceHolder.setPriorityService(priorityService);
         ServiceHolder.setTodoService(todoService);
-        IconResources.setIconsPath(iconsPath);
         ComponentRepresentation.initializeComponentRepresentationMap();
         FontResources.registerFonts();
 
