@@ -333,6 +333,35 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
 
     @Test
     @Transactional(propagation = Propagation.NEVER)
+    void saveWithPreviousStatus() {
+        TodoService service = getService();
+        Todo todo = service.create("Test", null, null, LocalDate.now());
+        Status previousStatus = todo.getStatus();
+        Todo todoWithPreviousStatus = service.save(StatusWorkflow.get(todo).goNextStatus());
+        todoWithPreviousStatus.setStatus(previousStatus);
+
+        assertThrows(ApplicationException.class, () -> service.save(todoWithPreviousStatus));
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
+    void saveWithFinalStatus() {
+        TodoService service = getService();
+        Todo todo = service.create("Test", null, null, LocalDate.now());
+
+        StatusWorkflow statusWorkflow;
+        do {
+            todo = service.save(StatusWorkflow.get(todo).goNextStatus());
+            statusWorkflow = StatusWorkflow.get(todo);
+        }
+        while(!statusWorkflow.isFinalStatus());
+        Todo finalTodo = todo;
+
+        assertThrows(ApplicationException.class, () -> service.save(finalTodo));
+    }
+
+    @Test
+    @Transactional(propagation = Propagation.NEVER)
     void saveWithNotNextStatus() {
         Todo todo = getTestEntityHolder().getEntities().get(0);
         Status expected = todo.getStatus();
