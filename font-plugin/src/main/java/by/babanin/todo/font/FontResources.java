@@ -6,6 +6,7 @@ import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Arrays;
+import java.util.List;
 
 import javax.swing.UIManager;
 
@@ -15,25 +16,33 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class FontResources {
 
-    public static void registerAdditionalFonts(String fontsPath) {
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Black.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-BlackItalic.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Bold.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-BoldItalic.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-ExtraBold.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-ExtraBoldItalic.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Italic.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Light.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-LightItalic.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Medium.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-MediumItalic.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-Regular.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-SemiBold.ttf");
-        registerAdditionalFont(fontsPath, "rubik/static/Rubik-SemiBoldItalic.ttf");
+    private static final String TTF = "ttf";
+    private static final String FONTS_PATH = "assets/fonts/";
+    private static final String STATIC_RUBIK_PATH = "rubik/static/";
+    private static final List<String> STATIC_RUBIK_FILE_NAMES = List.of(
+            "Rubik-Black",
+            "Rubik-BlackItalic",
+            "Rubik-Bold",
+            "Rubik-BoldItalic",
+            "Rubik-ExtraBold",
+            "Rubik-ExtraBoldItalic",
+            "Rubik-Italic",
+            "Rubik-Light",
+            "Rubik-LightItalic",
+            "Rubik-Medium",
+            "Rubik-MediumItalic",
+            "Rubik-Regular",
+            "Rubik-SemiBold",
+            "Rubik-SemiBoldItalic"
+    );
+
+    public static void registerFonts() {
+        String rubikPath = FONTS_PATH + STATIC_RUBIK_PATH;
+        STATIC_RUBIK_FILE_NAMES.forEach(fontName -> registerFont(rubikPath, fontName));
     }
 
-    private static void registerAdditionalFont(String fontsPath, String name) {
-        try(InputStream productSansBlackFontStream = FontResources.class.getResourceAsStream("/" + fontsPath + name)) {
+    private static void registerFont(String fontsPath, String name) {
+        try(InputStream productSansBlackFontStream = FontResources.class.getResourceAsStream("/" + fontsPath + name + "." + TTF)) {
             if(productSansBlackFontStream != null) {
                 Font font = Font.createFont(Font.TRUETYPE_FONT, productSansBlackFontStream);
                 GraphicsEnvironment.getLocalGraphicsEnvironment().registerFont(font);
@@ -46,7 +55,7 @@ public class FontResources {
 
     public static void applyFontByDefault(Font font) {
         String fontName = font.getName();
-        if(Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()).contains(fontName)) {
+        if(isRegisteredFont(fontName)) {
             for(Object key : UIManager.getDefaults().keySet()) {
                 Object value = UIManager.get(key);
                 if(value instanceof Font) {
@@ -57,5 +66,9 @@ public class FontResources {
         else {
             throw new FontResourcesException(fontName + " doesn't exist");
         }
+    }
+
+    public static boolean isRegisteredFont(String fontName) {
+        return Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()).contains(fontName);
     }
 }

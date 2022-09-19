@@ -36,9 +36,6 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
     @Value("${application.resource.icons.path:assets/icons/}")
     private String iconsPath;
 
-    @Value("${application.resource.fonts.path:assets/fonts/}")
-    private String fontsPath;
-
     @Value("${application.resource.font:Rubik}")
     private String fontName;
 
@@ -58,7 +55,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         ServiceHolder.setTodoService(todoService);
         IconResources.setIconsPath(iconsPath);
         ComponentRepresentation.initializeComponentRepresentationMap();
-        FontResources.registerAdditionalFonts(fontsPath);
+        FontResources.registerFonts();
 
         FlatDarculaLaf.setup();
         UICustomizer.customize();
