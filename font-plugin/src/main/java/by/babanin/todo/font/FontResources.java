@@ -41,7 +41,7 @@ public class FontResources {
         STATIC_RUBIK_FILE_NAMES.forEach(fontName -> registerFont(rubikPath, fontName));
     }
 
-    private static void registerFont(String fontsPath, String name) {
+    public static void registerFont(String fontsPath, String name) {
         try(InputStream productSansBlackFontStream = FontResources.class.getResourceAsStream("/" + fontsPath + name + "." + TTF)) {
             if(productSansBlackFontStream != null) {
                 Font font = Font.createFont(Font.TRUETYPE_FONT, productSansBlackFontStream);
