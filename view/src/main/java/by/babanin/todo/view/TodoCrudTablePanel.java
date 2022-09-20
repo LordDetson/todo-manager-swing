@@ -5,9 +5,8 @@ import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
-import java.util.Collections;
-import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
@@ -29,6 +28,7 @@ import by.babanin.todo.task.todo.CreateTodoTask;
 import by.babanin.todo.task.todo.UpdateTodoTask;
 import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CustomTableColumnModel;
+import by.babanin.todo.view.component.IndexableTableModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
 import by.babanin.todo.view.component.RunnableAction;
 import by.babanin.todo.view.component.TableModel;
@@ -84,12 +84,14 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     private void showPriorityDialog() {
         PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
         priorityPanel.addEditListener(priority -> {
-            List<Todo> todos = ServiceHolder.getTodoService().findAllByPriorities(Collections.singleton(priority));
-            todos.forEach(todo -> {
-                TableModel<Todo> model = getModel();
-                int row = getModel().indexOf(todo);
-                model.set(row, todo);
-            });
+            int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
+            IndexableTableModel<Todo> model = getModel();
+            model.getAll().stream()
+                    .filter(todo -> Objects.nonNull(todo.getPriority()))
+                    .filter(todo -> priority.getId().equals(todo.getPriority().getId()))
+                    .peek(todo -> todo.setPriority(priority))
+                    .map(model::indexOf)
+                    .forEach(row -> model.fireTableCellUpdated(row, columnIndex));
         });
         priorityPanel.addDeletionListener(priorities -> {
             int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
