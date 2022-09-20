@@ -494,4 +494,25 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
                 () -> assertTrue(result.isEmpty())
         );
     }
+
+    @Test
+    void removePrioritiesFromTodos() {
+        Priority priority = priorityService.create("Test");
+        Todo todo = getTestEntityHolder().getEntities().get(0);
+        todo.setPriority(priority);
+        getService().save(todo);
+
+        getService().removePrioritiesFromTodos(Collections.singleton(priority));
+
+        getService().getAll().forEach(todo1 -> assertNotEquals(todo1.getPriority(), priority));
+    }
+
+    @Test
+    void removeEmptyPrioritiesFromTodos() {
+        List<Todo> expected = getService().getAll();
+
+        getService().removePrioritiesFromTodos(Collections.emptyList());
+
+        assertIterableEquals(expected, getService().getAll());
+    }
 }

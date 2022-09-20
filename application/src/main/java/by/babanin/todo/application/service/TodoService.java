@@ -132,4 +132,11 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
         }
         return result;
     }
+
+    @Transactional
+    public void removePrioritiesFromTodos(Collection<Priority> priorities) {
+        List<Todo> todos = findAllByPriorities(priorities);
+        todos.forEach(todo -> todo.setPriority(null));
+        getRepository().saveAll(todos);
+    }
 }
