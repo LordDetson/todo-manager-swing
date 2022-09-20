@@ -487,6 +487,11 @@ class TodoServiceTest extends IndexableCrudServiceTest<Todo, Long, TodoService> 
         List<Priority> priorities = Collections.emptyList();
 
         TodoService service = getService();
-        assertThrows(ApplicationException.class, () -> service.findAllByPriorities(priorities));
+        List<Todo> result = service.findAllByPriorities(priorities);
+
+        assertAll(
+                () -> assertNotNull(result),
+                () -> assertTrue(result.isEmpty())
+        );
     }
 }

@@ -1,6 +1,7 @@
 package by.babanin.todo.application.service;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
@@ -117,17 +118,18 @@ public class TodoService extends AbstractIndexableCrudService<Todo, Long> {
 
     @Transactional(readOnly = true)
     public List<Todo> findAllByPriorities(Collection<Priority> priorities) {
-        if(priorities.isEmpty()) {
-            throw new ApplicationException("Priorities list is empty");
+        List<Todo> result = new ArrayList<>();
+        if(!priorities.isEmpty()) {
+            List<Priority> notExistedPriorities = priorities.stream()
+                    .filter(priority -> priority.getId() == null || !priorityRepository.existsById(priority.getId()))
+                    .toList();
+            if(!notExistedPriorities.isEmpty()) {
+                StringJoiner joiner = new StringJoiner(", ");
+                priorities.forEach(priority -> joiner.add(priority.getName()));
+                throw new ApplicationException("\"" + joiner + "\" priorities are not existed");
+            }
+            result.addAll(getRepository().findAllByPriorities(priorities));
         }
-        List<Priority> notExistedPriorities = priorities.stream()
-                .filter(priority -> priority.getId() == null || !priorityRepository.existsById(priority.getId()))
-                .toList();
-        if(!notExistedPriorities.isEmpty()) {
-            StringJoiner joiner = new StringJoiner(", ");
-            priorities.forEach(priority -> joiner.add(priority.getName()));
-            throw new ApplicationException("\"" + joiner + "\" priorities are not existed");
-        }
-        return getRepository().findAllByPriorities(priorities);
+        return result;
     }
 }
