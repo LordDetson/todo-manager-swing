@@ -164,7 +164,7 @@ public class LogStatusBarItem extends StatusBarItem {
                 setText(message);
             }
             else {
-                setText(Translator.toLocale(TranslateCode.ERROR_AND_X_MORE_CLICK).formatted(message, count));
+                setText(Translator.toLocale(TranslateCode.ERROR_AND_X_MORE_CLICK).formatted(message, count - 1));
             }
             showLogAction.setEnabled(true);
         }
