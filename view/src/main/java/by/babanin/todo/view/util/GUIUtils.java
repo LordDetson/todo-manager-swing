@@ -31,6 +31,8 @@ import javax.swing.table.TableColumn;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import com.formdev.flatlaf.util.SystemInfo;
+
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.Translator;
@@ -43,6 +45,10 @@ public final class GUIUtils {
     private static final int HALF_FRAME_SCALE = 50;
     private static final int SMALL_FRAME_SCALE = 35;
     private static final double SCALE_BASE = 100;
+
+    private static final String MNEMONIC_MODIFIER_FOR_MAC = "OPT";
+    private static final String MNEMONIC_MODIFIER_FOR_OTHER_OS = "ALT";
+    private static final String MNEMONIC_KEY_DESCRIPTION_FORMAT = "(%s+%s)";
 
     private static JFrame mainWindow;
     private static KeyCash vks;
@@ -194,7 +200,11 @@ public final class GUIUtils {
     }
 
     public static String getMnemonicKeyDescription(int mnemonicKey) {
-        return "(Alt+" + GUIUtils.getVKText(mnemonicKey) + ")";
+        String mnemonicModifier = MNEMONIC_MODIFIER_FOR_OTHER_OS;
+        if(SystemInfo.isMacOS) {
+            mnemonicModifier = MNEMONIC_MODIFIER_FOR_MAC;
+        }
+        return String.format(MNEMONIC_KEY_DESCRIPTION_FORMAT, mnemonicModifier, GUIUtils.getVKText(mnemonicKey));
     }
 
     public static String getVKText(int keyCode) {
