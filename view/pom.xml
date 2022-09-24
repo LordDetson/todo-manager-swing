@@ -147,7 +147,6 @@
                     <mainClass>by.babanin.todo.Application</mainClass>
                     <version>${project.version}</version>
                     <bundleName>${project.build.finalName}</bundleName>
-                    <generateDiskImageFile>true</generateDiskImageFile>
                     <buildDirectory>${project.build.directory}</buildDirectory>
                     <jvmVersion>17+</jvmVersion>
                 </configuration>
