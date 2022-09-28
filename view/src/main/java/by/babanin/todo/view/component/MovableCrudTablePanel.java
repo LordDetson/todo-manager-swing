@@ -4,7 +4,6 @@ import java.awt.event.KeyEvent;
 import java.util.List;
 
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JTable;
 
 import by.babanin.todo.application.service.AbstractIndexableCrudService;
@@ -21,15 +20,13 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
 
     private transient Action moveUpAction;
     private transient Action moveDownAction;
-    private JButton moveUpButton;
-    private JButton moveDownButton;
 
     protected MovableCrudTablePanel(Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
         super(componentClass, formRowFactory, crudStyle);
     }
 
     @Override
-    protected void createUiComponents() {
+    public void createUiComponents() {
         super.createUiComponents();
         CrudStyle crudStyle = getCrudStyle();
         moveUpAction = new RunnableAction(
@@ -44,20 +41,11 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
                 KeyEvent.VK_DOWN,
                 this::moveDown
         );
-        moveUpButton = new JButton(moveUpAction);
-        moveDownButton = new JButton(moveDownAction);
     }
 
     @Override
     protected IndexableTableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
         return new IndexableTableModel<>(representation, fields);
-    }
-
-    @Override
-    protected void placeComponents() {
-        super.placeComponents();
-        addToolBarComponent(moveUpButton);
-        addToolBarComponent(moveDownButton);
     }
 
     @Override
@@ -97,5 +85,13 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
             selectRow(nextIndex);
         });
         task.execute();
+    }
+
+    public Action getMoveUpAction() {
+        return moveUpAction;
+    }
+
+    public Action getMoveDownAction() {
+        return moveDownAction;
     }
 }

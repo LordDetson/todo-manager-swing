@@ -10,7 +10,6 @@ import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JTable;
@@ -45,7 +44,8 @@ import by.babanin.todo.view.util.ServiceHolder;
 public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
     private static final String PRIORITIES_DIALOG_CLOSING_ACTION_KEY = "closePrioritiesDialog";
-    private JButton showPrioritiesButton;
+
+    private transient Action showPrioritiesAction;
 
     public TodoCrudTablePanel() {
         super(Todo.class, new TodoFormRowFactory(), new CrudStyle()
@@ -56,15 +56,14 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     @Override
-    protected void createUiComponents() {
+    public void createUiComponents() {
         super.createUiComponents();
-        Action showPrioritiesAction = new RunnableAction(
+        showPrioritiesAction = new RunnableAction(
                 getCrudStyle().getIcon("priority_list"),
                 Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES),
                 KeyEvent.VK_P,
                 this::showPriorityDialog
         );
-        showPrioritiesButton = new JButton(showPrioritiesAction);
     }
 
     @Override
@@ -82,7 +81,7 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     private void showPriorityDialog() {
-        PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
+        PriorityPanel priorityPanel = new PriorityPanel();
         priorityPanel.addEditListener(priority -> {
             int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
             IndexableTableModel<Todo> model = getModel();
@@ -128,12 +127,6 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     @Override
-    protected void placeComponents() {
-        super.placeComponents();
-        addToolBarComponent(showPrioritiesButton);
-    }
-
-    @Override
     protected boolean canEdit() {
         boolean canEdit = super.canEdit();
         if(canEdit) {
@@ -154,5 +147,9 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     protected Task<Todo> createUpdateTask(Map<ReportField, ?> fieldValueMap, Todo selectedComponent) {
         TodoService service = ServiceHolder.getTodoService();
         return new UpdateTodoTask(service, getRepresentation(), fieldValueMap, selectedComponent);
+    }
+
+    public Action getShowPrioritiesAction() {
+        return showPrioritiesAction;
     }
 }

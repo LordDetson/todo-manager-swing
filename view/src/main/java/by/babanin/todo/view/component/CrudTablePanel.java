@@ -1,7 +1,6 @@
 package by.babanin.todo.view.component;
 
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.event.KeyEvent;
@@ -12,23 +11,21 @@ import java.util.Map;
 import java.util.Optional;
 
 import javax.swing.Action;
-import javax.swing.JButton;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JToolBar;
 
 import by.babanin.todo.application.service.CrudService;
 import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
-import by.babanin.todo.task.listener.ExceptionListener;
-import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.Task;
+import by.babanin.todo.task.listener.ExceptionListener;
+import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.exception.ViewException;
@@ -36,7 +33,7 @@ import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.ServiceHolder;
 
-public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel {
+public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel implements View {
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
@@ -44,13 +41,9 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private final transient FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
 
-    private JToolBar toolBar;
-
+    private transient Action showCreationDialogAction;
     private transient Action showEditDialogAction;
     private transient Action showDeleteConfirmDialogAction;
-    private JButton createButton;
-    private JButton editButton;
-    private JButton deleteButton;
     private TableModel<C> model;
     private CustomTableColumnModel columnModel;
     private JTable table;
@@ -59,7 +52,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         this.representation = ComponentRepresentation.get(componentClass);
         this.formRowFactory = formRowFactory;
         this.crudStyle = crudStyle;
+        initialize();
+    }
 
+    @Override
+    public void initialize() {
         createUiComponents();
         setupTable(table, model, columnModel);
         addListeners();
@@ -67,8 +64,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         actionEnabling();
     }
 
-    protected void createUiComponents() {
-        toolBar = new JToolBar();
+    @Override
+    public void createUiComponents() {
         List<String> excludedFieldFromTable = crudStyle.getExcludedFieldFromTable();
         List<ReportField> reportFields = representation.getFields().stream()
                 .filter(field -> !excludedFieldFromTable.contains(field.getName()))
@@ -77,7 +74,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         columnModel = new CustomTableColumnModel(reportFields);
         table = new JTable();
 
-        Action showCreationDialogAction = new RunnableAction(
+        showCreationDialogAction = new RunnableAction(
                 crudStyle.getCreateButtonIcon(),
                 crudStyle.getCreateButtonToolTip(),
                 KeyEvent.VK_C,
@@ -95,10 +92,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                 KeyEvent.VK_D,
                 this::showDeleteConfirmDialog
         );
-
-        createButton = new JButton(showCreationDialogAction);
-        editButton = new JButton(showEditDialogAction);
-        deleteButton = new JButton(showDeleteConfirmDialogAction);
     }
 
     protected TableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
@@ -110,7 +103,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         table.setColumnModel(columnModel);
     }
 
-    protected void addListeners() {
+    @Override
+    public void addListeners() {
         table.getSelectionModel().addListSelectionListener(event -> actionEnabling());
 
         addCreationListener(this::handleCreation);
@@ -169,18 +163,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         reload();
     }
 
-    protected void placeComponents() {
-        addToolBarComponent(createButton);
-        addToolBarComponent(editButton);
-        addToolBarComponent(deleteButton);
-
+    @Override
+    public void placeComponents() {
         setLayout(new BorderLayout());
-        add(toolBar, BorderLayout.PAGE_START);
         add(new JScrollPane(table), BorderLayout.CENTER);
-    }
-
-    protected void addToolBarComponent(Component component) {
-        toolBar.add(component);
     }
 
     protected void actionEnabling() {
@@ -198,6 +184,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         return selectionCount >= 1;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public void load() {
         GetTask<C, I, CrudService<C, I>> task = new GetTask<>(ServiceHolder.getCrudService(representation.getComponentClass()));
@@ -210,14 +197,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         task.execute();
     }
 
+    @Override
     public void clear() {
         table.clearSelection();
         model.clear();
-    }
-
-    public void reload() {
-        clear();
-        load();
     }
 
     private void showCreationDialog() {
@@ -336,5 +319,17 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     public JTable getTable() {
         return table;
+    }
+
+    public Action getShowCreationDialogAction() {
+        return showCreationDialogAction;
+    }
+
+    public Action getShowEditDialogAction() {
+        return showEditDialogAction;
+    }
+
+    public Action getShowDeleteConfirmDialogAction() {
+        return showDeleteConfirmDialogAction;
     }
 }
