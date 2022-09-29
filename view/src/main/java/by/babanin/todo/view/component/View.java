@@ -1,25 +1,8 @@
 package by.babanin.todo.view.component;
 
-public interface View {
+import by.babanin.todo.view.Initializable;
+import by.babanin.todo.view.Loadable;
 
-    default void initialize() {
-        createUiComponents();
-        addListeners();
-        placeComponents();
-    }
+public interface View extends Initializable, Loadable {
 
-    void createUiComponents();
-
-    void addListeners();
-
-    void placeComponents();
-
-    void load();
-
-    void clear();
-
-    default void reload() {
-        clear();
-        load();
-    }
 }
