@@ -93,6 +93,7 @@
                             <stayAlive>true</stayAlive>
                             <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
                             <outfile>${project.build.directory}/${project.build.finalName}.exe</outfile>
+                            <icon>${build.outputDirectory}/app_icon.ico</icon>
                             <classPath>
                                 <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
                             </classPath>
@@ -144,6 +145,7 @@
                     <bundleName>${project.build.finalName}</bundleName>
                     <buildDirectory>${project.build.directory}</buildDirectory>
                     <jvmVersion>17+</jvmVersion>
+                    <iconFile>src/main/resources/app_icon.icns</iconFile>
                 </configuration>
                 <dependencies>
                     <dependency>

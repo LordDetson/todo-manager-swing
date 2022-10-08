@@ -18,6 +18,7 @@ import com.formdev.flatlaf.FlatDarculaLaf;
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.font.FontResources;
+import by.babanin.todo.image.IconResources;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.view.component.custom.UICustomizer;
 import by.babanin.todo.view.translat.TranslateCode;
@@ -28,6 +29,7 @@ import by.babanin.todo.view.util.ServiceHolder;
 @Component
 public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
 
+    private static final int DEFAULT_ICON_SIZE = 32;
     private final ResourceBundleMessageSource messageSource;
     private final PriorityService priorityService;
     private final TodoService todoService;
@@ -72,6 +74,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setTitle(Translator.toLocale(TranslateCode.TODO_FRAME_TITLE));
+        mainFrame.setIconImage(IconResources.getIcon("transparent_check_hexagon", DEFAULT_ICON_SIZE).getImage());
         mainFrame.setVisible(true);
     }
 }
