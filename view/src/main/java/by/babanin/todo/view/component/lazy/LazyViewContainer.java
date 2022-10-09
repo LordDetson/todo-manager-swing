@@ -1,12 +1,12 @@
-package by.babanin.todo.view;
+package by.babanin.todo.view.component.lazy;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
+import by.babanin.todo.view.component.Loadable;
 import by.babanin.todo.view.component.View;
-import by.babanin.todo.view.exception.ViewException;
 
 public class LazyViewContainer implements Loadable {
 
@@ -22,9 +22,7 @@ public class LazyViewContainer implements Loadable {
     public View get() {
         if(!isInitialized()) {
             initializedView = viewFactory.get();
-            if(initializedView == null) {
-                throw new ViewException("View isn't initialized");
-            }
+            initializedView.initialize();
             lazyViewListeners.forEach(listener -> listener.initialized(initializedView));
         }
         return initializedView;

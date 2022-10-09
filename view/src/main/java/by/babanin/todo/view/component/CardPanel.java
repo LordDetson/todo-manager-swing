@@ -1,4 +1,4 @@
-package by.babanin.todo.view;
+package by.babanin.todo.view.component;
 
 import java.awt.CardLayout;
 import java.awt.Component;
@@ -13,34 +13,21 @@ import javax.swing.JPanel;
 
 import org.apache.commons.lang3.StringUtils;
 
-import by.babanin.todo.view.component.View;
+import by.babanin.todo.view.component.lazy.LazyViewContainer;
+import by.babanin.todo.view.component.lazy.ViewChangedListener;
 
-public class CardPanel extends JPanel implements View {
+public class CardPanel extends JPanel implements Loadable {
 
     private final Map<String, LazyViewContainer> lazyViewContainerMap = new LinkedHashMap<>();
     private final List<ViewChangedListener> listeners = new ArrayList<>();
 
-    private CardLayout cardLayout;
+    private final CardLayout cardLayout;
     private String visibleViewName;
     private View visibleView;
 
     public CardPanel() {
-        initialize();
-    }
-
-    @Override
-    public void createUiComponents() {
-        cardLayout = new CardLayout();
-    }
-
-    @Override
-    public void addListeners() {
-        // do nothing
-    }
-
-    @Override
-    public void placeComponents() {
-        setLayout(cardLayout);
+        super(new CardLayout());
+        cardLayout = (CardLayout) getLayout();
     }
 
     @Override

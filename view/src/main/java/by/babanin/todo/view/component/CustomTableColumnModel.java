@@ -1,17 +1,16 @@
 package by.babanin.todo.view.component;
 
-import java.util.List;
-
 import javax.swing.table.DefaultTableColumnModel;
 
+import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.util.GUIUtils;
 
-public class CustomTableColumnModel extends DefaultTableColumnModel {
+public class CustomTableColumnModel<C> extends DefaultTableColumnModel {
 
-    public CustomTableColumnModel(List<ReportField> fields) {
+    public CustomTableColumnModel(ComponentRepresentation<C> representation) {
         int modelIndex = 0;
-        for(ReportField field : fields) {
+        for(ReportField field : representation.getFields()) {
             addColumn(GUIUtils.createTableColumn(field, modelIndex++));
         }
     }

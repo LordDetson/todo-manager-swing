@@ -8,10 +8,10 @@ import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ViewException;
 
-public class IndexableTableModel<C extends Indexable> extends TableModel<C> {
+public class IndexableTableModel<C extends Indexable> extends DynamicTableModel<C> {
 
-    public IndexableTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
-        super(representation, fields);
+    public IndexableTableModel(ComponentRepresentation<C> representation) {
+        super(representation);
     }
 
     public void swap(int index1, int index2) {

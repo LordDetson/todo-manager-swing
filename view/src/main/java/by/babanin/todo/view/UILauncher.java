@@ -20,6 +20,7 @@ import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.font.FontResources;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.view.component.custom.UICustomizer;
+import by.babanin.todo.view.todo.TodoPanel;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
@@ -63,6 +64,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         GUIUtils.setMainWindow(mainFrame);
 
         TodoPanel todoPanel = new TodoPanel();
+        todoPanel.initialize();
         todoPanel.load();
         mainFrame.setContentPane(todoPanel);
 

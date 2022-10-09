@@ -1,48 +1,54 @@
-package by.babanin.todo.view;
+package by.babanin.todo.view.todo;
 
 import java.awt.BorderLayout;
 import java.util.function.Predicate;
 
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
-import javax.swing.JToolBar;
 
 import by.babanin.todo.model.Todo;
+import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.view.component.TextAreaPanel;
 import by.babanin.todo.view.component.View;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
-public class TodoPanel extends JPanel implements View {
+public class TodoWithDescriptionPanel extends JPanel implements View {
 
-    private JToolBar toolBar;
+    private final TodoCrud crud;
+
+    private boolean initialized;
     private TodoCrudTablePanel crudTablePanel;
     private TextAreaPanel descriptionPanel;
 
-    public TodoPanel() {
+    public TodoWithDescriptionPanel(TodoCrud crud) {
         super(new BorderLayout());
-        initialize();
+        this.crud = crud;
+    }
+
+    @Override
+    public boolean isInitialized() {
+        return initialized;
+    }
+
+    @Override
+    public void setInitialized(boolean initialized) {
+        this.initialized = initialized;
     }
 
     @Override
     public void createUiComponents() {
-        crudTablePanel = new TodoCrudTablePanel();
+        crudTablePanel = new TodoCrudTablePanel(crud);
+        crudTablePanel.initialize();
+        crudTablePanel.excludeField(Fields.description);
         descriptionPanel = new TextAreaPanel();
         descriptionPanel.setEditable(false);
-
-        toolBar = new JToolBar();
-        toolBar.add(crudTablePanel.getShowCreationDialogAction());
-        toolBar.add(crudTablePanel.getShowEditDialogAction());
-        toolBar.add(crudTablePanel.getShowDeleteConfirmDialogAction());
-        toolBar.add(crudTablePanel.getMoveUpAction());
-        toolBar.add(crudTablePanel.getMoveDownAction());
-        toolBar.add(crudTablePanel.getShowPrioritiesAction());
     }
 
     @Override
     public void addListeners() {
         crudTablePanel.getTable().getSelectionModel().addListSelectionListener(event -> showTodoDescription());
-        crudTablePanel.addEditListener(todo -> showTodoDescription());
+        crud.addUpdateListener(todo -> showTodoDescription());
     }
 
     @Override
@@ -51,7 +57,6 @@ public class TodoPanel extends JPanel implements View {
         splitPane.setTopComponent(crudTablePanel);
         splitPane.setBottomComponent(descriptionPanel);
 
-        add(toolBar, BorderLayout.PAGE_START);
         add(splitPane, BorderLayout.CENTER);
     }
 
@@ -65,12 +70,18 @@ public class TodoPanel extends JPanel implements View {
         crudTablePanel.clear();
     }
 
+    public TodoCrudTablePanel getCrudTablePanel() {
+        return crudTablePanel;
+    }
+
     private void showTodoDescription() {
-        String text = crudTablePanel.getSelectedComponent()
-                .filter(isSingleSelection())
-                .map(Todo::getDescription)
-                .orElse(Translator.toLocale(TranslateCode.NO_DESCRIPTION_TO_SHOW));
-        descriptionPanel.setText(text);
+        Todo selectedComponent = crudTablePanel.getSelectedComponent();
+        if(selectedComponent != null && isSingleSelection().test(selectedComponent)) {
+            descriptionPanel.setText(selectedComponent.getDescription());
+        }
+        else {
+            descriptionPanel.setText(Translator.toLocale(TranslateCode.NO_DESCRIPTION_TO_SHOW));
+        }
     }
 
     private Predicate<Todo> isSingleSelection() {

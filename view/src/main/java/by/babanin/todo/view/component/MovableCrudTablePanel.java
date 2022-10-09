@@ -1,34 +1,36 @@
 package by.babanin.todo.view.component;
 
 import java.awt.event.KeyEvent;
-import java.util.List;
 
 import javax.swing.Action;
 import javax.swing.JTable;
+import javax.swing.ListSelectionModel;
 
-import by.babanin.todo.application.service.AbstractIndexableCrudService;
+import by.babanin.todo.application.service.IndexableCrudService;
 import by.babanin.todo.model.Indexable;
 import by.babanin.todo.model.Persistent;
-import by.babanin.todo.representation.ComponentRepresentation;
-import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.SwapTask;
-import by.babanin.todo.view.component.form.FormRowFactory;
-import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.util.ServiceHolder;
+import by.babanin.todo.view.component.crud.Crud;
 
-public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable, I> extends CrudTablePanel<C, I> {
+public abstract class MovableCrudTablePanel
+        <C extends Persistent<I> & Indexable,
+                I,
+                S extends IndexableCrudService<C, I>,
+                T extends JTable,
+                M extends IndexableTableModel<C>>
+        extends CrudTablePanel<C, I, S, T, M> {
 
     private transient Action moveUpAction;
     private transient Action moveDownAction;
 
-    protected MovableCrudTablePanel(Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
-        super(componentClass, formRowFactory, crudStyle);
+    protected MovableCrudTablePanel(Crud<C, I, S> crud) {
+        super(crud);
     }
 
     @Override
     public void createUiComponents() {
         super.createUiComponents();
-        CrudStyle crudStyle = getCrudStyle();
+        CrudStyle crudStyle = getCrud().getCrudStyle();
         moveUpAction = new RunnableAction(
                 crudStyle.getMoveUpButtonIcon(),
                 crudStyle.getMoveUpButtonToolTip(),
@@ -44,22 +46,15 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     }
 
     @Override
-    protected IndexableTableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
-        return new IndexableTableModel<>(representation, fields);
-    }
-
-    @Override
-    protected void actionEnabling() {
-        super.actionEnabling();
+    public void addListeners() {
+        super.addListeners();
         JTable table = getTable();
-        int selectionCount = table.getSelectionModel().getSelectedItemsCount();
-        moveUpAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != 0);
-        moveDownAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
-    }
-
-    @Override
-    public IndexableTableModel<C> getModel() {
-        return (IndexableTableModel<C>) super.getModel();
+        ListSelectionModel selectionModel = table.getSelectionModel();
+        selectionModel.addListSelectionListener(e -> {
+            int selectionCount = selectionModel.getSelectedItemsCount();
+            moveUpAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != 0);
+            moveDownAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
+        });
     }
 
     private void moveUp() {
@@ -72,14 +67,11 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
 
     private void moveComponent(Direction direction) {
         IndexableTableModel<C> model = getModel();
-        C selectedComponent = getSelectedComponent()
-                .orElseThrow(() -> new ViewException("Can't move component because component is not selected"));
+        C selectedComponent = getSelectedComponent();
         int selectedIndex = model.indexOf(selectedComponent);
         int directionCount = direction == Direction.UP ? -1 : 1;
         int nextIndex = selectedIndex + directionCount;
-        Class<C> componentClass = getRepresentation().getComponentClass();
-        AbstractIndexableCrudService<C, I> service = (AbstractIndexableCrudService<C, I>) ServiceHolder.getCrudService(componentClass);
-        SwapTask<C, I, AbstractIndexableCrudService<C, I>> task = new SwapTask<>(service, selectedIndex, nextIndex);
+        SwapTask<C, I, S> task = new SwapTask<>(getCrud().getCrudService(), selectedIndex, nextIndex);
         task.addFinishListener(unused -> {
             model.swap(selectedIndex, nextIndex);
             selectRow(nextIndex);

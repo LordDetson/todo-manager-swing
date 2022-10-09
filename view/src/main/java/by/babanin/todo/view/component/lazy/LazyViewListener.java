@@ -1,4 +1,4 @@
-package by.babanin.todo.view;
+package by.babanin.todo.view.component.lazy;
 
 import by.babanin.todo.view.component.View;
 

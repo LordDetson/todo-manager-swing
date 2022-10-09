@@ -1,4 +1,4 @@
-package by.babanin.todo.view;
+package by.babanin.todo.view.component;
 
 public interface Loadable {
 

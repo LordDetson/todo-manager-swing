@@ -1,11 +1,10 @@
-package by.babanin.todo.view;
+package by.babanin.todo.view.todo;
 
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.time.LocalDate;
-import java.util.Map;
 import java.util.Objects;
 
 import javax.swing.AbstractAction;
@@ -15,24 +14,22 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
+import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.application.status.StatusWorkflow;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
-import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.task.Task;
-import by.babanin.todo.task.todo.CreateTodoTask;
-import by.babanin.todo.task.todo.UpdateTodoTask;
+import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.view.component.CrudStyle;
-import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.IndexableTableModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
 import by.babanin.todo.view.component.RunnableAction;
-import by.babanin.todo.view.component.TableModel;
-import by.babanin.todo.view.component.form.TodoFormRowFactory;
-import by.babanin.todo.view.component.validation.TodoValidatorFactory;
+import by.babanin.todo.view.component.form.PriorityFormRowFactory;
+import by.babanin.todo.view.component.validation.PriorityValidatorFactory;
+import by.babanin.todo.view.priority.PriorityCrud;
+import by.babanin.todo.view.priority.PriorityPanel;
 import by.babanin.todo.view.renderer.LocalDataRenderer;
 import by.babanin.todo.view.renderer.PriorityRenderer;
 import by.babanin.todo.view.renderer.StatusRenderer;
@@ -41,25 +38,21 @@ import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
 import by.babanin.todo.view.util.ServiceHolder;
 
-public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
+public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long, TodoService, JTable, IndexableTableModel<Todo>> {
 
     private static final String PRIORITIES_DIALOG_CLOSING_ACTION_KEY = "closePrioritiesDialog";
 
     private transient Action showPrioritiesAction;
 
-    public TodoCrudTablePanel() {
-        super(Todo.class, new TodoFormRowFactory(), new CrudStyle()
-                .setValidatorFactory(new TodoValidatorFactory())
-                .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
-                .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate)
-                .excludeFieldFromTable(Fields.description));
+    public TodoCrudTablePanel(TodoCrud crud) {
+        super(crud);
     }
 
     @Override
     public void createUiComponents() {
         super.createUiComponents();
         showPrioritiesAction = new RunnableAction(
-                getCrudStyle().getIcon("priority_list"),
+                getCrud().getCrudStyle().getIcon("priority_list"),
                 Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES),
                 KeyEvent.VK_P,
                 this::showPriorityDialog
@@ -67,11 +60,23 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     @Override
-    protected void setupTable(JTable table, TableModel<Todo> model, CustomTableColumnModel columnModel) {
-        super.setupTable(table, model, columnModel);
+    protected IndexableTableModel<Todo> createTableModel(ComponentRepresentation<Todo> representation) {
+        return new IndexableTableModel<>(representation);
+    }
+
+    @Override
+    protected JTable createTable(IndexableTableModel<Todo> model) {
+        JTable table = new JTable(model);
         table.setDefaultRenderer(Priority.class, new PriorityRenderer());
         table.setDefaultRenderer(Status.class, new StatusRenderer());
         table.setDefaultRenderer(LocalDate.class, new LocalDataRenderer());
+        return table;
+    }
+
+    @Override
+    public void addListeners() {
+        super.addListeners();
+        getCrud().setCanUpdateFunction(todo -> !StatusWorkflow.get(todo).isFinalStatus());
     }
 
     @Override
@@ -81,8 +86,13 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     private void showPriorityDialog() {
-        PriorityPanel priorityPanel = new PriorityPanel();
-        priorityPanel.addEditListener(priority -> {
+        PriorityService priorityService = ServiceHolder.getPriorityService();
+        ComponentRepresentation<Priority> representation = ComponentRepresentation.get(Priority.class);
+        PriorityCrud crud = new PriorityCrud(this, priorityService, representation, new PriorityFormRowFactory(), new CrudStyle()
+                .setValidatorFactory(new PriorityValidatorFactory()));
+        PriorityPanel priorityPanel = new PriorityPanel(crud);
+        priorityPanel.initialize();
+        priorityPanel.getCrud().addUpdateListener(priority -> {
             int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
             IndexableTableModel<Todo> model = getModel();
             model.getAll().stream()
@@ -92,9 +102,9 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
                     .map(model::indexOf)
                     .forEach(row -> model.fireTableCellUpdated(row, columnIndex));
         });
-        priorityPanel.addDeletionListener(priorities -> {
+        priorityPanel.getCrud().addDeletionListener(priorities -> {
             int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
-            TableModel<Todo> model = getModel();
+            IndexableTableModel<Todo> model = getModel();
             model.getAll().stream()
                     .filter(todo -> priorities.contains(todo.getPriority()))
                     .peek(todo -> todo.setPriority(null))
@@ -124,29 +134,6 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
                 dialog.dispose();
             }
         });
-    }
-
-    @Override
-    protected boolean canEdit() {
-        boolean canEdit = super.canEdit();
-        if(canEdit) {
-            canEdit = getSelectedComponent()
-                    .map(todo -> !StatusWorkflow.get(todo).isFinalStatus())
-                    .orElse(false);
-        }
-        return canEdit;
-    }
-
-    @Override
-    protected Task<Todo> createCreationTask(Map<ReportField, ?> fieldValueMap) {
-        TodoService service = ServiceHolder.getTodoService();
-        return new CreateTodoTask(service, getRepresentation(), fieldValueMap);
-    }
-
-    @Override
-    protected Task<Todo> createUpdateTask(Map<ReportField, ?> fieldValueMap, Todo selectedComponent) {
-        TodoService service = ServiceHolder.getTodoService();
-        return new UpdateTodoTask(service, getRepresentation(), fieldValueMap, selectedComponent);
     }
 
     public Action getShowPrioritiesAction() {
