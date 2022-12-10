@@ -16,7 +16,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>C:\Program Files\Java\jdk-17.0.3.1</directory>
+            <directory>${env.JAVA_HOME}</directory>
             <outputDirectory>lib/jdk</outputDirectory>
         </fileSet>
 
