@@ -7,4 +7,5 @@ RUN apk add --no-cache wget  && \
 FROM jenkins/jenkins:2.364-jdk17
 WORKDIR /opt/java
 COPY --from=win-openjdk-17 /jdk-17 ./win-openjdk-17
+ENV WIN_JAVA_HOME=/opt/java/win-openjdk-17
 WORKDIR /
