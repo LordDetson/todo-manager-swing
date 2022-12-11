@@ -16,7 +16,7 @@
         </fileSet>
 
         <fileSet>
-            <directory>${env.JAVA_HOME}</directory>
+            <directory>${env.WIN_JAVA_HOME}</directory>
             <outputDirectory>lib/jdk</outputDirectory>
         </fileSet>
 
