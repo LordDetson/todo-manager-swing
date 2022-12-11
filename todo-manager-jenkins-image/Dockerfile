@@ -5,8 +5,6 @@ RUN apk add --no-cache wget  && \
     unzip -q openjdk-17+35_windows-x64_bin.zip
 
 FROM jenkins/jenkins:2.364-jdk17
-USER root
 WORKDIR /opt/java
 COPY --from=win-openjdk-17 /jdk-17 ./win-openjdk-17
 WORKDIR /
-USER jenkins
