@@ -145,6 +145,7 @@
                     <bundleName>${project.build.finalName}</bundleName>
                     <buildDirectory>${project.build.directory}</buildDirectory>
                     <jvmVersion>17+</jvmVersion>
+                    <jrePath>${env.MAC_JAVA_HOME}</jrePath>
                     <iconFile>src/main/resources/app_icon.icns</iconFile>
                     <additionalBundledClasspathResources>
                         <fileSet>
