@@ -1,0 +1,19 @@
+pipeline {
+  agent any
+  tools {
+    jdk 'openjdk17'
+    maven 'maven-3.6.3'
+  }
+  stages {
+    stage ('Build todo-manager-swing') {
+      steps {
+        sh 'mvn --debug clean -Dmaven.test.failure.ignore=true install'
+      }
+      post {
+        success {
+          junit '**/surefire-reports/*.xml'
+        }
+      }
+    }
+  }
+}
