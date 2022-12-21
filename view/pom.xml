@@ -140,12 +140,20 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>by.babanin.todo.Application</mainClass>
+                    <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
                     <version>${project.version}</version>
                     <bundleName>${project.build.finalName}</bundleName>
                     <buildDirectory>${project.build.directory}</buildDirectory>
                     <jvmVersion>17+</jvmVersion>
                     <iconFile>src/main/resources/app_icon.icns</iconFile>
+                    <additionalBundledClasspathResources>
+                        <fileSet>
+                            <directory>${project.build.directory}</directory>
+                            <includes>
+                                <include>${project.build.finalName}.jar</include>
+                            </includes>
+                        </fileSet>
+                    </additionalBundledClasspathResources>
                 </configuration>
                 <dependencies>
                     <dependency>
