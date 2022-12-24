@@ -13,7 +13,7 @@
     <version>1.0-SNAPSHOT</version>
     <packaging>pom</packaging>
 
-    <name>ToDo Manager</name>
+    <name>ToDo Manager Desktop</name>
     <description>It has never been easier to keep track of to-dos before.</description>
     <url>https://github.com/LordDetson/todo-manager-swing</url>
     <inceptionYear>2022</inceptionYear>
