@@ -34,7 +34,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
     private final PriorityService priorityService;
     private final TodoService todoService;
 
-    @Value("${application.resource.font:Rubik}")
+    @Value("${application.resource.font:Rubik Medium}")
     private String fontName;
 
     @Value("${application.resource.fonts.size:16}")
