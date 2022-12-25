@@ -1,6 +1,5 @@
 package by.babanin.todo.view;
 
-import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.Font;
 
@@ -68,9 +67,8 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         todoPanel.load();
         mainFrame.setContentPane(todoPanel);
 
-        Dimension largeFrameSize = GUIUtils.getLargeFrameSize();
-        mainFrame.setMinimumSize(largeFrameSize);
-        mainFrame.setSize(largeFrameSize);
+        mainFrame.setSize(GUIUtils.getLargeFrameSize());
+        mainFrame.setMinimumSize(GUIUtils.getHalfFrameSize());
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setTitle(Translator.toLocale(TranslateCode.TODO_FRAME_TITLE));
