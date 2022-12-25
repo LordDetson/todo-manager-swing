@@ -128,46 +128,30 @@
                 </executions>
             </plugin>
             <plugin>
-                <groupId>sh.tak.appbundler</groupId>
-                <artifactId>appbundle-maven-plugin</artifactId>
-                <version>1.2.0</version>
+                <groupId>by.babanin.macappbundler</groupId>
+                <artifactId>macappbundler-maven-plugin</artifactId>
+                <version>1.0</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
                         <goals>
                             <goal>bundle</goal>
                         </goals>
                     </execution>
                 </executions>
                 <configuration>
-                    <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
-                    <version>${project.version}</version>
-                    <bundleName>${project.build.finalName}</bundleName>
-                    <buildDirectory>${project.build.directory}</buildDirectory>
-                    <jvmVersion>17+</jvmVersion>
+                    <name>${project.build.finalName}</name>
                     <jrePath>${env.MAC_JAVA_HOME}</jrePath>
-                    <iconFile>src/main/resources/app_icon.icns</iconFile>
-                    <additionalBundledClasspathResources>
+                    <iconPath>src/main/resources/app_icon.icns</iconPath>
+                    <buildPath>${project.build.directory}</buildPath>
+                    <appJarSet>
                         <fileSet>
                             <directory>${project.build.directory}</directory>
                             <includes>
                                 <include>${project.build.finalName}.jar</include>
                             </includes>
                         </fileSet>
-                    </additionalBundledClasspathResources>
+                    </appJarSet>
                 </configuration>
-                <dependencies>
-                    <dependency>
-                        <groupId>org.codehaus.plexus</groupId>
-                        <artifactId>plexus-archiver</artifactId>
-                        <version>${plexus.archiver.version}</version>
-                    </dependency>
-                    <dependency>
-                        <groupId>org.apache.velocity</groupId>
-                        <artifactId>velocity-tools</artifactId>
-                        <version>${velocity.tools.version}</version>
-                    </dependency>
-                </dependencies>
             </plugin>
         </plugins>
     </build>
