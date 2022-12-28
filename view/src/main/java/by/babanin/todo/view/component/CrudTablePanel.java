@@ -77,19 +77,19 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         columnModel = new CustomTableColumnModel(reportFields);
         table = new JTable();
 
-        Action showCreationDialogAction = new RunnableAction(
+        Action showCreationDialogAction = new ToolAction(
                 crudStyle.getCreateButtonIcon(),
                 crudStyle.getCreateButtonToolTip(),
                 KeyEvent.VK_C,
                 this::showCreationDialog
         );
-        showEditDialogAction = new RunnableAction(
+        showEditDialogAction = new ToolAction(
                 crudStyle.getEditButtonIcon(),
                 crudStyle.getEditButtonToolTip(),
                 KeyEvent.VK_E,
                 this::showEditDialog
         );
-        showDeleteConfirmDialogAction = new RunnableAction(
+        showDeleteConfirmDialogAction = new ToolAction(
                 crudStyle.getDeleteButtonIcon(),
                 crudStyle.getDeleteButtonToolTip(),
                 KeyEvent.VK_D,

@@ -32,13 +32,13 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     protected void createUiComponents() {
         super.createUiComponents();
         CrudStyle crudStyle = getCrudStyle();
-        moveUpAction = new RunnableAction(
+        moveUpAction = new ToolAction(
                 crudStyle.getMoveUpButtonIcon(),
                 crudStyle.getMoveUpButtonToolTip(),
                 KeyEvent.VK_UP,
                 this::moveUp
         );
-        moveDownAction = new RunnableAction(
+        moveDownAction = new ToolAction(
                 crudStyle.getMoveDownButtonIcon(),
                 crudStyle.getMoveDownButtonToolTip(),
                 KeyEvent.VK_DOWN,
