@@ -5,7 +5,6 @@ import lombok.experimental.UtilityClass;
 @UtilityClass
 public class TranslateCode {
 
-    public static final String TODO_FRAME_TITLE = "todo.frame.title";
     public static final String PRIORITY_FRAME_TITLE = "priority.frame.title";
     public static final String PRIORITY_UNPRIORITIZED = "priority.unprioritized";
     public static final String APPLY_BUTTON_TEXT = "component.apply.button.text";
@@ -38,6 +37,17 @@ public class TranslateCode {
     public static final String TOOLTIP_BUTTON_MOVE_UP = "tooltip.button.move.up";
     public static final String TOOLTIP_BUTTON_MOVE_DOWN = "tooltip.button.move.down";
     public static final String TOOLTIP_BUTTON_SHOW_PRIORITIES = "tooltip.button.show.priorities";
+
+    // Main menu
+    public static final String MAIN_MENU_FILE = "mainmenu.file";
+    public static final String MAIN_MENU_EXIT = "mainmenu.exit";
+    public static final String MAIN_MENU_HELP = "mainmenu.help";
+    public static final String MAIN_MENU_ABOUT = "mainmenu.about";
+
+    //About dialog
+    public static final String ABOUT_TITLE = "about.title";
+    public static final String ABOUT_DEVELOPERS = "about.developers";
+    public static final String ABOUT_CONTRIBUTORS = "about.contributors";
 
     public static final String TODO_STATUS = "todo.status.%s";
     public static final String FIELD_CAPTION = "%s.%s.caption";

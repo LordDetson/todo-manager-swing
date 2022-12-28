@@ -30,7 +30,7 @@ import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.IndexableTableModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
-import by.babanin.todo.view.component.RunnableAction;
+import by.babanin.todo.view.component.ToolAction;
 import by.babanin.todo.view.component.TableModel;
 import by.babanin.todo.view.component.form.TodoFormRowFactory;
 import by.babanin.todo.view.component.validation.TodoValidatorFactory;
@@ -58,7 +58,7 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     @Override
     protected void createUiComponents() {
         super.createUiComponents();
-        Action showPrioritiesAction = new RunnableAction(
+        Action showPrioritiesAction = new ToolAction(
                 getCrudStyle().getIcon("priority_list"),
                 Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES),
                 KeyEvent.VK_P,

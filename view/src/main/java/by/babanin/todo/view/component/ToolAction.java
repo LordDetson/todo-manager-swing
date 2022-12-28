@@ -8,11 +8,11 @@ import javax.swing.Icon;
 
 import by.babanin.todo.view.util.GUIUtils;
 
-public class RunnableAction extends AbstractAction {
+public class ToolAction extends AbstractAction {
 
     private final transient Runnable runnable;
 
-    public RunnableAction(Icon icon, String toolTip, int mnemonicKey, Runnable runnable) {
+    public ToolAction(Icon icon, String toolTip, int mnemonicKey, Runnable runnable) {
         this.runnable = runnable;
         putValue(Action.SMALL_ICON, icon);
         putValue(Action.MNEMONIC_KEY, mnemonicKey);

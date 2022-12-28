@@ -2,6 +2,8 @@ package by.babanin.todo.view.util;
 
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Cursor;
+import java.awt.Desktop;
 import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
@@ -9,17 +11,23 @@ import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.beans.PropertyChangeEvent;
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Objects;
 
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
@@ -193,6 +201,14 @@ public final class GUIUtils {
 
     public static void setMainWindow(JFrame window) {
         mainWindow = window;
+        if(SystemInfo.isMacOS) {
+            if(SystemInfo.isMacFullWindowContentSupported) {
+                window.getRootPane().putClientProperty("apple.awt.transparentTitleBar", true);
+            }
+            if(!SystemInfo.isJava_11_orLater) {
+                window.getRootPane().putClientProperty("apple.awt.fullscreenable", true);
+            }
+        }
     }
 
     public static JFrame getMainWindow() {
@@ -243,5 +259,27 @@ public final class GUIUtils {
         JRootPane rootPane = dialog.getRootPane();
         rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
         rootPane.getActionMap().put(actionKey, action);
+    }
+
+    public static JLabel createHyperlinkLabel(String hyperlink) {
+        return createHyperlinkLabel(hyperlink, hyperlink);
+    }
+
+    public static JLabel createHyperlinkLabel(String hyperlink, String text) {
+        JLabel hyperlinkLabel = new JLabel("<html><a href=\"#\">" + text + "</a></html>");
+        hyperlinkLabel.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        hyperlinkLabel.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent event) {
+                try {
+                    Desktop.getDesktop().browse(new URI(hyperlink));
+                }
+                catch(IOException | URISyntaxException e) {
+                    throw new ViewException(e);
+                }
+            }
+        });
+        return hyperlinkLabel;
     }
 }
