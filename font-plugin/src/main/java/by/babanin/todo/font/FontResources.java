@@ -5,10 +5,7 @@ import java.awt.FontFormatException;
 import java.awt.GraphicsEnvironment;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.Arrays;
 import java.util.List;
-
-import javax.swing.UIManager;
 
 import by.babanin.todo.font.exception.FontResourcesException;
 import lombok.experimental.UtilityClass;
@@ -51,24 +48,5 @@ public class FontResources {
         catch(IOException | FontFormatException e) {
             throw new FontResourcesException(e);
         }
-    }
-
-    public static void applyFontByDefault(Font font) {
-        String fontName = font.getName();
-        if(isRegisteredFont(fontName)) {
-            for(Object key : UIManager.getDefaults().keySet()) {
-                Object value = UIManager.get(key);
-                if(value instanceof Font) {
-                    UIManager.put(key, font);
-                }
-            }
-        }
-        else {
-            throw new FontResourcesException(fontName + " doesn't exist");
-        }
-    }
-
-    public static boolean isRegisteredFont(String fontName) {
-        return Arrays.asList(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()).contains(fontName);
     }
 }

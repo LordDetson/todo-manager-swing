@@ -1,18 +1,17 @@
 package by.babanin.todo.view;
 
 import java.awt.EventQueue;
-import java.awt.Font;
 
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
+import com.formdev.flatlaf.FlatLaf;
 
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
@@ -33,12 +32,6 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
     private final PriorityService priorityService;
     private final TodoService todoService;
 
-    @Value("${application.resource.font:Rubik Medium}")
-    private String fontName;
-
-    @Value("${application.resource.fonts.size:16}")
-    private int fontSize;
-
     public UILauncher(ResourceBundleMessageSource messageSource, PriorityService priorityService, TodoService todoService) {
         this.messageSource = messageSource;
         this.priorityService = priorityService;
@@ -53,9 +46,9 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         ComponentRepresentation.initializeComponentRepresentationMap();
         FontResources.registerFonts();
 
+        FlatLaf.registerCustomDefaultsSource( "themes" );
         FlatDarculaLaf.setup();
         UICustomizer.customize();
-        FontResources.applyFontByDefault(new Font(fontName, Font.PLAIN, fontSize));
         EventQueue.invokeLater(this::showMainFrame);
     }
 
