@@ -201,14 +201,6 @@ public final class GUIUtils {
 
     public static void setMainWindow(JFrame window) {
         mainWindow = window;
-        if(SystemInfo.isMacOS) {
-            if(SystemInfo.isMacFullWindowContentSupported) {
-                window.getRootPane().putClientProperty("apple.awt.transparentTitleBar", true);
-            }
-            if(!SystemInfo.isJava_11_orLater) {
-                window.getRootPane().putClientProperty("apple.awt.fullscreenable", true);
-            }
-        }
     }
 
     public static JFrame getMainWindow() {

@@ -1,6 +1,5 @@
 package by.babanin.todo.view;
 
-import java.awt.Desktop;
 import java.awt.EventQueue;
 
 import javax.swing.JFrame;
@@ -13,7 +12,6 @@ import org.springframework.stereotype.Component;
 
 import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLaf;
-import com.formdev.flatlaf.util.SystemInfo;
 
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
@@ -56,9 +54,6 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         FlatLaf.registerCustomDefaultsSource( "themes" );
         FlatDarculaLaf.setup();
         UICustomizer.customize();
-        if(SystemInfo.isMacOS) {
-            setupPropertiesForMacOs();
-        }
         EventQueue.invokeLater(this::showMainFrame);
     }
 
@@ -78,18 +73,5 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         mainFrame.setTitle(aboutInfo.getProduct().getName());
         mainFrame.setIconImage(IconResources.getIcon("transparent_check_hexagon", DEFAULT_ICON_SIZE).getImage());
         mainFrame.setVisible(true);
-    }
-
-    private void setupPropertiesForMacOs() {
-        System.setProperty("apple.laf.useScreenMenuBar", "true");
-        System.setProperty("apple.awt.application.name", aboutInfo.getProduct().getName());
-        System.setProperty("apple.awt.application.appearance", "system");
-        Desktop desktop = Desktop.getDesktop();
-        if(desktop.isSupported(Desktop.Action.APP_ABOUT)) {
-            desktop.setAboutHandler(e -> AboutDialog.show());
-        }
-        if(desktop.isSupported(Desktop.Action.APP_QUIT_HANDLER)) {
-            desktop.setQuitHandler((e, response) -> response.performQuit());
-        }
     }
 }
