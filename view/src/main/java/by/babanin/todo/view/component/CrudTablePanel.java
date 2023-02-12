@@ -25,21 +25,22 @@ import by.babanin.todo.model.Persistent;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
-import by.babanin.todo.task.listener.ExceptionListener;
-import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.Task;
+import by.babanin.todo.task.listener.ExceptionListener;
+import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.ServiceHolder;
 
 public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel {
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
+
+    private final transient CrudService<C, I> service;
     private final transient ComponentRepresentation<C> representation;
     private final transient FormRowFactory formRowFactory;
     private final CrudStyle crudStyle;
@@ -55,7 +56,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private CustomTableColumnModel columnModel;
     private JTable table;
 
-    protected CrudTablePanel(Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
+    protected CrudTablePanel(CrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
+        this.service = service;
         this.representation = ComponentRepresentation.get(componentClass);
         this.formRowFactory = formRowFactory;
         this.crudStyle = crudStyle;
@@ -200,7 +202,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     @SuppressWarnings("unchecked")
     public void load() {
-        GetTask<C, I, CrudService<C, I>> task = new GetTask<>(ServiceHolder.getCrudService(representation.getComponentClass()));
+        GetTask<C, I, CrudService<C, I>> task = new GetTask<>(service);
         if(crudListenersMap.containsKey(CrudAction.READ)) {
             crudListenersMap.get(CrudAction.READ)
                     .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
@@ -287,7 +289,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
             List<I> ids = selectedComponents.stream()
                     .map(Persistent::getId)
                     .toList();
-            DeleteTask<C, I, CrudService<C, I>> task = new DeleteTask<>(ServiceHolder.getCrudService(representation.getComponentClass()), ids);
+            DeleteTask<C, I, CrudService<C, I>> task = new DeleteTask<>(service, ids);
             if(crudListenersMap.containsKey(CrudAction.DELETE)) {
                 crudListenersMap.get(CrudAction.DELETE)
                         .forEach(finishListener -> task.addFinishListener((FinishListener<List<C>>) finishListener));
@@ -336,5 +338,9 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     public JTable getTable() {
         return table;
+    }
+
+    protected CrudService<C, I> getService() {
+        return service;
     }
 }

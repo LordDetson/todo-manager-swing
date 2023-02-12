@@ -5,64 +5,45 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.ResourceBundleMessageSource;
 import org.springframework.stereotype.Component;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
-import com.formdev.flatlaf.FlatLaf;
+import com.formdev.flatlaf.extras.FlatSVGIcon;
 
-import by.babanin.todo.application.service.PriorityService;
-import by.babanin.todo.application.service.TodoService;
-import by.babanin.todo.font.FontResources;
-import by.babanin.todo.image.IconResources;
-import by.babanin.todo.representation.ComponentRepresentation;
-import by.babanin.todo.view.about.AboutDialog;
 import by.babanin.todo.view.about.AboutInfo;
-import by.babanin.todo.view.component.custom.UICustomizer;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
-import by.babanin.todo.view.util.ServiceHolder;
 
 @Component
-public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
+public final class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
 
-    private static final int DEFAULT_ICON_SIZE = 32;
+    private final BeanFactory beanFactory;
     private final ResourceBundleMessageSource messageSource;
     private final AboutInfo aboutInfo;
-    private final PriorityService priorityService;
-    private final TodoService todoService;
+    private final FlatSVGIcon appLogoIcon;
 
-    public UILauncher(ResourceBundleMessageSource messageSource, AboutInfo aboutInfo, PriorityService priorityService,
-            TodoService todoService) {
+    public UILauncher(BeanFactory beanFactory, ResourceBundleMessageSource messageSource, AboutInfo aboutInfo, FlatSVGIcon appLogoIcon) {
+        this.beanFactory = beanFactory;
         this.messageSource = messageSource;
         this.aboutInfo = aboutInfo;
-        this.priorityService = priorityService;
-        this.todoService = todoService;
+        this.appLogoIcon = appLogoIcon;
     }
 
     @Override
     public void onApplicationEvent(ContextRefreshedEvent event) {
         Translator.setMessageSource(messageSource);
-        AboutDialog.setAboutInfo(aboutInfo);
-        ServiceHolder.setPriorityService(priorityService);
-        ServiceHolder.setTodoService(todoService);
-        ComponentRepresentation.initializeComponentRepresentationMap();
-        FontResources.registerFonts();
-
-        FlatLaf.registerCustomDefaultsSource( "themes" );
-        FlatDarculaLaf.setup();
-        UICustomizer.customize();
         EventQueue.invokeLater(this::showMainFrame);
     }
 
     private void showMainFrame() {
         JFrame mainFrame = new JFrame();
         GUIUtils.setMainWindow(mainFrame);
-        mainFrame.setJMenuBar(new MainMenuBar());
+        mainFrame.setJMenuBar(beanFactory.getBean(MainMenuBar.class));
 
-        TodoPanel todoPanel = new TodoPanel();
+        TodoPanel todoPanel = beanFactory.getBean(TodoPanel.class);
         todoPanel.load();
         mainFrame.setContentPane(todoPanel);
 
@@ -71,7 +52,7 @@ public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
         mainFrame.setTitle(aboutInfo.getProduct().getName());
-        mainFrame.setIconImage(IconResources.getIcon("transparent_check_hexagon", DEFAULT_ICON_SIZE).getImage());
+        mainFrame.setIconImage(appLogoIcon.getImage());
         mainFrame.setVisible(true);
     }
 }

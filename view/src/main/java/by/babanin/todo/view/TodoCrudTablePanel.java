@@ -16,6 +16,12 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
+import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.application.status.StatusWorkflow;
 import by.babanin.todo.model.Priority;
@@ -30,8 +36,8 @@ import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.IndexableTableModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
-import by.babanin.todo.view.component.ToolAction;
 import by.babanin.todo.view.component.TableModel;
+import by.babanin.todo.view.component.ToolAction;
 import by.babanin.todo.view.component.form.TodoFormRowFactory;
 import by.babanin.todo.view.component.validation.TodoValidatorFactory;
 import by.babanin.todo.view.renderer.LocalDataRenderer;
@@ -40,19 +46,23 @@ import by.babanin.todo.view.renderer.StatusRenderer;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
-import by.babanin.todo.view.util.ServiceHolder;
 
-public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public final class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
     private static final String PRIORITIES_DIALOG_CLOSING_ACTION_KEY = "closePrioritiesDialog";
     private JButton showPrioritiesButton;
 
-    public TodoCrudTablePanel() {
-        super(Todo.class, new TodoFormRowFactory(), new CrudStyle()
+    private final transient BeanFactory beanFactory;
+
+    public TodoCrudTablePanel(TodoService todoService, PriorityService priorityService, BeanFactory beanFactory) {
+        super(todoService, Todo.class, new TodoFormRowFactory(priorityService), new CrudStyle()
                 .setValidatorFactory(new TodoValidatorFactory())
                 .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
                 .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate)
                 .excludeFieldFromTable(Fields.description));
+        this.beanFactory = beanFactory;
     }
 
     @Override
@@ -82,7 +92,7 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     private void showPriorityDialog() {
-        PriorityCrudTablePanel priorityPanel = new PriorityCrudTablePanel();
+        PriorityCrudTablePanel priorityPanel = beanFactory.getBean(PriorityCrudTablePanel.class);
         priorityPanel.addEditListener(priority -> {
             int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
             IndexableTableModel<Todo> model = getModel();
@@ -145,14 +155,17 @@ public class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
     }
 
     @Override
+    protected TodoService getService() {
+        return (TodoService) super.getService();
+    }
+
+    @Override
     protected Task<Todo> createCreationTask(Map<ReportField, ?> fieldValueMap) {
-        TodoService service = ServiceHolder.getTodoService();
-        return new CreateTodoTask(service, getRepresentation(), fieldValueMap);
+        return new CreateTodoTask(getService(), getRepresentation(), fieldValueMap);
     }
 
     @Override
     protected Task<Todo> createUpdateTask(Map<ReportField, ?> fieldValueMap, Todo selectedComponent) {
-        TodoService service = ServiceHolder.getTodoService();
-        return new UpdateTodoTask(service, getRepresentation(), fieldValueMap, selectedComponent);
+        return new UpdateTodoTask(getService(), getRepresentation(), fieldValueMap, selectedComponent);
     }
 }

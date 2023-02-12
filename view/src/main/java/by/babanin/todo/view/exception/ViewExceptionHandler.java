@@ -5,7 +5,7 @@ import java.lang.Thread.UncaughtExceptionHandler;
 import org.springframework.stereotype.Component;
 
 @Component
-public class ViewExceptionHandler implements UncaughtExceptionHandler {
+public final class ViewExceptionHandler implements UncaughtExceptionHandler {
 
     @Override
     public void uncaughtException(Thread thread, Throwable throwable) {

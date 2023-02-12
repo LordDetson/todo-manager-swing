@@ -4,6 +4,7 @@ import java.time.LocalDate;
 
 import com.github.lgooddatepicker.zinternaltools.DateVetoPolicyMinimumMaximumDate;
 
+import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
@@ -12,6 +13,12 @@ import by.babanin.todo.view.component.datepicker.CustomDatePicker;
 import by.babanin.todo.view.exception.ViewException;
 
 public class TodoFormRowFactory implements FormRowFactory {
+
+    private final PriorityService priorityService;
+
+    public TodoFormRowFactory(PriorityService priorityService) {
+        this.priorityService = priorityService;
+    }
 
     @SuppressWarnings("unchecked")
     @Override
@@ -27,7 +34,7 @@ public class TodoFormRowFactory implements FormRowFactory {
                 formRow = new TextAreaFormRow(field);
             }
             else if(fieldName.equals(Fields.priority)) {
-                formRow = new PriorityComboBoxFormRow(field);
+                formRow = new PriorityComboBoxFormRow(priorityService, field);
             }
             else if(fieldName.equals(Fields.status)) {
                 formRow = new StatusComboBoxFormRow(field);

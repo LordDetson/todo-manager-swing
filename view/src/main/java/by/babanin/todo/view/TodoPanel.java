@@ -6,25 +6,35 @@ import java.util.function.Predicate;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
+import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.config.ConfigurableBeanFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
+
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.view.component.TextAreaPanel;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
-public class TodoPanel extends JPanel {
+@Component
+@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
+public final class TodoPanel extends JPanel {
+
+    private final transient BeanFactory beanFactory;
 
     private TodoCrudTablePanel crudTablePanel;
     private TextAreaPanel descriptionPanel;
 
-    public TodoPanel() {
+    public TodoPanel(BeanFactory beanFactory) {
         super(new BorderLayout());
+        this.beanFactory = beanFactory;
         createUiComponents();
         addListeners();
         placeComponents();
     }
 
     private void createUiComponents() {
-        crudTablePanel = new TodoCrudTablePanel();
+        crudTablePanel = beanFactory.getBean(TodoCrudTablePanel.class);
         descriptionPanel = new TextAreaPanel();
         descriptionPanel.setEditable(false);
     }

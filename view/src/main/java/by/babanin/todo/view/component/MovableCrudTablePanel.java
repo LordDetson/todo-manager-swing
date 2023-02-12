@@ -15,7 +15,6 @@ import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.SwapTask;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.util.ServiceHolder;
 
 public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable, I> extends CrudTablePanel<C, I> {
 
@@ -24,8 +23,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     private JButton moveUpButton;
     private JButton moveDownButton;
 
-    protected MovableCrudTablePanel(Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
-        super(componentClass, formRowFactory, crudStyle);
+    protected MovableCrudTablePanel(AbstractIndexableCrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
+        super(service, componentClass, formRowFactory, crudStyle);
     }
 
     @Override
@@ -89,13 +88,17 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
         int selectedIndex = model.indexOf(selectedComponent);
         int directionCount = direction == Direction.UP ? -1 : 1;
         int nextIndex = selectedIndex + directionCount;
-        Class<C> componentClass = getRepresentation().getComponentClass();
-        AbstractIndexableCrudService<C, I> service = (AbstractIndexableCrudService<C, I>) ServiceHolder.getCrudService(componentClass);
+        AbstractIndexableCrudService<C, I> service = getService();
         SwapTask<C, I, AbstractIndexableCrudService<C, I>> task = new SwapTask<>(service, selectedIndex, nextIndex);
         task.addFinishListener(unused -> {
             model.swap(selectedIndex, nextIndex);
             selectRow(nextIndex);
         });
         task.execute();
+    }
+
+    @Override
+    protected AbstractIndexableCrudService<C, I> getService() {
+        return (AbstractIndexableCrudService<C, I>) super.getService();
     }
 }
