@@ -5,7 +5,7 @@ import java.awt.EventQueue;
 import javax.swing.JFrame;
 import javax.swing.WindowConstants;
 
-import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -18,15 +18,13 @@ import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
 
 @Component
-public final class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
+public abstract class UILauncher implements ApplicationListener<ContextRefreshedEvent> {
 
-    private final BeanFactory beanFactory;
     private final ResourceBundleMessageSource messageSource;
     private final AboutInfo aboutInfo;
     private final FlatSVGIcon appLogoIcon;
 
-    public UILauncher(BeanFactory beanFactory, ResourceBundleMessageSource messageSource, AboutInfo aboutInfo, FlatSVGIcon appLogoIcon) {
-        this.beanFactory = beanFactory;
+    protected UILauncher(ResourceBundleMessageSource messageSource, AboutInfo aboutInfo, FlatSVGIcon appLogoIcon) {
         this.messageSource = messageSource;
         this.aboutInfo = aboutInfo;
         this.appLogoIcon = appLogoIcon;
@@ -41,9 +39,9 @@ public final class UILauncher implements ApplicationListener<ContextRefreshedEve
     private void showMainFrame() {
         JFrame mainFrame = new JFrame();
         GUIUtils.setMainWindow(mainFrame);
-        mainFrame.setJMenuBar(beanFactory.getBean(MainMenuBar.class));
+        mainFrame.setJMenuBar(createMainMenuBar());
 
-        TodoPanel todoPanel = beanFactory.getBean(TodoPanel.class);
+        TodoPanel todoPanel = createTodoPanel();
         todoPanel.load();
         mainFrame.setContentPane(todoPanel);
 
@@ -55,4 +53,10 @@ public final class UILauncher implements ApplicationListener<ContextRefreshedEve
         mainFrame.setIconImage(appLogoIcon.getImage());
         mainFrame.setVisible(true);
     }
+
+    @Lookup
+    protected abstract MainMenuBar createMainMenuBar();
+
+    @Lookup
+    protected abstract TodoPanel createTodoPanel();
 }

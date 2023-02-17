@@ -16,7 +16,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
 
-import org.springframework.beans.factory.BeanFactory;
+import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -49,20 +49,17 @@ import by.babanin.todo.view.util.GUIUtils;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public final class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
+public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
     private static final String PRIORITIES_DIALOG_CLOSING_ACTION_KEY = "closePrioritiesDialog";
     private JButton showPrioritiesButton;
 
-    private final transient BeanFactory beanFactory;
-
-    public TodoCrudTablePanel(TodoService todoService, PriorityService priorityService, BeanFactory beanFactory) {
+    protected TodoCrudTablePanel(TodoService todoService, PriorityService priorityService) {
         super(todoService, Todo.class, new TodoFormRowFactory(priorityService), new CrudStyle()
                 .setValidatorFactory(new TodoValidatorFactory())
                 .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
                 .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate)
                 .excludeFieldFromTable(Fields.description));
-        this.beanFactory = beanFactory;
     }
 
     @Override
@@ -92,7 +89,7 @@ public final class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> 
     }
 
     private void showPriorityDialog() {
-        PriorityCrudTablePanel priorityPanel = beanFactory.getBean(PriorityCrudTablePanel.class);
+        PriorityCrudTablePanel priorityPanel = createPriorityCrudTablePanel();
         priorityPanel.addEditListener(priority -> {
             int columnIndex = getTable().getColumnModel().getColumnIndex(Fields.priority);
             IndexableTableModel<Todo> model = getModel();
@@ -125,6 +122,9 @@ public final class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> 
         addPrioritiesDialogClosingAction(dialog);
         dialog.setVisible(true);
     }
+
+    @Lookup
+    protected abstract PriorityCrudTablePanel createPriorityCrudTablePanel();
 
     private static void addPrioritiesDialogClosingAction(JDialog dialog) {
         KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
