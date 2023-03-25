@@ -49,7 +49,7 @@ public abstract class UILauncher implements ApplicationListener<ContextRefreshed
         mainFrame.setMinimumSize(GUIUtils.getHalfFrameSize());
         mainFrame.setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         mainFrame.setLocationRelativeTo(null);
-        mainFrame.setTitle(aboutInfo.getProduct().getName());
+        mainFrame.setTitle(aboutInfo.getProduct().getNameWithVersion());
         mainFrame.setIconImage(appLogoIcon.getImage());
         mainFrame.setVisible(true);
     }

@@ -35,7 +35,7 @@ public final class ShowAboutAction extends AbstractAction {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String title = Translator.toLocale(TranslateCode.ABOUT_TITLE).formatted(aboutInfo.getProduct().getName());
+        String title = Translator.toLocale(TranslateCode.ABOUT_TITLE).formatted(aboutInfo.getProduct().getNameWithVersion());
         JDialog dialog = new CustomDialog(GUIUtils.getMainWindow(), title, ModalityType.APPLICATION_MODAL);
         dialog.setContentPane(new AboutPanel(aboutInfo));
         dialog.setResizable(false);

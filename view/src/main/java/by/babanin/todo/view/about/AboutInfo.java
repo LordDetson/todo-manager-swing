@@ -24,9 +24,14 @@ public class AboutInfo {
     public static class ProductInfo {
 
         private String name;
+        private String version;
         private String description;
         private String url;
         private String inceptionYear;
+
+        public String getNameWithVersion() {
+            return getName() + " " + getVersion();
+        }
     }
 
     @Getter

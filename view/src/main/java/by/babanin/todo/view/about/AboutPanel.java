@@ -47,7 +47,7 @@ public class AboutPanel extends JPanel {
 
         FlatLabel productName = new FlatLabel();
         productName.setLabelType(LabelType.h2);
-        productName.setText(aboutInfo.getProduct().getName());
+        productName.setText(aboutInfo.getProduct().getNameWithVersion());
         add(productName, c);
 
         c.insets = new Insets(PARAGRAPH_SPACE, 0, 0, BORDER_SPACE);
