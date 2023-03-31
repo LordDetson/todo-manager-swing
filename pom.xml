@@ -62,4 +62,48 @@
         <module>font-plugin</module>
         <module>image-plugin</module>
     </modules>
+
+    <properties>
+        <flatlaf.version>2.4</flatlaf.version>
+        <lgooddatepicker.version>11.2.1</lgooddatepicker.version>
+        <launch4j.version>2.1.2</launch4j.version>
+        <macappbundler.version>1.0</macappbundler.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.formdev</groupId>
+                <artifactId>flatlaf</artifactId>
+                <version>${flatlaf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.formdev</groupId>
+                <artifactId>flatlaf-extras</artifactId>
+                <version>${flatlaf.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.github.lgooddatepicker</groupId>
+                <artifactId>LGoodDatePicker</artifactId>
+                <version>${lgooddatepicker.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                    <artifactId>launch4j-maven-plugin</artifactId>
+                    <version>${launch4j.version}</version>
+                </plugin>
+                <plugin>
+                    <groupId>by.babanin.macappbundler</groupId>
+                    <artifactId>macappbundler-maven-plugin</artifactId>
+                    <version>${macappbundler.version}</version>
+                </plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
 </project>

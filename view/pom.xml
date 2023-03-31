@@ -13,14 +13,17 @@
     <packaging>jar</packaging>
 
     <properties>
-        <flatlaf.version>2.4</flatlaf.version>
-        <lgooddatepicker.version>11.2.1</lgooddatepicker.version>
         <plexus.archiver.version>4.5.0</plexus.archiver.version>
         <velocity.tools.version>2.0</velocity.tools.version>
         <sonar.coverage.exclusions>**/*</sonar.coverage.exclusions>
     </properties>
 
     <dependencies>
+        <dependency>
+            <groupId>by.babanin.todo</groupId>
+            <artifactId>model</artifactId>
+            <version>1.0-SNAPSHOT</version>
+        </dependency>
         <dependency>
             <groupId>by.babanin.todo</groupId>
             <artifactId>application</artifactId>
@@ -37,8 +40,8 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter</artifactId>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
@@ -47,12 +50,18 @@
         <dependency>
             <groupId>com.formdev</groupId>
             <artifactId>flatlaf</artifactId>
-            <version>${flatlaf.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.formdev</groupId>
+            <artifactId>flatlaf-extras</artifactId>
         </dependency>
         <dependency>
             <groupId>com.github.lgooddatepicker</groupId>
             <artifactId>LGoodDatePicker</artifactId>
-            <version>${lgooddatepicker.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>jakarta.annotation</groupId>
+            <artifactId>jakarta.annotation-api</artifactId>
         </dependency>
     </dependencies>
 
@@ -76,13 +85,28 @@
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
+                <artifactId>maven-dependency-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>dependency-analyzing</id>
+                        <goals>
+                            <goal>analyze-only</goal>
+                        </goals>
+                        <configuration>
+                            <ignoredUnusedDeclaredDependencies>
+                                <ignoredUnusedDeclaredDependency>org.springframework*</ignoredUnusedDeclaredDependency>
+                                <ignoredUnusedDeclaredDependency>org.projectlombok:lombok</ignoredUnusedDeclaredDependency>
+                            </ignoredUnusedDeclaredDependencies>
+                        </configuration>
+                    </execution>
+                </executions>
             </plugin>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <executions>
                     <execution>
+                        <id>repackage</id>
                         <goals>
                             <goal>repackage</goal>
                         </goals>
@@ -92,82 +116,106 @@
                     </execution>
                 </executions>
             </plugin>
-            <plugin>
-                <groupId>com.akathist.maven.plugins.launch4j</groupId>
-                <artifactId>launch4j-maven-plugin</artifactId>
-                <version>2.1.2</version>
-                <executions>
-                    <execution>
-                        <id>jar-to-exe</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>launch4j</goal>
-                        </goals>
-                        <configuration>
-                            <headerType>gui</headerType>
-                            <stayAlive>true</stayAlive>
-                            <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
-                            <outfile>${project.build.directory}/${project.build.finalName}.exe</outfile>
-                            <icon>${build.outputDirectory}/app_icon.ico</icon>
-                            <classPath>
-                                <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
-                            </classPath>
-                            <jre>
-                                <minVersion>17</minVersion>
-                                <path>./lib/jdk</path>
-                            </jre>
-                            <singleInstance>
-                                <mutexName>${project.build.finalName}</mutexName>
-                                <windowTitle>${project.build.finalName}</windowTitle>
-                            </singleInstance>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-assembly-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>create-archive</id>
-                        <phase>package</phase>
-                        <goals>
-                            <goal>single</goal>
-                        </goals>
-                        <configuration>
-                            <descriptors>
-                                <descriptor>/assembly.xml</descriptor>
-                            </descriptors>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-            <plugin>
-                <groupId>by.babanin.macappbundler</groupId>
-                <artifactId>macappbundler-maven-plugin</artifactId>
-                <version>1.0</version>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>bundle</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <name>${project.build.finalName}</name>
-                    <jrePath>${env.MAC_JAVA_HOME}</jrePath>
-                    <iconPath>src/main/resources/app_icon.icns</iconPath>
-                    <buildPath>${project.build.directory}</buildPath>
-                    <appJarSet>
-                        <fileSet>
-                            <directory>${project.build.directory}</directory>
-                            <includes>
-                                <include>${project.build.finalName}.jar</include>
-                            </includes>
-                        </fileSet>
-                    </appJarSet>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
+
+    <profiles>
+        <profile>
+            <id>jar-to-exe</id>
+            <activation>
+                <property>
+                    <name>env.WIN_JAVA_HOME</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>com.akathist.maven.plugins.launch4j</groupId>
+                        <artifactId>launch4j-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>jar-to-exe</id>
+                                <goals>
+                                    <goal>launch4j</goal>
+                                </goals>
+                                <configuration>
+                                    <headerType>gui</headerType>
+                                    <stayAlive>true</stayAlive>
+                                    <jar>${project.build.directory}/${project.build.finalName}.jar</jar>
+                                    <outfile>${project.build.directory}/${project.build.finalName}.exe</outfile>
+                                    <icon>${project.build.outputDirectory}/app_icon.ico</icon>
+                                    <classPath>
+                                        <mainClass>org.springframework.boot.loader.JarLauncher</mainClass>
+                                    </classPath>
+                                    <jre>
+                                        <minVersion>17</minVersion>
+                                        <path>./lib/jdk</path>
+                                    </jre>
+                                    <singleInstance>
+                                        <mutexName>${project.build.finalName}</mutexName>
+                                        <windowTitle>${project.build.finalName}</windowTitle>
+                                    </singleInstance>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                    <plugin>
+                        <groupId>org.apache.maven.plugins</groupId>
+                        <artifactId>maven-assembly-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <id>create-archive</id>
+                                <phase>package</phase>
+                                <goals>
+                                    <goal>single</goal>
+                                </goals>
+                                <configuration>
+                                    <descriptors>
+                                        <descriptor>/assembly.xml</descriptor>
+                                    </descriptors>
+                                </configuration>
+                            </execution>
+                        </executions>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+        <profile>
+            <id>jar-to-mac</id>
+            <activation>
+                <property>
+                    <name>env.MAC_JAVA_HOME</name>
+                </property>
+            </activation>
+            <build>
+                <plugins>
+                    <plugin>
+                        <groupId>by.babanin.macappbundler</groupId>
+                        <artifactId>macappbundler-maven-plugin</artifactId>
+                        <executions>
+                            <execution>
+                                <goals>
+                                    <goal>bundle</goal>
+                                </goals>
+                            </execution>
+                        </executions>
+                        <configuration>
+                            <name>${project.build.finalName}</name>
+                            <jrePath>${env.MAC_JAVA_HOME}</jrePath>
+                            <iconPath>src/main/resources/app_icon.icns</iconPath>
+                            <buildPath>${project.build.directory}</buildPath>
+                            <appJarSet>
+                                <fileSet>
+                                    <directory>${project.build.directory}</directory>
+                                    <includes>
+                                        <include>${project.build.finalName}.jar</include>
+                                    </includes>
+                                </fileSet>
+                            </appJarSet>
+                        </configuration>
+                    </plugin>
+                </plugins>
+            </build>
+        </profile>
+    </profiles>
 </project>
