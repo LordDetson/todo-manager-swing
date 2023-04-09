@@ -10,9 +10,12 @@ import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
 import java.awt.Toolkit;
 import java.awt.Window;
+import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.PropertyChangeEvent;
 import java.io.IOException;
 import java.io.PrintWriter;
@@ -23,6 +26,7 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.Objects;
 
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -41,6 +45,8 @@ import javax.swing.text.JTextComponent;
 
 import com.formdev.flatlaf.util.SystemInfo;
 
+import by.babanin.todo.preferences.PreferenceAware;
+import by.babanin.todo.preferences.PreferencesSupport;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.Translator;
@@ -273,5 +279,38 @@ public final class GUIUtils {
             }
         });
         return hyperlinkLabel;
+    }
+
+    public static void addCloseActionOnEscape(JDialog dialog, String key) {
+        KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
+        GUIUtils.addDialogKeyAction(dialog, escapeStroke, key, new AbstractAction() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                dialog.dispose();
+            }
+        });
+    }
+
+    public static <T extends Window & PreferenceAware<?>> void addPreferenceSupport(T preferenceAware) {
+        PreferencesSupport preferencesSupport = new PreferencesSupport();
+        preferencesSupport.put(preferenceAware);
+        preferenceAware.addWindowListener(new WindowAdapter() {
+
+            @Override
+            public void windowOpened(WindowEvent e) {
+                preferencesSupport.apply();
+            }
+
+            @Override
+            public void windowClosing(WindowEvent e) {
+                preferencesSupport.save();
+            }
+
+            @Override
+            public void windowClosed(WindowEvent e) {
+                preferencesSupport.save();
+            }
+        });
     }
 }

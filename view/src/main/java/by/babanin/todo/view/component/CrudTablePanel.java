@@ -13,7 +13,6 @@ import java.util.Optional;
 
 import javax.swing.Action;
 import javax.swing.JButton;
-import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -22,6 +21,8 @@ import javax.swing.JToolBar;
 
 import by.babanin.todo.application.service.CrudService;
 import by.babanin.todo.model.Persistent;
+import by.babanin.todo.preferences.PreferenceAware;
+import by.babanin.todo.preferences.PreferencesGroup;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
@@ -30,12 +31,18 @@ import by.babanin.todo.task.Task;
 import by.babanin.todo.task.listener.ExceptionListener;
 import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.view.component.form.ComponentForm;
+import by.babanin.todo.view.component.form.FormDialog;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.view.preference.TableColumnsPreference;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.util.GUIUtils;
 
-public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel {
+public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
+        implements PreferenceAware<PreferencesGroup> {
+
+    private static final String TABLE_COLUMNS_PREFERENCE_KEY = "tableColumnsPreference";
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
@@ -54,6 +61,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private JButton deleteButton;
     private TableModel<C> model;
     private CustomTableColumnModel columnModel;
+    private CustomTableColumnModel defaultColumnModel;
     private JTable table;
 
     protected CrudTablePanel(CrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
@@ -76,7 +84,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                 .filter(field -> !excludedFieldFromTable.contains(field.getName()))
                 .toList();
         model = createTableModel(representation, reportFields);
-        columnModel = new CustomTableColumnModel(reportFields);
+        defaultColumnModel = createColumnModel(reportFields);
+        columnModel = createColumnModel(reportFields);
         table = new JTable();
 
         Action showCreationDialogAction = new ToolAction(
@@ -107,9 +116,14 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
         return new TableModel<>(representation, fields);
     }
 
+    protected CustomTableColumnModel createColumnModel(List<ReportField> reportFields) {
+        return new CustomTableColumnModel(reportFields);
+    }
+
     protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel columnModel) {
         table.setModel(model);
         table.setColumnModel(columnModel);
+        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     }
 
     protected void addListeners() {
@@ -225,7 +239,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     private void showCreationDialog() {
         ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle);
         form.addApplyListener(this::runCreationTask);
-        showComponentForm(form, TranslateCode.CREATION_DIALOG_TITLE);
+        FormDialog<C> formDialog = new FormDialog<>(this, form, TranslateCode.CREATION_DIALOG_TITLE);
+        formDialog.setName(form.getComponentRepresentation().getComponentClass().getSimpleName() + "CreationFormDialog");
+        GUIUtils.addPreferenceSupport(formDialog);
+        formDialog.setVisible(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -247,7 +264,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
                 .orElseThrow(() -> new ViewException("Can't open edit dialog because component is not selected"));
         ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle, selectedComponent);
         form.addApplyListener(fieldValueMap -> runUpdateTask(fieldValueMap, selectedComponent));
-        showComponentForm(form, TranslateCode.EDIT_DIALOG_TITLE);
+        FormDialog<C> formDialog = new FormDialog<>(this, form, TranslateCode.EDIT_DIALOG_TITLE);
+        formDialog.setName(form.getComponentRepresentation().getComponentClass().getSimpleName() + "EditFormDialog");
+        GUIUtils.addPreferenceSupport(formDialog);
+        formDialog.setVisible(true);
     }
 
     @SuppressWarnings("unchecked")
@@ -263,18 +283,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
     }
 
     protected abstract Task<C> createUpdateTask(Map<ReportField, ?> fieldValueMap, C selectedComponent);
-
-    private void showComponentForm(ComponentForm<C> form, String titleCode) {
-        Frame frame = JOptionPane.getFrameForComponent(this);
-        JDialog dialog = new JDialog(frame, true);
-        dialog.setContentPane(form);
-        form.setOwner(dialog);
-        dialog.setTitle(Translator.toLocale(titleCode).formatted(Translator.getComponentCaption(representation.getComponentClass())));
-        dialog.pack();
-        dialog.setLocationRelativeTo(frame);
-        dialog.setMinimumSize(dialog.getSize());
-        dialog.setVisible(true);
-    }
 
     @SuppressWarnings("unchecked")
     private void showDeleteConfirmDialog() {
@@ -342,5 +350,34 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel 
 
     protected CrudService<C, I> getService() {
         return service;
+    }
+
+    @Override
+    public void apply(PreferencesGroup preferencesGroup) {
+        preferencesGroup.get(TABLE_COLUMNS_PREFERENCE_KEY)
+                .ifPresent(preference -> ((TableColumnsPreference) preference).apply(columnModel));
+    }
+
+    @Override
+    public PreferencesGroup createCurrentPreference() {
+        TableColumnsPreference tableColumnsPreference = new TableColumnsPreference();
+        tableColumnsPreference.add(columnModel);
+        PreferencesGroup preferencesGroup = new PreferencesGroup();
+        preferencesGroup.put(TABLE_COLUMNS_PREFERENCE_KEY, tableColumnsPreference);
+        return preferencesGroup;
+    }
+
+    @Override
+    public PreferencesGroup createDefaultPreference() {
+        TableColumnsPreference tableColumnsPreference = new TableColumnsPreference();
+        tableColumnsPreference.add(defaultColumnModel);
+        PreferencesGroup preferencesGroup = new PreferencesGroup();
+        preferencesGroup.put(TABLE_COLUMNS_PREFERENCE_KEY, tableColumnsPreference);
+        return preferencesGroup;
+    }
+
+    @Override
+    public String getKey() {
+        return getName();
     }
 }
