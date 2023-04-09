@@ -37,6 +37,7 @@ public class TranslateCode {
     public static final String TOOLTIP_BUTTON_MOVE_UP = "tooltip.button.move.up";
     public static final String TOOLTIP_BUTTON_MOVE_DOWN = "tooltip.button.move.down";
     public static final String TOOLTIP_BUTTON_SHOW_PRIORITIES = "tooltip.button.show.priorities";
+    public static final String RESET_PREFERENCES = "preferences.reset";
 
     // Main menu
     public static final String MAIN_MENU_FILE = "mainmenu.file";

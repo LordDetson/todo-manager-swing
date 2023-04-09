@@ -37,7 +37,6 @@ public abstract class MainFrame extends JFrame implements PreferenceAware<Prefer
         this.appLogoIcon = appLogoIcon;
         setName("mainFrame");
         GUIUtils.setMainWindow(this);
-        GUIUtils.addPreferenceSupport(this);
     }
 
     @PostConstruct
@@ -52,6 +51,7 @@ public abstract class MainFrame extends JFrame implements PreferenceAware<Prefer
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
         setTitle(this.aboutInfo.getProduct().getNameWithVersion());
         setIconImage(this.appLogoIcon.getImage());
+        GUIUtils.addPreferenceSupport(this);
     }
 
     @Override

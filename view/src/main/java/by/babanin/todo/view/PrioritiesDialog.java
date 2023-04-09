@@ -32,12 +32,12 @@ public abstract class PrioritiesDialog extends JDialog implements PreferenceAwar
         setName("prioritiesDialog");
         setTitle(Translator.toLocale(TranslateCode.PRIORITY_FRAME_TITLE));
         GUIUtils.addCloseActionOnEscape(this, PRIORITIES_DIALOG_CLOSING_ACTION_KEY);
-        GUIUtils.addPreferenceSupport(this);
     }
 
     @PostConstruct
     void init() {
         setContentPane(createPriorityCrudTablePanel());
+        GUIUtils.addPreferenceSupport(this);
     }
 
     @Lookup

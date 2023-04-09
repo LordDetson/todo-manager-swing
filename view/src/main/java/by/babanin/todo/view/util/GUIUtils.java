@@ -24,6 +24,9 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Modifier;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import javax.swing.AbstractAction;
@@ -35,6 +38,7 @@ import javax.swing.JLabel;
 import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -49,6 +53,7 @@ import by.babanin.todo.preferences.PreferenceAware;
 import by.babanin.todo.preferences.PreferencesSupport;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import lombok.experimental.UtilityClass;
 
@@ -312,5 +317,43 @@ public final class GUIUtils {
                 preferencesSupport.save();
             }
         });
+        JRootPane rootPane = SwingUtilities.getRootPane(preferenceAware);
+        addResetPreferencesPopupMenuItem(rootPane, preferenceAware);
+    }
+
+    private static void addResetPreferencesPopupMenuItem(JComponent component, PreferenceAware<?> preferenceAware) {
+        JPopupMenu popupMenu = component.getComponentPopupMenu();
+        if(popupMenu == null) {
+            popupMenu = new JPopupMenu();
+            component.setComponentPopupMenu(popupMenu);
+
+        }
+        popupMenu.add(new AbstractAction(Translator.toLocale(TranslateCode.RESET_PREFERENCES).formatted()) {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                preferenceAware.resetToDefault();
+            }
+        });
+        getAllComponentsRecursively(component).forEach(child -> {
+            if(child instanceof JComponent jComponent) {
+                jComponent.setInheritsPopupMenu(true);
+            }
+        });
+    }
+
+    public static List<Component> getAllComponentsRecursively(Container container) {
+        List<Component> result = new ArrayList<>();
+        collectComponentsRecursively(container, result);
+        return result;
+    }
+
+    private static void collectComponentsRecursively(Component component, Collection<Component> result) {
+        result.add(component);
+        if(component instanceof Container container) {
+            for(Component child : container.getComponents()) {
+                collectComponentsRecursively(child, result);
+            }
+        }
     }
 }
