@@ -202,6 +202,10 @@ public class ComponentForm<C> extends JPanel {
         return Optional.ofNullable(component);
     }
 
+    public ComponentRepresentation<C> getComponentRepresentation() {
+        return componentRepresentation;
+    }
+
     public void addApplyListener(ApplyListener listener) {
         applyListeners.add(listener);
     }

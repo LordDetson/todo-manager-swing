@@ -24,6 +24,7 @@ public final class PriorityCrudTablePanel extends MovableCrudTablePanel<Priority
     public PriorityCrudTablePanel(PriorityService priorityService) {
         super(priorityService, Priority.class, new PriorityFormRowFactory(), new CrudStyle()
                 .setValidatorFactory(new PriorityValidatorFactory(priorityService)));
+        setName("priorityCrudTablePanel");
     }
 
     @Override

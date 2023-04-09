@@ -61,11 +61,13 @@
         <module>view</module>
         <module>font-plugin</module>
         <module>image-plugin</module>
+        <module>preferences-plugin</module>
     </modules>
 
     <properties>
         <flatlaf.version>2.4</flatlaf.version>
         <lgooddatepicker.version>11.2.1</lgooddatepicker.version>
+        <commons-collections.version>4.4</commons-collections.version>
         <launch4j.version>2.1.2</launch4j.version>
         <macappbundler.version>1.0</macappbundler.version>
     </properties>
@@ -86,6 +88,11 @@
                 <groupId>com.github.lgooddatepicker</groupId>
                 <artifactId>LGoodDatePicker</artifactId>
                 <version>${lgooddatepicker.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-collections4</artifactId>
+                <version>${commons-collections.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
