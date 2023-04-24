@@ -36,6 +36,7 @@ import by.babanin.todo.view.component.validation.TodoValidatorFactory;
 import by.babanin.todo.view.renderer.LocalDataRenderer;
 import by.babanin.todo.view.renderer.PriorityRenderer;
 import by.babanin.todo.view.renderer.StatusRenderer;
+import by.babanin.todo.view.settings.Settings;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
@@ -45,8 +46,8 @@ public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Lon
 
     private JButton showPrioritiesButton;
 
-    protected TodoCrudTablePanel(TodoService todoService, PriorityService priorityService) {
-        super(todoService, Todo.class, new TodoFormRowFactory(priorityService), new CrudStyle()
+    protected TodoCrudTablePanel(TodoService todoService, PriorityService priorityService, Settings settings) {
+        super(todoService, Todo.class, new TodoFormRowFactory(priorityService), settings, new CrudStyle()
                 .setValidatorFactory(new TodoValidatorFactory())
                 .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
                 .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate)

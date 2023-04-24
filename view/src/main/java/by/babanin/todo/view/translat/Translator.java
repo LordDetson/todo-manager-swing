@@ -8,6 +8,7 @@ import org.springframework.context.support.ResourceBundleMessageSource;
 import by.babanin.todo.model.Status;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.view.settings.SettingViewType;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
@@ -41,5 +42,13 @@ public class Translator {
 
     public static <T> String getComponentPluralCaption(Class<T> componentClass) {
         return Translator.toLocale(String.format(TranslateCode.COMPONENT_PLURAL_CAPTION, componentClass.getSimpleName()));
+    }
+
+    public static String getSettingViewTitle(SettingViewType type) {
+        return Translator.toLocale(String.format(TranslateCode.SETTINGS_VIEW_TITLE, type.getId()));
+    }
+
+    public static String getSettingViewDescription(SettingViewType type) {
+        return Translator.toLocale(String.format(TranslateCode.SETTINGS_VIEW_DESCRIPTION, type.getId()));
     }
 }

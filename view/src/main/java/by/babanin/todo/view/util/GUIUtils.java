@@ -8,6 +8,8 @@ import java.awt.Dialog;
 import java.awt.Dimension;
 import java.awt.Frame;
 import java.awt.KeyboardFocusManager;
+import java.awt.MouseInfo;
+import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
@@ -328,32 +330,63 @@ public final class GUIUtils {
             component.setComponentPopupMenu(popupMenu);
 
         }
-        popupMenu.add(new AbstractAction(Translator.toLocale(TranslateCode.RESET_PREFERENCES).formatted()) {
+        AbstractAction resetPreferencesAction = new AbstractAction(Translator.toLocale(TranslateCode.RESET_PREFERENCES).formatted()) {
 
             @Override
             public void actionPerformed(ActionEvent e) {
                 preferenceAware.resetToDefault();
             }
-        });
+        };
+        popupMenu.add(resetPreferencesAction);
+        component.addNotify();
         getAllComponentsRecursively(component).forEach(child -> {
-            if(child instanceof JComponent jComponent) {
-                jComponent.setInheritsPopupMenu(true);
+            if(child instanceof JComponent jComponent && (!jComponent.getInheritsPopupMenu())) {
+                JPopupMenu componentPopupMenu = jComponent.getComponentPopupMenu();
+                if(componentPopupMenu == null) {
+                    jComponent.setInheritsPopupMenu(true);
+                }
+                else {
+                    componentPopupMenu.addSeparator();
+                    componentPopupMenu.add(resetPreferencesAction);
+                }
             }
         });
     }
 
     public static List<Component> getAllComponentsRecursively(Container container) {
+        return getAllComponentsRecursively(container, false);
+    }
+
+    public static List<Component> getAllComponentsRecursively(Container container, boolean withYourself) {
         List<Component> result = new ArrayList<>();
+        if(withYourself) {
+            result.add(container);
+        }
         collectComponentsRecursively(container, result);
         return result;
     }
 
     private static void collectComponentsRecursively(Component component, Collection<Component> result) {
-        result.add(component);
         if(component instanceof Container container) {
             for(Component child : container.getComponents()) {
+                result.add(child);
                 collectComponentsRecursively(child, result);
             }
         }
+    }
+
+    public static Point getMouseLocationOn(Component component) {
+        return getRelativeLocation(MouseInfo.getPointerInfo().getLocation(), component.getLocationOnScreen());
+    }
+
+    public static Point getPopupMenuLocationOnInvoker(JPopupMenu popupMenu) {
+        return getRelativeLocation(popupMenu.getLocationOnScreen(), popupMenu.getInvoker().getLocationOnScreen());
+    }
+
+    public static Point getRelativeLocation(Point point1, Point point2) {
+        return new Point(
+                point1.x - point2.x,
+                point1.y - point2.y
+        );
     }
 }

@@ -3,6 +3,7 @@ package by.babanin.todo.view.component;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 
+import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -13,9 +14,15 @@ public class TextAreaPanel extends JPanel {
     private static final int MINIMUM_HEIGHT = 150;
 
     private JTextArea textArea;
+    private final boolean scrollable;
 
     public TextAreaPanel() {
+        this(true);
+    }
+
+    public TextAreaPanel(boolean scrollable) {
         super(new BorderLayout());
+        this.scrollable = scrollable;
         createUiComponents();
         placeComponents();
     }
@@ -25,15 +32,21 @@ public class TextAreaPanel extends JPanel {
         textArea.setLineWrap(true);
         textArea.setWrapStyleWord(true);
         textArea.setMinimumSize(new Dimension(textArea.getPreferredSize().width, MINIMUM_HEIGHT));
+        textArea.setBorder(BorderFactory.createEmptyBorder());
         if(textArea.getCaret() instanceof DefaultCaret caret) {
             caret.setUpdatePolicy(DefaultCaret.ALWAYS_UPDATE);
         }
     }
 
     private void placeComponents() {
-        JScrollPane scrollPane = new JScrollPane(textArea);
-        scrollPane.setMinimumSize(textArea.getMinimumSize());
-        add(scrollPane, BorderLayout.CENTER);
+        if(scrollable) {
+            JScrollPane scrollPane = new JScrollPane(textArea);
+            scrollPane.setMinimumSize(textArea.getMinimumSize());
+            add(scrollPane, BorderLayout.CENTER);
+        }
+        else {
+            add(textArea, BorderLayout.CENTER);
+        }
     }
 
     public void setText(String text) {

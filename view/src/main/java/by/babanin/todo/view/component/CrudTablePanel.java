@@ -4,7 +4,11 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Rectangle;
+import java.awt.Window;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
@@ -33,16 +37,26 @@ import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormDialog;
 import by.babanin.todo.view.component.form.FormRowFactory;
+import by.babanin.todo.view.component.table.adjustment.TableColumnAdjuster;
+import by.babanin.todo.view.component.table.adjustment.TableColumnAdjustment;
+import by.babanin.todo.view.config.SettingsUpdateEvent;
 import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.view.preference.BooleanPreference;
+import by.babanin.todo.view.preference.TableColumnAdjustmentPreference;
 import by.babanin.todo.view.preference.TableColumnsPreference;
+import by.babanin.todo.view.settings.Settings;
+import by.babanin.todo.view.settings.SettingsObserver;
+import by.babanin.todo.view.settings.SettingsObserversDelegator;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
 
 public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
-        implements PreferenceAware<PreferencesGroup> {
+        implements PreferenceAware<PreferencesGroup>, SettingsObserver {
 
+    private static final String TABLE_COLUMN_ADJUSTMENT_KEY = "tableColumnAdjustment";
     private static final String TABLE_COLUMNS_PREFERENCE_KEY = "tableColumnsPreference";
+    private static final String USE_GLOBAL_PREFERENCE_KEY = "useGlobalPreference";
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
@@ -50,6 +64,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     private final transient CrudService<C, I> service;
     private final transient ComponentRepresentation<C> representation;
     private final transient FormRowFactory formRowFactory;
+    private final Settings settings;
     private final CrudStyle crudStyle;
 
     private JToolBar toolBar;
@@ -61,13 +76,14 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     private JButton deleteButton;
     private TableModel<C> model;
     private CustomTableColumnModel columnModel;
-    private CustomTableColumnModel defaultColumnModel;
     private JTable table;
+    private TableColumnAdjuster tableColumnAdjuster;
 
-    protected CrudTablePanel(CrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
+    protected CrudTablePanel(CrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, Settings settings, CrudStyle crudStyle) {
         this.service = service;
         this.representation = ComponentRepresentation.get(componentClass);
         this.formRowFactory = formRowFactory;
+        this.settings = settings;
         this.crudStyle = crudStyle;
 
         createUiComponents();
@@ -84,7 +100,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
                 .filter(field -> !excludedFieldFromTable.contains(field.getName()))
                 .toList();
         model = createTableModel(representation, reportFields);
-        defaultColumnModel = createColumnModel(reportFields);
         columnModel = createColumnModel(reportFields);
         table = new JTable();
 
@@ -110,6 +125,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         createButton = new JButton(showCreationDialogAction);
         editButton = new JButton(showEditDialogAction);
         deleteButton = new JButton(showDeleteConfirmDialogAction);
+
+        tableColumnAdjuster = new TableColumnAdjuster(table, settings.getTableColumnAdjustment());
     }
 
     protected TableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
@@ -123,7 +140,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel columnModel) {
         table.setModel(model);
         table.setColumnModel(columnModel);
-        table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
     }
 
     protected void addListeners() {
@@ -354,30 +370,76 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
+        preferencesGroup.get(USE_GLOBAL_PREFERENCE_KEY)
+                        .ifPresent(preference -> tableColumnAdjuster.setUseGlobal(((BooleanPreference) preference).isValue()));
+        preferencesGroup.get(TABLE_COLUMN_ADJUSTMENT_KEY)
+                .ifPresentOrElse(
+                        preference -> {
+                            tableColumnAdjuster.setAdjustment(((TableColumnAdjustmentPreference) preference).getTableColumnAdjustment());
+                            tableColumnAdjuster.adjustColumns();
+                        },
+                        () -> tableColumnAdjuster.adjustColumns());
         preferencesGroup.get(TABLE_COLUMNS_PREFERENCE_KEY)
                 .ifPresent(preference -> ((TableColumnsPreference) preference).apply(columnModel));
     }
 
     @Override
     public PreferencesGroup createCurrentPreference() {
+        BooleanPreference useGlobalPreference = new BooleanPreference();
+        useGlobalPreference.setValue(tableColumnAdjuster.isUseGlobal());
+        TableColumnAdjustmentPreference tableColumnAdjustmentPreference = new TableColumnAdjustmentPreference();
+        tableColumnAdjustmentPreference.setTableColumnAdjustment(tableColumnAdjuster.getAdjustment());
         TableColumnsPreference tableColumnsPreference = new TableColumnsPreference();
         tableColumnsPreference.add(columnModel);
         PreferencesGroup preferencesGroup = new PreferencesGroup();
+        preferencesGroup.put(USE_GLOBAL_PREFERENCE_KEY, useGlobalPreference);
+        if(!tableColumnAdjuster.isUseGlobal()) {
+            preferencesGroup.put(TABLE_COLUMN_ADJUSTMENT_KEY, tableColumnAdjustmentPreference);
+        }
         preferencesGroup.put(TABLE_COLUMNS_PREFERENCE_KEY, tableColumnsPreference);
         return preferencesGroup;
     }
 
     @Override
     public PreferencesGroup createDefaultPreference() {
-        TableColumnsPreference tableColumnsPreference = new TableColumnsPreference();
-        tableColumnsPreference.add(defaultColumnModel);
+        BooleanPreference useGlobalPreference = new BooleanPreference();
+        useGlobalPreference.setValue(true);
         PreferencesGroup preferencesGroup = new PreferencesGroup();
-        preferencesGroup.put(TABLE_COLUMNS_PREFERENCE_KEY, tableColumnsPreference);
+        preferencesGroup.put(USE_GLOBAL_PREFERENCE_KEY, useGlobalPreference);
         return preferencesGroup;
     }
 
     @Override
     public String getKey() {
         return getName();
+    }
+
+    @Override
+    public void register(SettingsObserversDelegator delegator) {
+        delegator.add(this);
+        addHierarchyListener(e -> {
+            if(e.getChangeFlags() == HierarchyEvent.SHOWING_CHANGED && e.getChanged() instanceof Window window) {
+                window.addWindowListener(new WindowAdapter() {
+
+                    @Override
+                    public void windowClosing(WindowEvent e) {
+                        delegator.remove(CrudTablePanel.this);
+                    }
+
+                    @Override
+                    public void windowClosed(WindowEvent e) {
+                        delegator.remove(CrudTablePanel.this);
+                    }
+                });
+            }
+        });
+    }
+
+    @Override
+    public void handleSettingsUpdateEvent(SettingsUpdateEvent event) {
+        if(tableColumnAdjuster.isUseGlobal() && event.getSource() instanceof TableColumnAdjustment tableColumnAdjustment) {
+            tableColumnAdjuster.setAdjustment(tableColumnAdjustment);
+            tableColumnAdjuster.adjustColumns();
+        }
     }
 }
