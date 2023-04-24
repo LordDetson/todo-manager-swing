@@ -28,9 +28,13 @@ import by.babanin.todo.view.preference.mixin.DimensionMixIn;
 import by.babanin.todo.view.preference.mixin.PreferenceMixIn;
 import by.babanin.todo.view.preference.serialization.PreferencesGroupSerializer;
 import by.babanin.todo.view.preference.serialization.PreferencesStoreSerializer;
+import by.babanin.todo.view.settings.Settings;
 
 @Configuration
-@EnableConfigurationProperties(AboutInfo.class)
+@EnableConfigurationProperties({
+        AboutInfo.class,
+        Settings.class
+})
 public class ViewConfiguration {
 
     private static final int DEFAULT_MENU_ICON_SIZE = 12;
@@ -60,6 +64,11 @@ public class ViewConfiguration {
     @Bean
     public FlatSVGIcon exitIcon() {
         return getMenuIcon("out_door");
+    }
+
+    @Bean
+    public FlatSVGIcon settingsIcon() {
+        return getMenuIcon("gearwheel");
     }
 
     private FlatSVGIcon getMenuIcon(String name) {

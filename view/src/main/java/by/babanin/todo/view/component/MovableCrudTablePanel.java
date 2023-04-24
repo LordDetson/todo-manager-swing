@@ -15,6 +15,7 @@ import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.SwapTask;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.view.settings.Settings;
 
 public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable, I> extends CrudTablePanel<C, I> {
 
@@ -23,8 +24,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     private JButton moveUpButton;
     private JButton moveDownButton;
 
-    protected MovableCrudTablePanel(AbstractIndexableCrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
-        super(service, componentClass, formRowFactory, crudStyle);
+    protected MovableCrudTablePanel(AbstractIndexableCrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, Settings settings, CrudStyle crudStyle) {
+        super(service, componentClass, formRowFactory, settings, crudStyle);
     }
 
     @Override

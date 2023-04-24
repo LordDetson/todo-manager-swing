@@ -14,7 +14,14 @@ public class SplitPanePreference implements Preference {
     private double proportion;
 
     public void storeProportion(JSplitPane splitPane) {
-        setProportion(roundToSecondDecimalPlace(splitPane.getDividerLocation() / (double) splitPane.getHeight()));
+        double size;
+        if(splitPane.getOrientation() == JSplitPane.VERTICAL_SPLIT) {
+            size = splitPane.getHeight();
+        }
+        else {
+            size = splitPane.getWidth();
+        }
+        setProportion(roundToSecondDecimalPlace(splitPane.getDividerLocation() / size));
     }
 
     private static double roundToSecondDecimalPlace(double number) {

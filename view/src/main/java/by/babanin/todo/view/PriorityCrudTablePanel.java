@@ -16,13 +16,14 @@ import by.babanin.todo.view.component.CrudStyle;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
 import by.babanin.todo.view.component.form.PriorityFormRowFactory;
 import by.babanin.todo.view.component.validation.PriorityValidatorFactory;
+import by.babanin.todo.view.settings.Settings;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public final class PriorityCrudTablePanel extends MovableCrudTablePanel<Priority, Long> {
 
-    public PriorityCrudTablePanel(PriorityService priorityService) {
-        super(priorityService, Priority.class, new PriorityFormRowFactory(), new CrudStyle()
+    public PriorityCrudTablePanel(PriorityService priorityService, Settings settings) {
+        super(priorityService, Priority.class, new PriorityFormRowFactory(), settings, new CrudStyle()
                 .setValidatorFactory(new PriorityValidatorFactory(priorityService)));
         setName("priorityCrudTablePanel");
     }

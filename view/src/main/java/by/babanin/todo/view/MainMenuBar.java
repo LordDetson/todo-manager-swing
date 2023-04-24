@@ -45,8 +45,13 @@ public abstract class MainMenuBar extends JMenuBar {
         fileMenu = new JMenu(Translator.toLocale(TranslateCode.MAIN_MENU_FILE));
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
+        fileMenu.add(getShowSettingsAction());
+        fileMenu.addSeparator();
         fileMenu.add(getExitAction());
     }
+
+    @Lookup("showSettingsAction")
+    protected abstract Action getShowSettingsAction();
 
     @Lookup("exitAction")
     protected abstract Action getExitAction();
