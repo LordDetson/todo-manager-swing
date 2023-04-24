@@ -244,6 +244,21 @@ public class SettingsPanel extends JPanel implements PreferenceAware<Preferences
         public List<SettingChangeListener<Setting>> getListeners() {
             return Collections.emptyList();
         }
+
+        @Override
+        public void fireChange() {
+            // do nothing since it's placeholder
+        }
+
+        @Override
+        public boolean shouldApply() {
+            return false;
+        }
+
+        @Override
+        public Setting apply() {
+            return null;
+        }
     }
 }
 
