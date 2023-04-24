@@ -7,6 +7,7 @@ import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import by.babanin.todo.preferences.PreferencesGroup;
 import by.babanin.todo.view.preference.BooleanPreference;
 import by.babanin.todo.view.preference.DimensionPreference;
+import by.babanin.todo.view.preference.IntegerPreference;
 import by.babanin.todo.view.preference.PointPreference;
 import by.babanin.todo.view.preference.SplitPanePreference;
 import by.babanin.todo.view.preference.StringPreference;
@@ -21,6 +22,7 @@ import by.babanin.todo.view.preference.TableColumnsPreference;
         @Type(value = PreferencesGroup.class, name = "group"),
         @Type(value = StringPreference.class, name = "string"),
         @Type(value = BooleanPreference.class, name = "boolean"),
+        @Type(value = IntegerPreference.class, name = "integer"),
         @Type(value = DimensionPreference.class, name = "dimension"),
         @Type(value = PointPreference.class, name = "point"),
         @Type(value = SplitPanePreference.class, name = "splitPane"),
