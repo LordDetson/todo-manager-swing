@@ -2,14 +2,19 @@ package by.babanin.todo.view.config;
 
 import java.awt.Color;
 import java.awt.Dimension;
+import java.nio.file.Path;
+import java.util.regex.Matcher;
 
 import javax.swing.UIManager;
 
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
+import org.springframework.core.convert.ConversionService;
+import org.springframework.format.support.DefaultFormattingConversionService;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
@@ -85,7 +90,8 @@ public class ViewConfiguration {
     }
 
     @Bean
-    public JsonMapper jsonMapper() {
+    @Qualifier("preferences")
+    public JsonMapper preferencesJsonMapper() {
         SimpleModule module = new SimpleModule();
         module.addSerializer(PreferencesStore.class, new PreferencesStoreSerializer());
         module.addDeserializer(PreferencesStore.class, new PreferencesStoreDeserializer());
@@ -97,5 +103,19 @@ public class ViewConfiguration {
                 .addMixIn(Dimension.class, DimensionMixIn.class)
                 .disable(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES)
                 .build();
+    }
+
+    @Bean
+    @Qualifier("settings")
+    public JsonMapper settingsJsonMapper() {
+        return JsonMapper.builder().build();
+    }
+
+    @Bean
+    public ConversionService conversionService() {
+        DefaultFormattingConversionService conversionService = new DefaultFormattingConversionService();
+        conversionService.addConverter(String.class, Path.class,
+                source -> Path.of(source.replaceFirst("^~", Matcher.quoteReplacement(System.getProperty("user.home")))));
+        return conversionService;
     }
 }

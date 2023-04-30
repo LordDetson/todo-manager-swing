@@ -1,8 +1,6 @@
-package by.babanin.todo.view.config;
+package by.babanin.todo.view.settings;
 
 import org.springframework.context.ApplicationEvent;
-
-import by.babanin.todo.view.settings.Setting;
 
 public class SettingsUpdateEvent extends ApplicationEvent {
 

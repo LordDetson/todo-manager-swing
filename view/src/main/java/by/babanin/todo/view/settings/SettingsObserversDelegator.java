@@ -6,8 +6,6 @@ import java.util.List;
 import org.springframework.context.ApplicationListener;
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.view.config.SettingsUpdateEvent;
-
 @Component
 public class SettingsObserversDelegator implements ApplicationListener<SettingsUpdateEvent> {
 

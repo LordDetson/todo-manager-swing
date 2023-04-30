@@ -39,7 +39,7 @@ import by.babanin.todo.view.component.form.FormDialog;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.component.table.adjustment.TableColumnAdjuster;
 import by.babanin.todo.view.component.table.adjustment.TableColumnAdjustment;
-import by.babanin.todo.view.config.SettingsUpdateEvent;
+import by.babanin.todo.view.settings.SettingsUpdateEvent;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.preference.BooleanPreference;
 import by.babanin.todo.view.preference.TableColumnAdjustmentPreference;

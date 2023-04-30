@@ -30,7 +30,6 @@ import org.springframework.stereotype.Component;
 import by.babanin.todo.preferences.PreferenceAware;
 import by.babanin.todo.preferences.PreferencesGroup;
 import by.babanin.todo.view.component.CardPanel;
-import by.babanin.todo.view.config.SettingsUpdateEvent;
 import by.babanin.todo.view.preference.SplitPanePreference;
 import by.babanin.todo.view.preference.StringPreference;
 import by.babanin.todo.view.renderer.SettingViewTypeRenderer;
