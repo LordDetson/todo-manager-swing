@@ -437,8 +437,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
 
     @Override
     public void handleSettingsUpdateEvent(SettingsUpdateEvent event) {
-        if(tableColumnAdjuster.isUseGlobal() && event.getSource() instanceof TableColumnAdjustment tableColumnAdjustment) {
-            tableColumnAdjuster.setAdjustment(tableColumnAdjustment);
+        if(tableColumnAdjuster.isUseGlobal() && event.getSource() instanceof TableColumnAdjustment) {
             tableColumnAdjuster.adjustColumns();
         }
     }
