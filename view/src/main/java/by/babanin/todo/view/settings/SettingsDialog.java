@@ -1,15 +1,14 @@
 package by.babanin.todo.view.settings;
 
 import java.awt.Dimension;
+import java.awt.Image;
 
 import javax.swing.JDialog;
 
-import org.springframework.beans.factory.annotation.Lookup;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
-
-import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 import by.babanin.todo.preferences.PreferenceAware;
 import by.babanin.todo.preferences.PreferencesGroup;
@@ -18,35 +17,31 @@ import by.babanin.todo.view.preference.PointPreference;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
-import jakarta.annotation.PostConstruct;
 
 @Component
 @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public abstract class SettingsDialog extends JDialog implements PreferenceAware<PreferencesGroup> {
+public class SettingsDialog extends JDialog implements PreferenceAware<PreferencesGroup> {
 
     public static final String SETTINGS_DIALOG_CLOSING_ACTION_KEY = "closePrioritiesDialog";
     private static final String SIZE_KEY = "settingsDialogSize";
     private static final String LOCATION_KEY = "settingsDialogLocation";
 
-    protected SettingsDialog(FlatSVGIcon appLogoIcon) {
+    public SettingsDialog(SettingsPanel settingsPanel) {
         super(GUIUtils.getMainWindow(), true);
         setName("settingsDialog");
         setTitle(Translator.toLocale(TranslateCode.MAIN_MENU_SETTINGS));
-        setIconImage(appLogoIcon.getImage());
         GUIUtils.addCloseActionOnEscape(this, SETTINGS_DIALOG_CLOSING_ACTION_KEY);
-    }
-
-    @PostConstruct
-    void init() {
-        SettingsPanel settingsPanel = createSettingsPanel();
         settingsPanel.setCancelAction(rootPane.getActionMap().get(SettingsDialog.SETTINGS_DIALOG_CLOSING_ACTION_KEY));
         rootPane.setDefaultButton(settingsPanel.getDefaultButton());
         setContentPane(settingsPanel);
         GUIUtils.addPreferenceSupport(this);
     }
 
-    @Lookup
-    protected abstract SettingsPanel createSettingsPanel();
+    @Override
+    @Autowired
+    public void setIconImage(Image appLogoImage) {
+        super.setIconImage(appLogoImage);
+    }
 
     @Override
     public SettingsPanel getContentPane() {

@@ -1,5 +1,6 @@
 package by.babanin.todo.view.util;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
@@ -33,6 +34,7 @@ import java.util.Objects;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
 import javax.swing.JFrame;
@@ -41,6 +43,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.UIManager;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import javax.swing.event.DocumentEvent;
@@ -49,8 +52,11 @@ import javax.swing.table.TableColumn;
 import javax.swing.text.Document;
 import javax.swing.text.JTextComponent;
 
+import com.formdev.flatlaf.extras.FlatSVGIcon;
+import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter;
 import com.formdev.flatlaf.util.SystemInfo;
 
+import by.babanin.todo.image.IconResources;
 import by.babanin.todo.preferences.PreferenceAware;
 import by.babanin.todo.preferences.PreferencesSupport;
 import by.babanin.todo.representation.ReportField;
@@ -66,6 +72,7 @@ public final class GUIUtils {
     private static final int HALF_FRAME_SCALE = 50;
     private static final int SMALL_FRAME_SCALE = 35;
     private static final double SCALE_BASE = 100;
+    public static final int DEFAULT_MENU_ICON_SIZE = 12;
 
     private static final String MNEMONIC_MODIFIER_FOR_MAC = "OPT";
     private static final String MNEMONIC_MODIFIER_FOR_OTHER_OS = "ALT";
@@ -388,5 +395,13 @@ public final class GUIUtils {
                 point1.x - point2.x,
                 point1.y - point2.y
         );
+    }
+
+    public static Icon getMenuIcon(String name) {
+        FlatSVGIcon icon = IconResources.getIcon(name, DEFAULT_MENU_ICON_SIZE);
+        ColorFilter colorFilter = new ColorFilter();
+        colorFilter.add(Color.BLACK, UIManager.getDefaults().getColor("Button.foreground"));
+        icon.setColorFilter(colorFilter);
+        return icon;
     }
 }
