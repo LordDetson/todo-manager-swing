@@ -10,10 +10,13 @@ import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.Action;
 import javax.swing.JButton;
@@ -39,14 +42,15 @@ import by.babanin.todo.view.component.form.FormDialog;
 import by.babanin.todo.view.component.form.FormRowFactory;
 import by.babanin.todo.view.component.table.adjustment.TableColumnAdjuster;
 import by.babanin.todo.view.component.table.adjustment.TableColumnAdjustment;
-import by.babanin.todo.view.settings.SettingsUpdateEvent;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.preference.BooleanPreference;
+import by.babanin.todo.view.preference.StringsPreference;
 import by.babanin.todo.view.preference.TableColumnAdjustmentPreference;
 import by.babanin.todo.view.preference.TableColumnsPreference;
 import by.babanin.todo.view.settings.Settings;
 import by.babanin.todo.view.settings.SettingsObserver;
 import by.babanin.todo.view.settings.SettingsObserversDelegator;
+import by.babanin.todo.view.settings.SettingsUpdateEvent;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
@@ -57,9 +61,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     private static final String TABLE_COLUMN_ADJUSTMENT_KEY = "tableColumnAdjustment";
     private static final String TABLE_COLUMNS_PREFERENCE_KEY = "tableColumnsPreference";
     private static final String USE_GLOBAL_PREFERENCE_KEY = "useGlobalPreference";
+    private static final String COLUMN_IDS_TO_FIT_PREFERENCE_KEY = "columnIdsToFitPreference";
 
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
+    private final Set<String> defaultColumnIdsToFit = new HashSet<>();
 
     private final transient CrudService<C, I> service;
     private final transient ComponentRepresentation<C> representation;
@@ -356,6 +362,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         }
     }
 
+    public void setDefaultColumnIdsToFit(String... defaultColumnIdsToFit) {
+        this.defaultColumnIdsToFit.clear();
+        this.defaultColumnIdsToFit.addAll(Arrays.stream(defaultColumnIdsToFit).toList());
+    }
+
     public TableModel<C> getModel() {
         return model;
     }
@@ -372,6 +383,12 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     public void apply(PreferencesGroup preferencesGroup) {
         preferencesGroup.get(USE_GLOBAL_PREFERENCE_KEY)
                         .ifPresent(preference -> tableColumnAdjuster.setUseGlobal(((BooleanPreference) preference).isValue()));
+        preferencesGroup.get(COLUMN_IDS_TO_FIT_PREFERENCE_KEY)
+                        .ifPresent(preference -> {
+                            Set<String> columnIdsToFit = tableColumnAdjuster.getColumnIdsToFit();
+                            columnIdsToFit.clear();
+                            columnIdsToFit.addAll(((StringsPreference) preference).getValues());
+                        });
         preferencesGroup.get(TABLE_COLUMN_ADJUSTMENT_KEY)
                 .ifPresentOrElse(
                         preference -> {
@@ -391,12 +408,15 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         tableColumnAdjustmentPreference.setTableColumnAdjustment(tableColumnAdjuster.getAdjustment());
         TableColumnsPreference tableColumnsPreference = new TableColumnsPreference();
         tableColumnsPreference.add(columnModel);
+        StringsPreference columnIdsToFitPreference = new StringsPreference();
+        columnIdsToFitPreference.getValues().addAll(tableColumnAdjuster.getColumnIdsToFit());
         PreferencesGroup preferencesGroup = new PreferencesGroup();
         preferencesGroup.put(USE_GLOBAL_PREFERENCE_KEY, useGlobalPreference);
         if(!tableColumnAdjuster.isUseGlobal()) {
             preferencesGroup.put(TABLE_COLUMN_ADJUSTMENT_KEY, tableColumnAdjustmentPreference);
         }
         preferencesGroup.put(TABLE_COLUMNS_PREFERENCE_KEY, tableColumnsPreference);
+        preferencesGroup.put(COLUMN_IDS_TO_FIT_PREFERENCE_KEY, columnIdsToFitPreference);
         return preferencesGroup;
     }
 
@@ -404,8 +424,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     public PreferencesGroup createDefaultPreference() {
         BooleanPreference useGlobalPreference = new BooleanPreference();
         useGlobalPreference.setValue(true);
+        StringsPreference columnIdsToFitPreference = new StringsPreference();
+        columnIdsToFitPreference.getValues().addAll(defaultColumnIdsToFit);
         PreferencesGroup preferencesGroup = new PreferencesGroup();
         preferencesGroup.put(USE_GLOBAL_PREFERENCE_KEY, useGlobalPreference);
+        preferencesGroup.put(COLUMN_IDS_TO_FIT_PREFERENCE_KEY, columnIdsToFitPreference);
         return preferencesGroup;
     }
 

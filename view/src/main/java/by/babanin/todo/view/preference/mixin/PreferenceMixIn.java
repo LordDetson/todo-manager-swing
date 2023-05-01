@@ -11,6 +11,7 @@ import by.babanin.todo.view.preference.IntegerPreference;
 import by.babanin.todo.view.preference.PointPreference;
 import by.babanin.todo.view.preference.SplitPanePreference;
 import by.babanin.todo.view.preference.StringPreference;
+import by.babanin.todo.view.preference.StringsPreference;
 import by.babanin.todo.view.preference.TableColumnAdjustmentPreference;
 import by.babanin.todo.view.preference.TableColumnPreference;
 import by.babanin.todo.view.preference.TableColumnsPreference;
@@ -21,6 +22,7 @@ import by.babanin.todo.view.preference.TableColumnsPreference;
 @JsonSubTypes({
         @Type(value = PreferencesGroup.class, name = "group"),
         @Type(value = StringPreference.class, name = "string"),
+        @Type(value = StringsPreference.class, name = "strings"),
         @Type(value = BooleanPreference.class, name = "boolean"),
         @Type(value = IntegerPreference.class, name = "integer"),
         @Type(value = DimensionPreference.class, name = "dimension"),

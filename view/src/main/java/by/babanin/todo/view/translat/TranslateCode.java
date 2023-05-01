@@ -65,6 +65,7 @@ public class TranslateCode {
     public static final String SETTINGS_ADJUST_SELECTED_COLUMN = "settings.tableColumnAdjustment.adjustSelectedColumn";
     public static final String SETTINGS_RESTORE_COLUMNS = "settings.tableColumnAdjustment.restoreColumns";
     public static final String SETTINGS_RESTORE_SELECTED_COLUMN = "settings.tableColumnAdjustment.restoreSelectedColumn";
+    public static final String SETTINGS_COLUMNS_TO_FIT = "settings.tableColumnAdjustment.columnsToFit";
     public static final String SETTINGS_VIEW_TITLE = "settings.%s.title";
     public static final String SETTINGS_VIEW_DESCRIPTION = "settings.%s.description";
 
