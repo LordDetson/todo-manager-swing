@@ -1,15 +1,16 @@
 package by.babanin.todo.view.config;
 
-import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Image;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 
-import javax.swing.UIManager;
+import javax.swing.Icon;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.MessageSource;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.support.ResourceBundleMessageSource;
@@ -19,8 +20,6 @@ import org.springframework.format.support.DefaultFormattingConversionService;
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import com.formdev.flatlaf.extras.FlatSVGIcon;
-import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter;
 
 import by.babanin.todo.image.IconResources;
 import by.babanin.todo.preferences.Preference;
@@ -34,6 +33,8 @@ import by.babanin.todo.view.preference.mixin.PreferenceMixIn;
 import by.babanin.todo.view.preference.serialization.PreferencesGroupSerializer;
 import by.babanin.todo.view.preference.serialization.PreferencesStoreSerializer;
 import by.babanin.todo.view.settings.Settings;
+import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.util.GUIUtils;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -42,46 +43,37 @@ import by.babanin.todo.view.settings.Settings;
 })
 public class ViewConfiguration {
 
-    private static final int DEFAULT_MENU_ICON_SIZE = 12;
-
     @Value("${application.translation.properties.baseName}")
     private String propertiesBasename;
 
-    @Bean(name = "textsResourceBundleMessageSource")
-    public ResourceBundleMessageSource messageSource() {
+    @Bean
+    public MessageSource messageSource() {
         ResourceBundleMessageSource rs = new ResourceBundleMessageSource();
         rs.setBasename(propertiesBasename);
         rs.setDefaultEncoding("UTF-8");
         rs.setUseCodeAsDefaultMessage(true);
+        Translator.setMessageSource(rs);
         return rs;
     }
 
     @Bean
-    public FlatSVGIcon appLogoIcon() {
-        return IconResources.getIcon("transparent_check_hexagon", DEFAULT_MENU_ICON_SIZE);
+    public Image appLogoImage() {
+        return IconResources.getIcon("transparent_check_hexagon", GUIUtils.DEFAULT_MENU_ICON_SIZE).getImage();
     }
 
     @Bean
-    public FlatSVGIcon aboutActionIcon() {
-        return getMenuIcon("i");
+    public Icon aboutActionIcon() {
+        return GUIUtils.getMenuIcon("i");
     }
 
     @Bean
-    public FlatSVGIcon exitIcon() {
-        return getMenuIcon("out_door");
+    public Icon exitIcon() {
+        return GUIUtils.getMenuIcon("out_door");
     }
 
     @Bean
-    public FlatSVGIcon settingsIcon() {
-        return getMenuIcon("gearwheel");
-    }
-
-    private FlatSVGIcon getMenuIcon(String name) {
-        FlatSVGIcon icon = IconResources.getIcon(name, DEFAULT_MENU_ICON_SIZE);
-        ColorFilter colorFilter = new ColorFilter();
-        colorFilter.add(Color.BLACK, UIManager.getDefaults().getColor("Button.foreground"));
-        icon.setColorFilter(colorFilter);
-        return icon;
+    public Icon settingsIcon() {
+        return GUIUtils.getMenuIcon("gearwheel");
     }
 
     @Bean

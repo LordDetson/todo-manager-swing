@@ -1,39 +1,29 @@
 package by.babanin.todo.view;
 
 import java.awt.event.KeyEvent;
+import java.util.Map;
 
 import javax.swing.Action;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 
-import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
-import jakarta.annotation.PostConstruct;
 
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public abstract class MainMenuBar extends JMenuBar {
+public class MainMenuBar extends JMenuBar {
 
-    private boolean initialized;
+    private final Map<String, Action> actionMap;
+
     private JMenu fileMenu;
     private JMenu helpMenu;
 
-    @PostConstruct
-    public void initialize() {
-        if(!initialized) {
-            createUiComponents();
-            placeComponents();
-            initialized = true;
-        }
-        else {
-            throw new ViewException("It's already initialized");
-        }
+    public MainMenuBar(Map<String, Action> actionMap) {
+        this.actionMap = actionMap;
+        createUiComponents();
+        placeComponents();
     }
 
     private void createUiComponents() {
@@ -45,26 +35,17 @@ public abstract class MainMenuBar extends JMenuBar {
         fileMenu = new JMenu(Translator.toLocale(TranslateCode.MAIN_MENU_FILE));
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
-        fileMenu.add(getShowSettingsAction());
+        fileMenu.add(actionMap.get("showSettingsAction"));
         fileMenu.addSeparator();
-        fileMenu.add(getExitAction());
+        fileMenu.add(actionMap.get("exitAction"));
     }
-
-    @Lookup("showSettingsAction")
-    protected abstract Action getShowSettingsAction();
-
-    @Lookup("exitAction")
-    protected abstract Action getExitAction();
 
     private void initializeHelpMenu() {
         helpMenu = new JMenu(Translator.toLocale(TranslateCode.MAIN_MENU_HELP));
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
-        helpMenu.add(getShowAboutAction());
+        helpMenu.add(actionMap.get("showAboutAction"));
     }
-
-    @Lookup("showAboutAction")
-    protected abstract Action getShowAboutAction();
 
     private void placeComponents() {
         add(fileMenu);

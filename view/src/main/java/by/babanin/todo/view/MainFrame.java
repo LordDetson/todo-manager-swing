@@ -2,59 +2,64 @@ package by.babanin.todo.view;
 
 import java.awt.Frame;
 import java.awt.HeadlessException;
+import java.awt.Image;
 
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.WindowConstants;
 
-import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
-
-import com.formdev.flatlaf.extras.FlatSVGIcon;
 
 import by.babanin.todo.preferences.PreferenceAware;
 import by.babanin.todo.preferences.PreferencesGroup;
-import by.babanin.todo.view.about.AboutInfo;
 import by.babanin.todo.view.preference.DimensionPreference;
 import by.babanin.todo.view.preference.IntegerPreference;
 import by.babanin.todo.view.preference.PointPreference;
 import by.babanin.todo.view.util.GUIUtils;
-import jakarta.annotation.PostConstruct;
 
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-public abstract class MainFrame extends JFrame implements PreferenceAware<PreferencesGroup> {
+public class MainFrame extends JFrame implements PreferenceAware<PreferencesGroup> {
 
     private static final String MAIN_FRAME_SIZE_KEY = "mainFrameSize";
     private static final String MAIN_FRAME_EXTENDED_STATE_KEY = "mainFrameExtendedState";
     private static final String MAIN_FRAME_LOCATION_KEY = "mainFrameLocation";
     private static final String TO_DO_PANEL_KEY = "toDoPanel";
 
-    private final AboutInfo aboutInfo;
-    private final FlatSVGIcon appLogoIcon;
-    private TodoPanel todoPanel;
+    private final TodoPanel todoPanel;
 
-    protected MainFrame(AboutInfo aboutInfo, FlatSVGIcon appLogoIcon) throws HeadlessException {
-        this.aboutInfo = aboutInfo;
-        this.appLogoIcon = appLogoIcon;
+    public MainFrame(TodoPanel todoPanel) throws HeadlessException {
+        this.todoPanel = todoPanel;
         setName("mainFrame");
         GUIUtils.setMainWindow(this);
-    }
-
-    @PostConstruct
-    void init() {
-        setJMenuBar(createMainMenuBar());
-
-        todoPanel = createTodoPanel();
-        todoPanel.load();
-        setContentPane(todoPanel);
+        setContentPane(this.todoPanel);
 
         setMinimumSize(GUIUtils.getHalfFrameSize());
         setDefaultCloseOperation(WindowConstants.EXIT_ON_CLOSE);
-        setTitle(this.aboutInfo.getProduct().getNameWithVersion());
-        setIconImage(this.appLogoIcon.getImage());
         GUIUtils.addPreferenceSupport(this);
+    }
+
+    @Override
+    @Autowired
+    public void setJMenuBar(JMenuBar menubar) {
+        super.setJMenuBar(menubar);
+    }
+
+    @Override
+    @Value("#{'${about.product.name}' + ' ' + '${about.product.version}'}")
+    public void setTitle(String title) {
+        super.setTitle(title);
+    }
+
+    @Override
+    @Autowired
+    public void setIconImage(Image appLogoImage) {
+        super.setIconImage(appLogoImage);
+    }
+
+    public void load() {
+        todoPanel.load();
     }
 
     @Override
@@ -105,10 +110,4 @@ public abstract class MainFrame extends JFrame implements PreferenceAware<Prefer
     public String getKey() {
         return getName();
     }
-
-    @Lookup
-    protected abstract MainMenuBar createMainMenuBar();
-
-    @Lookup
-    protected abstract TodoPanel createTodoPanel();
 }

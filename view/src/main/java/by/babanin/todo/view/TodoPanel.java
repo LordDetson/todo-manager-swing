@@ -7,8 +7,6 @@ import java.util.function.Predicate;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
 
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import by.babanin.todo.model.Todo;
@@ -20,7 +18,6 @@ import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public final class TodoPanel extends JPanel implements PreferenceAware<PreferencesGroup> {
 
     private static final String SPLIT_PANE_KEY = "splitPane";

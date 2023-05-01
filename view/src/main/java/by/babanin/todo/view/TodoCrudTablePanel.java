@@ -10,8 +10,6 @@ import javax.swing.JButton;
 import javax.swing.JTable;
 
 import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.beans.factory.config.ConfigurableBeanFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import by.babanin.todo.application.service.PriorityService;
@@ -41,7 +39,6 @@ import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
 @Component
-@Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
 public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
     private JButton showPrioritiesButton;
