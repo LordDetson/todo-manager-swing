@@ -63,6 +63,8 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         this.globalAdjustment = globalAdjustment;
         this.spacing = spacing;
         table.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+        table.addPropertyChangeListener(this);
+        table.getModel().addTableModelListener(this);
         installActions();
     }
 
@@ -235,18 +237,6 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
      * dynamically recalculated.
      */
     public void setDynamicAdjustment(boolean dynamicAdjustment) {
-        // May need to add or remove the TableModelListener when changed
-        if(adjustment.isDynamicAdjustment() != dynamicAdjustment) {
-            if(dynamicAdjustment) {
-                table.addPropertyChangeListener(this);
-                table.getModel().addTableModelListener(this);
-            }
-            else {
-                table.removePropertyChangeListener(this);
-                table.getModel().removeTableModelListener(this);
-            }
-        }
-
         adjustment.setDynamicAdjustment(dynamicAdjustment);
         useGlobal = false;
     }
@@ -290,7 +280,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 
     @Override
     public void tableChanged(TableModelEvent e) {
-        if(!adjustment.isColumnContentIncluded()) {
+        if(!isDynamicAdjustment()) {
             return;
         }
 
@@ -301,7 +291,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 
             if(e.getType() == TableModelEvent.UPDATE && column != -1) {
                 // Only need to worry about an increase in width for this cell
-                if(adjustment.isOnlyAdjustLarger()) {
+                if(isOnlyAdjustLarger()) {
                     int row = e.getFirstRow();
                     TableColumn tableColumn = table.getColumnModel().getColumn(column);
 
