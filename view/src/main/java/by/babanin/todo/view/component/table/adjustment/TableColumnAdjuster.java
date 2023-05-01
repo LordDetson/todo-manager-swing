@@ -5,13 +5,17 @@ import java.awt.EventQueue;
 import java.awt.event.ActionEvent;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 import javax.swing.KeyStroke;
@@ -39,6 +43,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
     private static final int DEFAULT_SPACING = 3;
 
     private final Map<TableColumn, Integer> columnSizes = new HashMap<>();
+    private final Set<String> columnIdsToFit = new HashSet<>();
 
     private final JTable table;
     private final int spacing;
@@ -47,6 +52,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
     private TableColumnAdjustment adjustment = new TableColumnAdjustment();
     private boolean useGlobal = true;
     private int selectedColumnIndex = -1;
+    private JMenu fitColumnsMenu;
 
     /**
      * Specify the table and use default spacing
@@ -86,26 +92,32 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         }
         TableColumnModel tcm = table.getColumnModel();
 
+        storeColumnSizes();
+
         for(int i = 0; i < tcm.getColumnCount(); i++) {
-            adjustColumn(i);
+            adjustColumn(i, false);
         }
+        fitColumns(false);
     }
 
     /**
      * Adjust the width of the specified column in the table
      */
-    public void adjustColumn(final int column) {
+    private void adjustColumn(final int column, boolean storeColumnSize) {
         TableColumn tableColumn = table.getColumnModel().getColumn(column);
 
         if(!tableColumn.getResizable()) {
             return;
         }
+        if(columnIdsToFit.contains(tableColumn.getIdentifier().toString())) {
+            return;
+        }
 
-        int columnHeaderWidth = getColumnHeaderWidth(column);
-        int columnDataWidth = getColumnContentWidth(column);
+        int columnHeaderWidth = getColumnHeaderWidth(column) + spacing;
+        int columnDataWidth = getColumnContentWidth(column) + spacing;
         int preferredWidth = Math.max(columnHeaderWidth, columnDataWidth);
 
-        updateTableColumn(column, preferredWidth);
+        updateTableColumn(column, preferredWidth, storeColumnSize);
     }
 
     /**
@@ -164,24 +176,35 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
     /**
      * Update the TableColumn with the newly calculated width
      */
-    private void updateTableColumn(int column, int width) {
+    private void updateTableColumn(int column, int width, boolean storeColumnSize) {
         final TableColumn tableColumn = table.getColumnModel().getColumn(column);
 
         if(!tableColumn.getResizable()) {
             return;
         }
 
-        width += spacing;
-
         // Don't shrink the column width
         if(adjustment.isOnlyAdjustLarger()) {
             width = Math.max(width, tableColumn.getPreferredWidth());
         }
 
-        columnSizes.put(tableColumn, tableColumn.getWidth());
+        if(storeColumnSize) {
+            storeColumnSize(tableColumn);
+        }
 
         table.getTableHeader().setResizingColumn(tableColumn);
         tableColumn.setWidth(width);
+    }
+
+    private void storeColumnSizes() {
+        Enumeration<TableColumn> columns = table.getColumnModel().getColumns();
+        while(columns.hasMoreElements()) {
+            storeColumnSize(columns.nextElement());
+        }
+    }
+
+    private void storeColumnSize(TableColumn column) {
+        columnSizes.put(column, column.getWidth());
     }
 
     /**
@@ -207,6 +230,39 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
             tableColumn.setWidth(width);
         }
     }
+
+    private void fitColumns(boolean storeColumnSize) {
+        TableColumnModel columnModel = table.getColumnModel();
+        for(String id : columnIdsToFit) {
+            int columnIndex = columnModel.getColumnIndex(id);
+            TableColumn column = columnModel.getColumn(columnIndex);
+            int columnWidthToFit = getColumnWidthToFit(column);
+            updateTableColumn(columnIndex, columnWidthToFit, storeColumnSize);
+        }
+    }
+
+    /**
+     * Get the column width to fill all the free width of the table
+     * @param columnToFit is column to fit
+     * @return the column width to fill
+     */
+    private int getColumnWidthToFit(TableColumn columnToFit) {
+        TableColumnModel columnModel = table.getColumnModel();
+        String columnId = columnToFit.getIdentifier().toString();
+        if(!columnIdsToFit.contains(columnId)) {
+            return 0;
+        }
+
+        int columnsWidthSum = 0;
+        for(int i = 0; i < columnModel.getColumnCount(); i++) {
+            TableColumn column = columnModel.getColumn(i);
+            if(!columnIdsToFit.contains(column.getIdentifier().toString())) {
+                columnsWidthSum += column.getWidth();
+            }
+        }
+        return (table.getParent().getWidth() - columnsWidthSum) / columnIdsToFit.size();
+    }
+
 
     /**
      * Indicates whether to include the header in the width calculation
@@ -265,6 +321,10 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         return useGlobal;
     }
 
+    public Set<String> getColumnIdsToFit() {
+        return columnIdsToFit;
+    }
+
     @Override
     public void propertyChange(PropertyChangeEvent e) {
         // When the TableModel changes we need to update the listeners and column widths
@@ -276,6 +336,20 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
             model.addTableModelListener(this);
             adjustColumns();
         }
+
+        if("columnModel".equals(e.getPropertyName())) {
+            columnIdsToFit.clear();
+            fitColumnsMenu.removeAll();
+            TableColumnModel columnModel = (TableColumnModel) e.getNewValue();
+            Enumeration<TableColumn> columns = columnModel.getColumns();
+            while(columns.hasMoreElements()) {
+                TableColumn column = columns.nextElement();
+                if(column.getResizable()) {
+                    FitColumnToggleAction action = new FitColumnToggleAction(column);
+                    fitColumnsMenu.add(new JCheckBoxMenuItem(action));
+                }
+            }
+        }
     }
 
     @Override
@@ -286,6 +360,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
 
         // Needed when table is sorted.
         SwingUtilities.invokeLater(() -> {
+            storeColumnSizes();
             // A cell has been updated
             int column = table.convertColumnIndexToView(e.getColumn());
 
@@ -296,13 +371,13 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
                     TableColumn tableColumn = table.getColumnModel().getColumn(column);
 
                     if(tableColumn.getResizable()) {
-                        int width = getCellContentWidth(row, column);
-                        updateTableColumn(column, width);
+                        int width = getCellContentWidth(row, column) + spacing;
+                        updateTableColumn(column, width, false);
                     }
                 }
                 // Could be an increase of decrease so check all rows
                 else {
-                    adjustColumn(column);
+                    adjustColumn(column, false);
                 }
             }
             // The update affected more than one column so adjust all columns
@@ -326,12 +401,14 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         RestoreTableColumnsAction restoreTableColumnsAction = new RestoreTableColumnsAction();
         RestoreSelectedTableColumnAction restoreSelectedTableColumnAction = new RestoreSelectedTableColumnAction();
 
+        fitColumnsMenu = new JMenu(Translator.toLocale(TranslateCode.SETTINGS_COLUMNS_TO_FIT));
         JCheckBoxMenuItem columnHeaderIncludedMenuItem = new JCheckBoxMenuItem(columnsHeaderIncludedToggleAction);
         JCheckBoxMenuItem columnContentIncludedMenuItem = new JCheckBoxMenuItem(columnsContentIncludedToggleAction);
         JCheckBoxMenuItem onlyAdjustLargerMenuItem = new JCheckBoxMenuItem(onlyAdjustLargerToggleAction);
         JCheckBoxMenuItem dynamicAdjustmentMenuItem = new JCheckBoxMenuItem(dynamicAdjustmentToggleAction);
         JCheckBoxMenuItem useGlobalMenuItem = new JCheckBoxMenuItem(useGlobalToggleAction);
         JPopupMenu popupMenu = new JPopupMenu();
+        popupMenu.add(fitColumnsMenu);
         popupMenu.add(columnHeaderIncludedMenuItem);
         popupMenu.add(columnContentIncludedMenuItem);
         popupMenu.add(onlyAdjustLargerMenuItem);
@@ -351,6 +428,13 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
                 onlyAdjustLargerMenuItem.setState(isOnlyAdjustLarger());
                 dynamicAdjustmentMenuItem.setState(isDynamicAdjustment());
                 useGlobalMenuItem.setState(useGlobal);
+
+                for(int i = 0; i < fitColumnsMenu.getItemCount(); i++) {
+                    if(fitColumnsMenu.getItem(i) instanceof JCheckBoxMenuItem checkBoxMenuItem &&
+                            checkBoxMenuItem.getAction() instanceof FitColumnToggleAction fitColumnToggleAction) {
+                        checkBoxMenuItem.setState(columnIdsToFit.contains(fitColumnToggleAction.getColumnId()));
+                    }
+                }
             }
 
             @Override
@@ -471,7 +555,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
                 selectedColumnIndex = getSelectedColumnIndex();
             }
             if(selectedColumnIndex > -1) {
-                adjustColumn(selectedColumnIndex);
+                adjustColumn(selectedColumnIndex, true);
                 selectedColumnIndex = -1;
             }
         }
@@ -553,4 +637,31 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
             return selectedColumn;
         }
     }
+
+    private final class FitColumnToggleAction extends AbstractAction {
+
+        private final TableColumn column;
+
+        private FitColumnToggleAction(TableColumn column) {
+            super(column.getHeaderValue().toString());
+            this.column = column;
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            String id = getColumnId();
+            if(columnIdsToFit.contains(id)) {
+                columnIdsToFit.remove(id);
+            }
+            else {
+                columnIdsToFit.add(id);
+            }
+            adjustColumns();
+        }
+
+        public String getColumnId() {
+            return column.getIdentifier().toString();
+        }
+    }
+
 }

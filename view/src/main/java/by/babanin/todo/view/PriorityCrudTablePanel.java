@@ -2,18 +2,23 @@ package by.babanin.todo.view;
 
 import java.util.Map;
 
+import javax.swing.JTable;
+
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.model.Priority;
+import by.babanin.todo.model.Priority.Fields;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.Task;
 import by.babanin.todo.task.priority.CreatePriorityTask;
 import by.babanin.todo.task.priority.UpdatePriorityTask;
 import by.babanin.todo.view.component.CrudStyle;
+import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
+import by.babanin.todo.view.component.TableModel;
 import by.babanin.todo.view.component.form.PriorityFormRowFactory;
 import by.babanin.todo.view.component.validation.PriorityValidatorFactory;
 import by.babanin.todo.view.settings.Settings;
@@ -31,6 +36,12 @@ public final class PriorityCrudTablePanel extends MovableCrudTablePanel<Priority
     @Override
     protected PriorityService getService() {
         return (PriorityService) super.getService();
+    }
+
+    @Override
+    protected void setupTable(JTable table, TableModel<Priority> model, CustomTableColumnModel columnModel) {
+        super.setupTable(table, model, columnModel);
+        setDefaultColumnIdsToFit(Fields.name);
     }
 
     @Override

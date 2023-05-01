@@ -73,6 +73,7 @@ public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Lon
         table.setDefaultRenderer(Priority.class, new PriorityRenderer());
         table.setDefaultRenderer(Status.class, new StatusRenderer());
         table.setDefaultRenderer(LocalDate.class, new LocalDataRenderer());
+        setDefaultColumnIdsToFit(Fields.title);
     }
 
     @Override
