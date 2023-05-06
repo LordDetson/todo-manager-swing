@@ -1,10 +1,9 @@
 package by.babanin.todo.view.component;
 
-import java.awt.event.KeyEvent;
 import java.util.List;
 
-import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import by.babanin.todo.application.service.AbstractIndexableCrudService;
@@ -19,11 +18,6 @@ import by.babanin.todo.view.settings.Settings;
 
 public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable, I> extends CrudTablePanel<C, I> {
 
-    private transient Action moveUpAction;
-    private transient Action moveDownAction;
-    private JButton moveUpButton;
-    private JButton moveDownButton;
-
     protected MovableCrudTablePanel(AbstractIndexableCrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, Settings settings, CrudStyle crudStyle) {
         super(service, componentClass, formRowFactory, settings, crudStyle);
     }
@@ -32,20 +26,8 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     protected void createUiComponents() {
         super.createUiComponents();
         CrudStyle crudStyle = getCrudStyle();
-        moveUpAction = new ToolAction(
-                crudStyle.getMoveUpButtonIcon(),
-                crudStyle.getMoveUpButtonToolTip(),
-                KeyEvent.VK_UP,
-                this::moveUp
-        );
-        moveDownAction = new ToolAction(
-                crudStyle.getMoveDownButtonIcon(),
-                crudStyle.getMoveDownButtonToolTip(),
-                KeyEvent.VK_DOWN,
-                this::moveDown
-        );
-        moveUpButton = new JButton(moveUpAction);
-        moveDownButton = new JButton(moveDownAction);
+        crudStyle.setMoveUpActionImpl(actionEvent -> moveUp());
+        crudStyle.setMoveDownActionImpl(actionEvent -> moveDown());
     }
 
     @Override
@@ -54,19 +36,30 @@ public abstract class MovableCrudTablePanel<C extends Persistent<I> & Indexable,
     }
 
     @Override
+    protected JPopupMenu createTablePopupMenu() {
+        JPopupMenu tablePopupMenu = super.createTablePopupMenu();
+        CrudStyle crudStyle = getCrudStyle();
+        tablePopupMenu.add(crudStyle.getMoveUpAction());
+        tablePopupMenu.add(crudStyle.getMoveDownAction());
+        return tablePopupMenu;
+    }
+
+    @Override
     protected void placeComponents() {
         super.placeComponents();
-        addToolBarComponent(moveUpButton);
-        addToolBarComponent(moveDownButton);
+        CrudStyle crudStyle = getCrudStyle();
+        addToolBarComponent(new JButton(crudStyle.getMoveUpAction()));
+        addToolBarComponent(new JButton(crudStyle.getMoveDownAction()));
     }
 
     @Override
     protected void actionEnabling() {
         super.actionEnabling();
+        CrudStyle crudStyle = getCrudStyle();
         JTable table = getTable();
         int selectionCount = table.getSelectionModel().getSelectedItemsCount();
-        moveUpAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != 0);
-        moveDownAction.setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
+        crudStyle.getMoveUpAction().setEnabled(selectionCount == 1 && table.getSelectedRow() != 0);
+        crudStyle.getMoveDownAction().setEnabled(selectionCount == 1 && table.getSelectedRow() != table.getRowCount() - 1);
     }
 
     @Override

@@ -30,8 +30,7 @@ public class SettingsDialog extends JDialog implements PreferenceAware<Preferenc
         super(GUIUtils.getMainWindow(), true);
         setName("settingsDialog");
         setTitle(Translator.toLocale(TranslateCode.MAIN_MENU_SETTINGS));
-        GUIUtils.addCloseActionOnEscape(this, SETTINGS_DIALOG_CLOSING_ACTION_KEY);
-        settingsPanel.setCancelAction(rootPane.getActionMap().get(SettingsDialog.SETTINGS_DIALOG_CLOSING_ACTION_KEY));
+        settingsPanel.setCancelAction(GUIUtils.addCloseActionOnEscape(this, SETTINGS_DIALOG_CLOSING_ACTION_KEY));
         rootPane.setDefaultButton(settingsPanel.getDefaultButton());
         setContentPane(settingsPanel);
         GUIUtils.addPreferenceSupport(this);

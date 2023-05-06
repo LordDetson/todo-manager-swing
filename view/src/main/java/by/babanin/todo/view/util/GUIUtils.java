@@ -13,7 +13,6 @@ import java.awt.MouseInfo;
 import java.awt.Point;
 import java.awt.Toolkit;
 import java.awt.Window;
-import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
@@ -32,8 +31,6 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JDialog;
@@ -60,6 +57,8 @@ import by.babanin.todo.image.IconResources;
 import by.babanin.todo.preferences.PreferenceAware;
 import by.babanin.todo.preferences.PreferencesSupport;
 import by.babanin.todo.representation.ReportField;
+import by.babanin.todo.view.component.action.Action;
+import by.babanin.todo.view.component.action.BindingAction;
 import by.babanin.todo.view.exception.ViewException;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
@@ -267,12 +266,6 @@ public final class GUIUtils {
         return vks;
     }
 
-    public static void addDialogKeyAction(JDialog dialog, KeyStroke keyStroke, String actionKey, Action action) {
-        JRootPane rootPane = dialog.getRootPane();
-        rootPane.getInputMap(JComponent.WHEN_IN_FOCUSED_WINDOW).put(keyStroke, actionKey);
-        rootPane.getActionMap().put(actionKey, action);
-    }
-
     public static JLabel createHyperlinkLabel(String hyperlink) {
         return createHyperlinkLabel(hyperlink, hyperlink);
     }
@@ -295,15 +288,13 @@ public final class GUIUtils {
         return hyperlinkLabel;
     }
 
-    public static void addCloseActionOnEscape(JDialog dialog, String key) {
-        KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-        GUIUtils.addDialogKeyAction(dialog, escapeStroke, key, new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                dialog.dispose();
-            }
-        });
+    public static Action addCloseActionOnEscape(JDialog dialog, String key) {
+        return Action.builder(() -> new BindingAction(dialog.getRootPane(), JComponent.WHEN_IN_FOCUSED_WINDOW))
+                .id(key)
+                .name("Close")
+                .accelerator(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0))
+                .action(actionEvent -> dialog.dispose())
+                .build();
     }
 
     public static <T extends Window & PreferenceAware<?>> void addPreferenceSupport(T preferenceAware) {
@@ -337,13 +328,11 @@ public final class GUIUtils {
             component.setComponentPopupMenu(popupMenu);
 
         }
-        AbstractAction resetPreferencesAction = new AbstractAction(Translator.toLocale(TranslateCode.RESET_PREFERENCES).formatted()) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                preferenceAware.resetToDefault();
-            }
-        };
+        Action resetPreferencesAction = Action.builder()
+                .id("resetPreferences")
+                .name(Translator.toLocale(TranslateCode.RESET_PREFERENCES))
+                .action(actionEvent -> preferenceAware.resetToDefault())
+                .build();
         popupMenu.add(resetPreferencesAction);
         component.addNotify();
         getAllComponentsRecursively(component).forEach(child -> {

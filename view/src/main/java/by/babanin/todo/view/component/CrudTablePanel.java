@@ -6,7 +6,6 @@ import java.awt.Frame;
 import java.awt.Rectangle;
 import java.awt.Window;
 import java.awt.event.HierarchyEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.ArrayList;
@@ -18,10 +17,11 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 
-import javax.swing.Action;
+import javax.swing.AbstractButton;
 import javax.swing.JButton;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JPopupMenu;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
@@ -37,6 +37,7 @@ import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.Task;
 import by.babanin.todo.task.listener.ExceptionListener;
 import by.babanin.todo.task.listener.FinishListener;
+import by.babanin.todo.view.component.action.BindingAction;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormDialog;
 import by.babanin.todo.view.component.form.FormRowFactory;
@@ -75,11 +76,6 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
 
     private JToolBar toolBar;
 
-    private transient Action showEditDialogAction;
-    private transient Action showDeleteConfirmDialogAction;
-    private JButton createButton;
-    private JButton editButton;
-    private JButton deleteButton;
     private TableModel<C> model;
     private CustomTableColumnModel columnModel;
     private JTable table;
@@ -93,7 +89,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         this.crudStyle = crudStyle;
 
         createUiComponents();
-        setupTable(table, model, columnModel);
+        setupTable(table, model, columnModel, createTablePopupMenu());
         addListeners();
         placeComponents();
         actionEnabling();
@@ -108,31 +104,12 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         model = createTableModel(representation, reportFields);
         columnModel = createColumnModel(reportFields);
         table = new JTable();
-
-        Action showCreationDialogAction = new ToolAction(
-                crudStyle.getCreateButtonIcon(),
-                crudStyle.getCreateButtonToolTip(),
-                KeyEvent.VK_C,
-                this::showCreationDialog
-        );
-        showEditDialogAction = new ToolAction(
-                crudStyle.getEditButtonIcon(),
-                crudStyle.getEditButtonToolTip(),
-                KeyEvent.VK_E,
-                this::showEditDialog
-        );
-        showDeleteConfirmDialogAction = new ToolAction(
-                crudStyle.getDeleteButtonIcon(),
-                crudStyle.getDeleteButtonToolTip(),
-                KeyEvent.VK_D,
-                this::showDeleteConfirmDialog
-        );
-
-        createButton = new JButton(showCreationDialogAction);
-        editButton = new JButton(showEditDialogAction);
-        deleteButton = new JButton(showDeleteConfirmDialogAction);
-
         tableColumnAdjuster = new TableColumnAdjuster(table, settings.getTableColumnAdjustment());
+
+        crudStyle.setActionFactory(() -> new BindingAction(table));
+        crudStyle.setShowCreationDialogActionImpl(event -> showCreationDialog());
+        crudStyle.setShowEditDialogActionImpl(event -> showEditDialog());
+        crudStyle.setShowDeleteConfirmDialogActionImpl(event -> showDeleteConfirmDialog());
     }
 
     protected TableModel<C> createTableModel(ComponentRepresentation<C> representation, List<ReportField> fields) {
@@ -143,9 +120,18 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         return new CustomTableColumnModel(reportFields);
     }
 
-    protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel columnModel) {
+    protected void setupTable(JTable table, TableModel<C> model, CustomTableColumnModel columnModel, JPopupMenu popupMenu) {
         table.setModel(model);
         table.setColumnModel(columnModel);
+        table.setComponentPopupMenu(popupMenu);
+    }
+
+    protected JPopupMenu createTablePopupMenu() {
+        JPopupMenu popupMenu = new JPopupMenu();
+        popupMenu.add(crudStyle.getShowCreationDialogAction());
+        popupMenu.add(crudStyle.getShowEditDialogAction());
+        popupMenu.add(crudStyle.getShowDeleteConfirmDialogAction());
+        return popupMenu;
     }
 
     protected void addListeners() {
@@ -208,9 +194,9 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     }
 
     protected void placeComponents() {
-        addToolBarComponent(createButton);
-        addToolBarComponent(editButton);
-        addToolBarComponent(deleteButton);
+        addToolBarComponent(new JButton(crudStyle.getShowCreationDialogAction()));
+        addToolBarComponent(new JButton(crudStyle.getShowEditDialogAction()));
+        addToolBarComponent(new JButton(crudStyle.getShowDeleteConfirmDialogAction()));
 
         setLayout(new BorderLayout());
         add(toolBar, BorderLayout.PAGE_START);
@@ -218,12 +204,15 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     }
 
     protected void addToolBarComponent(Component component) {
+        if(component instanceof AbstractButton button) {
+            button.setText("");
+        }
         toolBar.add(component);
     }
 
     protected void actionEnabling() {
-        showEditDialogAction.setEnabled(canEdit());
-        showDeleteConfirmDialogAction.setEnabled(canDelete());
+        crudStyle.getShowEditDialogAction().setEnabled(canEdit());
+        crudStyle.getShowDeleteConfirmDialogAction().setEnabled(canDelete());
     }
 
     protected boolean canEdit() {

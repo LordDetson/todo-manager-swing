@@ -4,13 +4,10 @@ import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.EventQueue;
 import java.awt.GridBagLayout;
-import java.awt.event.ActionEvent;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -30,6 +27,7 @@ import org.springframework.stereotype.Component;
 import by.babanin.todo.preferences.PreferenceAware;
 import by.babanin.todo.preferences.PreferencesGroup;
 import by.babanin.todo.view.component.CardPanel;
+import by.babanin.todo.view.component.action.Action;
 import by.babanin.todo.view.preference.SplitPanePreference;
 import by.babanin.todo.view.preference.StringPreference;
 import by.babanin.todo.view.renderer.SettingViewTypeRenderer;
@@ -85,7 +83,6 @@ public class SettingsPanel extends JPanel implements PreferenceAware<Preferences
 
         Action okAction = createOkAction();
         applyAction = createApplyAction();
-        applyAction.setEnabled(false);
         okButton = new JButton(okAction);
         cancelButton = new JButton();
     }
@@ -96,27 +93,26 @@ public class SettingsPanel extends JPanel implements PreferenceAware<Preferences
                         .anyMatch(SettingView::shouldApply));
     }
 
-    private AbstractAction createOkAction() {
-        return new AbstractAction(Translator.toLocale(TranslateCode.SETTINGS_OK_BUTTON_TEXT)) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                applyAction.actionPerformed(e);
-                cancelAction.actionPerformed(e);
-            }
-        };
+    private Action createOkAction() {
+        return Action.builder()
+                .id("ok")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_OK_BUTTON_TEXT))
+                .action(actionEvent -> {
+                    applyAction.actionPerformed(actionEvent);
+                    cancelAction.actionPerformed(actionEvent);
+                })
+                .build();
     }
 
-    private AbstractAction createApplyAction() {
-        return new AbstractAction(Translator.toLocale(TranslateCode.SETTINGS_APPLY_BUTTON_TEXT)) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                cardPanel.getAllInitialized().stream()
+    private Action createApplyAction() {
+        return Action.builder()
+                .id("apply")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_APPLY_BUTTON_TEXT))
+                .disable()
+                .action(actionEvent -> cardPanel.getAllInitialized().stream()
                         .filter(SettingView::shouldApply)
-                        .forEach(SettingsPanel.this::applyAndPublishEvent);
-            }
-        };
+                        .forEach(SettingsPanel.this::applyAndPublishEvent))
+                .build();
     }
 
     private void addListeners() {

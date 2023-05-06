@@ -5,8 +5,6 @@ import java.awt.Dialog.ModalityType;
 import java.awt.Dimension;
 import java.awt.Window;
 import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -17,12 +15,11 @@ import java.util.Map.Entry;
 import java.util.Objects;
 import java.util.StringJoiner;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JDialog;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 
+import by.babanin.todo.view.component.action.Action;
 import by.babanin.todo.view.component.logger.CombinedLogPanel;
 import by.babanin.todo.view.component.logger.CombinedLogger;
 import by.babanin.todo.view.component.logger.LogMessageType;
@@ -47,34 +44,23 @@ public class LogStatusBarItem extends StatusBarItem {
         getLabel().addMouseListener(createClickActionListener());
     }
 
-    private AbstractAction createShowLogAction() {
-        return new AbstractAction() {
-
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                Window window = GUIUtils.getWindowOwner((Component) event.getSource());
-                JDialog dialog = new JDialog(window, ModalityType.APPLICATION_MODAL);
-                dialog.setContentPane(new CombinedLogPanel(combinedLogger));
-                dialog.setTitle(Translator.toLocale(TranslateCode.LOG_MESSAGES));
-                Dimension smallFrameSize = GUIUtils.getSmallFrameSize();
-                dialog.setMinimumSize(smallFrameSize);
-                dialog.setSize(smallFrameSize);
-                dialog.setLocationRelativeTo(window);
-                addCloseLogAction(dialog);
-                dialog.setVisible(true);
-            }
-
-            private void addCloseLogAction(JDialog dialog) {
-                KeyStroke escapeStroke = KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0);
-                GUIUtils.addDialogKeyAction(dialog, escapeStroke, LOG_CLOSING_ACTION_KEY, new AbstractAction() {
-
-                    @Override
-                    public void actionPerformed(ActionEvent e) {
-                        dialog.dispose();
-                    }
-                });
-            }
-        };
+    private Action createShowLogAction() {
+        return Action.builder()
+                .id(LOG_SHOWING_ACTION_KEY)
+                .accelerator(KeyStroke.getKeyStroke("control L"))
+                .action(actionEvent -> {
+                    Window window = GUIUtils.getWindowOwner((Component) actionEvent.getSource());
+                    JDialog dialog = new JDialog(window, ModalityType.APPLICATION_MODAL);
+                    dialog.setContentPane(new CombinedLogPanel(combinedLogger));
+                    dialog.setTitle(Translator.toLocale(TranslateCode.LOG_MESSAGES));
+                    Dimension smallFrameSize = GUIUtils.getSmallFrameSize();
+                    dialog.setMinimumSize(smallFrameSize);
+                    dialog.setSize(smallFrameSize);
+                    dialog.setLocationRelativeTo(window);
+                    GUIUtils.addCloseActionOnEscape(dialog, LOG_CLOSING_ACTION_KEY);
+                    dialog.setVisible(true);
+                })
+                .build();
     }
 
     private MouseListener createClickActionListener() {
@@ -85,7 +71,7 @@ public class LogStatusBarItem extends StatusBarItem {
                 if(!event.isConsumed() && event.getClickCount() == 1 && event.getButton() == MouseEvent.BUTTON1
                         && showLogAction.isEnabled()) {
                     showLogAction.actionPerformed(new ActionEvent(LogStatusBarItem.this, ActionEvent.ACTION_PERFORMED,
-                            (String) showLogAction.getValue(Action.ACTION_COMMAND_KEY)));
+                            showLogAction.getId()));
                     event.consume();
                 }
             }
@@ -172,9 +158,8 @@ public class LogStatusBarItem extends StatusBarItem {
 
     public void addLogShowingAction(JDialog dialog) {
         JRootPane rootPane = dialog.getRootPane();
-        KeyStroke keyStroke = KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.ALT_DOWN_MASK);
-        rootPane.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(keyStroke, LOG_SHOWING_ACTION_KEY);
-        rootPane.getActionMap().put(LOG_SHOWING_ACTION_KEY, showLogAction);
+        rootPane.getInputMap(WHEN_IN_FOCUSED_WINDOW).put(showLogAction.getAccelerator(), showLogAction.getId());
+        rootPane.getActionMap().put(showLogAction.getId(), showLogAction);
     }
 
     private record LogOwner(Component component, String title) {

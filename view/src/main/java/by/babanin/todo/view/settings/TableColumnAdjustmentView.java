@@ -1,14 +1,13 @@
 package by.babanin.todo.view.settings;
 
-import java.awt.event.ActionEvent;
 import java.util.function.Consumer;
 
-import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.BoxLayout;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
+import by.babanin.todo.view.component.action.Action;
 import by.babanin.todo.view.component.table.adjustment.TableColumnAdjustment;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
@@ -43,15 +42,14 @@ public class TableColumnAdjustmentView extends AbstractSettingView<TableColumnAd
     }
 
     private JCheckBox createCheckBox(String translateCode, boolean selected, Consumer<Boolean> setter) {
-        JCheckBox checkBox = new JCheckBox(new AbstractAction(Translator.toLocale(translateCode)) {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                setter.accept(((AbstractButton) e.getSource()).isSelected());
-                fireChange();
-            }
-        });
-        checkBox.setSelected(selected);
-        return checkBox;
+        Action action = Action.builder()
+                .name(Translator.toLocale(translateCode))
+                .selected(selected)
+                .action(actionEvent -> {
+                    setter.accept(((AbstractButton) actionEvent.getSource()).isSelected());
+                    fireChange();
+                })
+                .build();
+        return new JCheckBox(action);
     }
 }

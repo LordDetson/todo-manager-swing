@@ -3,21 +3,23 @@ package by.babanin.todo.view.about;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 
 import org.springframework.stereotype.Component;
 
+import by.babanin.todo.view.component.action.Action;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 
 @Component
-public class ExitAction extends AbstractAction {
+public class ExitAction extends Action {
 
     public ExitAction(Icon exitIcon) {
-        super(Translator.toLocale(TranslateCode.MAIN_MENU_EXIT), exitIcon);
-        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_X);
+        setId("exit");
+        setName(Translator.toLocale(TranslateCode.MAIN_MENU_EXIT));
+        setSmallIcon(exitIcon);
+        setLargeIcon(exitIcon);
+        setMnemonic(KeyEvent.VK_X);
     }
 
     @Override

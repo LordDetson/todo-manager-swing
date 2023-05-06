@@ -9,11 +9,10 @@ import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
+import java.util.function.Supplier;
 
 import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenu;
 import javax.swing.JPopupMenu;
@@ -29,7 +28,8 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 
-import by.babanin.todo.view.exception.ViewException;
+import by.babanin.todo.view.component.action.Action;
+import by.babanin.todo.view.component.action.BindingAction;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
@@ -391,15 +391,92 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
      * Install Actions to give user control of certain functionality.
      */
     private void installActions() {
-        ColumnsHeaderIncludedToggleAction columnsHeaderIncludedToggleAction = new ColumnsHeaderIncludedToggleAction();
-        ColumnsContentIncludedToggleAction columnsContentIncludedToggleAction = new ColumnsContentIncludedToggleAction();
-        OnlyAdjustLargerToggleAction onlyAdjustLargerToggleAction = new OnlyAdjustLargerToggleAction();
-        DynamicAdjustmentToggleAction dynamicAdjustmentToggleAction = new DynamicAdjustmentToggleAction();
-        UseGlobalToggleAction useGlobalToggleAction = new UseGlobalToggleAction();
-        AdjustTableColumnsAction adjustTableColumnsAction = new AdjustTableColumnsAction();
-        AdjustSelectedTableColumnAction adjustSelectedTableColumnAction = new AdjustSelectedTableColumnAction();
-        RestoreTableColumnsAction restoreTableColumnsAction = new RestoreTableColumnsAction();
-        RestoreSelectedTableColumnAction restoreSelectedTableColumnAction = new RestoreSelectedTableColumnAction();
+        Supplier<BindingAction> actionFactory = () -> new BindingAction(table);
+        Action columnsHeaderIncludedToggleAction = Action.builder(actionFactory)
+                .name(Translator.toLocale(TranslateCode.SETTINGS_COLUMNS_HEADER_INCLUDED))
+                .action(actionEvent -> {
+                    setColumnHeaderIncluded(!isColumnHeaderIncluded());
+                    adjustColumns();
+                })
+                .build();
+
+        Action columnsContentIncludedToggleAction = Action.builder(actionFactory)
+                .name(Translator.toLocale(TranslateCode.SETTINGS_COLUMNS_CONTENT_INCLUDED))
+                .action(actionEvent -> {
+                    setColumnContentIncluded(!isColumnContentIncluded());
+                    adjustColumns();
+                })
+                .build();
+
+        Action onlyAdjustLargerToggleAction = Action.builder(actionFactory)
+                .id("toggleLarger")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_ONLY_ADJUST_LARGER))
+                .accelerator(KeyStroke.getKeyStroke("control shift L"))
+                .action(actionEvent -> {
+                    setOnlyAdjustLarger(!isOnlyAdjustLarger());
+                    adjustColumns();
+                })
+                .build();
+
+        Action dynamicAdjustmentToggleAction = Action.builder(actionFactory)
+                .id("toggleDynamic")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_DYNAMIC_ADJUSTMENT))
+                .accelerator(KeyStroke.getKeyStroke("control shift D"))
+                .action(actionEvent -> {
+                    setDynamicAdjustment(!isDynamicAdjustment());
+                    adjustColumns();
+                })
+                .build();
+
+        Action useGlobalToggleAction = Action.builder(actionFactory)
+                .name(Translator.toLocale(TranslateCode.SETTINGS_USE_GLOBAL))
+                .action(actionEvent -> {
+                    useGlobal = !useGlobal;
+                    adjustColumns();
+                })
+                .build();
+
+        Action adjustTableColumnsAction = Action.builder(actionFactory)
+                .id("adjustTableColumns")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_ADJUST_COLUMNS))
+                .accelerator(KeyStroke.getKeyStroke("control shift T"))
+                .action(actionEvent -> adjustColumns())
+                .build();
+
+        Action adjustSelectedTableColumnAction = Action.builder(actionFactory)
+                .id("adjustSelectedTableColumn")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_ADJUST_SELECTED_COLUMN))
+                .action(actionEvent -> {
+                    if(selectedColumnIndex < 0) {
+                        selectedColumnIndex = getSelectedColumnIndex();
+                    }
+                    if(selectedColumnIndex > -1) {
+                        adjustColumn(selectedColumnIndex, true);
+                        selectedColumnIndex = -1;
+                    }
+                })
+                .build();
+
+        Action restoreTableColumnsAction = Action.builder(actionFactory)
+                .id("restoreTableColumns")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_RESTORE_COLUMNS))
+                .accelerator(KeyStroke.getKeyStroke("control shift R"))
+                .action(actionEvent -> restoreColumns())
+                .build();
+
+        Action restoreSelectedTableColumnAction = Action.builder(actionFactory)
+                .id("restoreSelectedTableColumn")
+                .name(Translator.toLocale(TranslateCode.SETTINGS_RESTORE_SELECTED_COLUMN))
+                .action(actionEvent -> {
+                    if(selectedColumnIndex < 0) {
+                        selectedColumnIndex = getSelectedColumnIndex();
+                    }
+                    if(selectedColumnIndex > -1) {
+                        restoreColumn(selectedColumnIndex);
+                        selectedColumnIndex = -1;
+                    }
+                })
+                .build();
 
         fitColumnsMenu = new JMenu(Translator.toLocale(TranslateCode.SETTINGS_COLUMNS_TO_FIT));
         JCheckBoxMenuItem columnHeaderIncludedMenuItem = new JCheckBoxMenuItem(columnsHeaderIncludedToggleAction);
@@ -458,182 +535,12 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         table.getTableHeader().setComponentPopupMenu(popupMenu);
     }
 
-    private final class ColumnsHeaderIncludedToggleAction extends TableAction {
-
-        public ColumnsHeaderIncludedToggleAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_COLUMNS_HEADER_INCLUDED));
+    public int getSelectedColumnIndex() {
+        int selectedColumn = table.getSelectedColumn();
+        if(selectedColumn < 0) {
+            selectedColumn = table.columnAtPoint(GUIUtils.getMouseLocationOn(table));
         }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            setColumnHeaderIncluded(!isColumnHeaderIncluded());
-            adjustColumns();
-        }
-    }
-
-    private final class ColumnsContentIncludedToggleAction extends TableAction {
-
-        public ColumnsContentIncludedToggleAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_COLUMNS_CONTENT_INCLUDED));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            setColumnContentIncluded(!isColumnContentIncluded());
-            adjustColumns();
-        }
-    }
-
-    private final class OnlyAdjustLargerToggleAction extends TableAction {
-
-        public OnlyAdjustLargerToggleAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_ONLY_ADJUST_LARGER));
-            setId("toggleLarger");
-            setAccelerator(KeyStroke.getKeyStroke("control L"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            setOnlyAdjustLarger(!isOnlyAdjustLarger());
-            adjustColumns();
-        }
-    }
-
-    private final class DynamicAdjustmentToggleAction extends TableAction {
-
-        public DynamicAdjustmentToggleAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_DYNAMIC_ADJUSTMENT));
-            setId("toggleDynamic");
-            setAccelerator(KeyStroke.getKeyStroke("control D"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            setDynamicAdjustment(!isDynamicAdjustment());
-            adjustColumns();
-        }
-    }
-
-    private class UseGlobalToggleAction extends TableAction {
-
-        public UseGlobalToggleAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_USE_GLOBAL));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            useGlobal = !useGlobal;
-            adjustColumns();
-        }
-    }
-
-    private class AdjustTableColumnsAction extends TableAction {
-
-        public AdjustTableColumnsAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_ADJUST_COLUMNS));
-            setId("adjustTableColumns");
-            setAccelerator(KeyStroke.getKeyStroke("control T"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            adjustColumns();
-        }
-    }
-
-    private class AdjustSelectedTableColumnAction extends TableAction {
-
-        public AdjustSelectedTableColumnAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_ADJUST_SELECTED_COLUMN));
-            setId("adjustSelectedTableColumn");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if(selectedColumnIndex < 0) {
-                selectedColumnIndex = getSelectedColumnIndex();
-            }
-            if(selectedColumnIndex > -1) {
-                adjustColumn(selectedColumnIndex, true);
-                selectedColumnIndex = -1;
-            }
-        }
-    }
-
-    private class RestoreTableColumnsAction extends TableAction {
-
-        public RestoreTableColumnsAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_RESTORE_COLUMNS));
-            setId("restoreTableColumns");
-            setAccelerator(KeyStroke.getKeyStroke("control R"));
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            restoreColumns();
-        }
-    }
-
-    private class RestoreSelectedTableColumnAction extends TableAction {
-
-        public RestoreSelectedTableColumnAction() {
-            super(Translator.toLocale(TranslateCode.SETTINGS_RESTORE_SELECTED_COLUMN));
-            setId("restoreSelectedTableColumn");
-        }
-
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            if(selectedColumnIndex < 0) {
-                selectedColumnIndex = getSelectedColumnIndex();
-            }
-            if(selectedColumnIndex > -1) {
-                restoreColumn(selectedColumnIndex);
-                selectedColumnIndex = -1;
-            }
-        }
-    }
-
-    private abstract class TableAction extends AbstractAction {
-
-        public static final String ID_KEY = "id";
-
-        protected TableAction(String name) {
-            super(name);
-            addPropertyChangeListener(event -> {
-                String propertyName = event.getPropertyName();
-                if(propertyName.equals(Action.ACCELERATOR_KEY)) {
-                    String id = getId();
-                    table.getInputMap().put(getAccelerator(), id);
-                    table.getActionMap().put(id, TableAction.this);
-                }
-            });
-        }
-
-        public String getId() {
-            return (String) Optional.ofNullable(getValue(ID_KEY))
-                    .orElseThrow(() -> new ViewException("ID is null"));
-        }
-
-        public void setId(String id) {
-            putValue(ID_KEY, id);
-        }
-
-        public KeyStroke getAccelerator() {
-            return (KeyStroke) Optional.ofNullable(getValue(Action.ACCELERATOR_KEY))
-                    .orElseThrow(() -> new ViewException("Accelerator is null"));
-        }
-
-        public void setAccelerator(KeyStroke accelerator) {
-            putValue(Action.ACCELERATOR_KEY, accelerator);
-        }
-
-        public int getSelectedColumnIndex() {
-            int selectedColumn = table.getSelectedColumn();
-            if(selectedColumn < 0) {
-                selectedColumn = table.columnAtPoint(GUIUtils.getMouseLocationOn(table));
-            }
-            return selectedColumn;
-        }
+        return selectedColumn;
     }
 
     private final class FitColumnToggleAction extends AbstractAction {

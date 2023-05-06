@@ -5,29 +5,30 @@ import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.JDialog;
 
 import org.springframework.stereotype.Component;
 
+import by.babanin.todo.view.component.action.Action;
 import by.babanin.todo.view.component.custom.CustomDialog;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
 import by.babanin.todo.view.util.GUIUtils;
 
 @Component
-public final class ShowAboutAction extends AbstractAction {
+public final class ShowAboutAction extends Action {
 
     private final transient AboutInfo aboutInfo;
     private final Image appLogoImage;
 
     public ShowAboutAction(AboutInfo aboutInfo, Icon aboutActionIcon, Image appLogoImage) {
-        super(Translator.toLocale(TranslateCode.MAIN_MENU_ABOUT), aboutActionIcon);
+        setName(Translator.toLocale(TranslateCode.MAIN_MENU_ABOUT));
+        setSmallIcon(aboutActionIcon);
+        setLargeIcon(aboutActionIcon);
+        setMnemonic(KeyEvent.VK_A);
         this.aboutInfo = aboutInfo;
         this.appLogoImage = appLogoImage;
-        putValue(Action.MNEMONIC_KEY, KeyEvent.VK_A);
     }
 
     @Override

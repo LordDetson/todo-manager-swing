@@ -1,13 +1,13 @@
 package by.babanin.todo.view;
 
-import java.awt.event.KeyEvent;
 import java.time.LocalDate;
 import java.util.Map;
 import java.util.Objects;
 
-import javax.swing.Action;
 import javax.swing.JButton;
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
+import javax.swing.KeyStroke;
 
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
@@ -28,7 +28,8 @@ import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.IndexableTableModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
 import by.babanin.todo.view.component.TableModel;
-import by.babanin.todo.view.component.ToolAction;
+import by.babanin.todo.view.component.action.Action;
+import by.babanin.todo.view.component.action.BindingAction;
 import by.babanin.todo.view.component.form.TodoFormRowFactory;
 import by.babanin.todo.view.component.validation.TodoValidatorFactory;
 import by.babanin.todo.view.renderer.LocalDataRenderer;
@@ -37,11 +38,12 @@ import by.babanin.todo.view.renderer.StatusRenderer;
 import by.babanin.todo.view.settings.Settings;
 import by.babanin.todo.view.translat.TranslateCode;
 import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.util.GUIUtils;
 
 @Component
 public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
-    private JButton showPrioritiesButton;
+    private Action showPrioritiesDialogAction;
 
     protected TodoCrudTablePanel(TodoService todoService, PriorityService priorityService, Settings settings) {
         super(todoService, Todo.class, new TodoFormRowFactory(priorityService), settings, new CrudStyle()
@@ -55,18 +57,21 @@ public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Lon
     @Override
     protected void createUiComponents() {
         super.createUiComponents();
-        Action showPrioritiesAction = new ToolAction(
-                getCrudStyle().getIcon("priority_list"),
-                Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES),
-                KeyEvent.VK_P,
-                this::showPriorityDialog
-        );
-        showPrioritiesButton = new JButton(showPrioritiesAction);
+        CrudStyle crudStyle = getCrudStyle();
+        showPrioritiesDialogAction = Action.builder(() -> new BindingAction(getTable()))
+                .id("showPrioritiesDialog")
+                .name(Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES))
+                .toolTip(Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES))
+                .smallIcon(crudStyle.getIcon("priority_list", GUIUtils.DEFAULT_MENU_ICON_SIZE))
+                .largeIcon(crudStyle.getIcon("priority_list", crudStyle.getIconSize()))
+                .accelerator(KeyStroke.getKeyStroke("control P"))
+                .action(actionEvent -> showPriorityDialog())
+                .build();
     }
 
     @Override
-    protected void setupTable(JTable table, TableModel<Todo> model, CustomTableColumnModel columnModel) {
-        super.setupTable(table, model, columnModel);
+    protected void setupTable(JTable table, TableModel<Todo> model, CustomTableColumnModel columnModel, JPopupMenu popupMenu) {
+        super.setupTable(table, model, columnModel, popupMenu);
         table.setDefaultRenderer(Priority.class, new PriorityRenderer());
         table.setDefaultRenderer(Status.class, new StatusRenderer());
         table.setDefaultRenderer(LocalDate.class, new LocalDataRenderer());
@@ -111,7 +116,7 @@ public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Lon
     @Override
     protected void placeComponents() {
         super.placeComponents();
-        addToolBarComponent(showPrioritiesButton);
+        addToolBarComponent(new JButton(showPrioritiesDialogAction));
     }
 
     @Override

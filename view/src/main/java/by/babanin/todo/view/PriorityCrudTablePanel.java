@@ -2,6 +2,7 @@ package by.babanin.todo.view;
 
 import java.util.Map;
 
+import javax.swing.JPopupMenu;
 import javax.swing.JTable;
 
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -39,8 +40,8 @@ public final class PriorityCrudTablePanel extends MovableCrudTablePanel<Priority
     }
 
     @Override
-    protected void setupTable(JTable table, TableModel<Priority> model, CustomTableColumnModel columnModel) {
-        super.setupTable(table, model, columnModel);
+    protected void setupTable(JTable table, TableModel<Priority> model, CustomTableColumnModel columnModel, JPopupMenu popupMenu) {
+        super.setupTable(table, model, columnModel, popupMenu);
         setDefaultColumnIdsToFit(Fields.name);
     }
 
