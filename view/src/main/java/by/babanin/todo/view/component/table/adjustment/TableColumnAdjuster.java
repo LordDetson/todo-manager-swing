@@ -489,7 +489,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         public OnlyAdjustLargerToggleAction() {
             super(Translator.toLocale(TranslateCode.SETTINGS_ONLY_ADJUST_LARGER));
             setId("toggleLarger");
-            setAccelerator(KeyStroke.getKeyStroke("control MULTIPLY"));
+            setAccelerator(KeyStroke.getKeyStroke("control L"));
         }
 
         @Override
@@ -504,7 +504,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         public DynamicAdjustmentToggleAction() {
             super(Translator.toLocale(TranslateCode.SETTINGS_DYNAMIC_ADJUSTMENT));
             setId("toggleDynamic");
-            setAccelerator(KeyStroke.getKeyStroke("control DIVIDE"));
+            setAccelerator(KeyStroke.getKeyStroke("control D"));
         }
 
         @Override
@@ -532,7 +532,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         public AdjustTableColumnsAction() {
             super(Translator.toLocale(TranslateCode.SETTINGS_ADJUST_COLUMNS));
             setId("adjustTableColumns");
-            setAccelerator(KeyStroke.getKeyStroke("control ADD"));
+            setAccelerator(KeyStroke.getKeyStroke("control T"));
         }
 
         @Override
@@ -546,7 +546,6 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         public AdjustSelectedTableColumnAction() {
             super(Translator.toLocale(TranslateCode.SETTINGS_ADJUST_SELECTED_COLUMN));
             setId("adjustSelectedTableColumn");
-            setAccelerator(KeyStroke.getKeyStroke("control shift ADD"));
         }
 
         @Override
@@ -566,7 +565,7 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         public RestoreTableColumnsAction() {
             super(Translator.toLocale(TranslateCode.SETTINGS_RESTORE_COLUMNS));
             setId("restoreTableColumns");
-            setAccelerator(KeyStroke.getKeyStroke("control SUBTRACT"));
+            setAccelerator(KeyStroke.getKeyStroke("control R"));
         }
 
         @Override
@@ -580,7 +579,6 @@ public class TableColumnAdjuster implements PropertyChangeListener, TableModelLi
         public RestoreSelectedTableColumnAction() {
             super(Translator.toLocale(TranslateCode.SETTINGS_RESTORE_SELECTED_COLUMN));
             setId("restoreSelectedTableColumn");
-            setAccelerator(KeyStroke.getKeyStroke("control shift SUBTRACT"));
         }
 
         @Override
