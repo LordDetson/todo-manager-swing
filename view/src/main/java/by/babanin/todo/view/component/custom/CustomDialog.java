@@ -7,7 +7,7 @@ import java.awt.Window;
 
 import javax.swing.JDialog;
 
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.ext.component.util.GUIUtils;
 
 public class CustomDialog extends JDialog {
 

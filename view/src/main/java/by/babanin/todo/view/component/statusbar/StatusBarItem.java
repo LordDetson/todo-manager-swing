@@ -9,7 +9,7 @@ import javax.swing.Icon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.ext.component.util.GUIUtils;
 
 public class StatusBarItem extends JPanel {
 

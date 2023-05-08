@@ -4,8 +4,8 @@ import javax.swing.JComponent;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 
+import by.babanin.ext.component.util.GUIUtils;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.util.GUIUtils;
 
 public class TextAreaFormRow extends FormRow<String> {
 

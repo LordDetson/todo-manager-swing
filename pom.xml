@@ -61,7 +61,6 @@
         <module>view</module>
         <module>font-plugin</module>
         <module>image-plugin</module>
-        <module>preferences-plugin</module>
     </modules>
 
     <properties>

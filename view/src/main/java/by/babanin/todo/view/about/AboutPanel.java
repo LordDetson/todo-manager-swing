@@ -11,13 +11,13 @@ import javax.swing.JPanel;
 import com.formdev.flatlaf.extras.components.FlatLabel;
 import com.formdev.flatlaf.extras.components.FlatLabel.LabelType;
 
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.image.IconResources;
 import by.babanin.todo.view.about.AboutInfo.Contributor;
 import by.babanin.todo.view.about.AboutInfo.Developer;
 import by.babanin.todo.view.component.ImagePanel;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class AboutPanel extends JPanel {
 
@@ -84,7 +84,7 @@ public class AboutPanel extends JPanel {
 
         FlatLabel aboutDevelopers = new FlatLabel();
         aboutDevelopers.setLabelType(LabelType.h3);
-        aboutDevelopers.setText(Translator.toLocale(TranslateCode.ABOUT_DEVELOPERS));
+        aboutDevelopers.setText(Translator.toLocale(AppTranslateCode.ABOUT_DEVELOPERS));
         add(aboutDevelopers, c);
 
         int keepedGridwidth = c.gridwidth;
@@ -157,7 +157,7 @@ public class AboutPanel extends JPanel {
 
         FlatLabel aboutContributors = new FlatLabel();
         aboutContributors.setLabelType(LabelType.h3);
-        aboutContributors.setText(Translator.toLocale(TranslateCode.ABOUT_CONTRIBUTORS));
+        aboutContributors.setText(Translator.toLocale(AppTranslateCode.ABOUT_CONTRIBUTORS));
         add(aboutContributors, c);
 
         int keepedGridwidth = c.gridwidth;

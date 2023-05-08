@@ -7,8 +7,8 @@ import javax.swing.JTabbedPane;
 import javax.swing.JTable;
 import javax.swing.table.DefaultTableModel;
 
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.ext.message.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class CombinedLogPanel extends JTabbedPane {
     private final transient CombinedLogger combinedLogger;
@@ -23,7 +23,7 @@ public class CombinedLogPanel extends JTabbedPane {
                 .flatMap(logger -> logger.getMessages(type).stream())
                 .toList();
         DefaultTableModel model = new DefaultTableModel();
-        model.addColumn(Translator.toLocale(TranslateCode.MESSAGES), messages.toArray());
+        model.addColumn(Translator.toLocale(AppTranslateCode.MESSAGES), messages.toArray());
 
         int count = combinedLogger.getMessageCount(type);
         addTab(type.getCaption() + " (" + count + ")", type.getIcon(), new JScrollPane(new JTable(model)));

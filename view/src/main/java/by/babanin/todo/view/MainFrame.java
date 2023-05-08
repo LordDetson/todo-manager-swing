@@ -12,12 +12,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.preferences.PreferenceAware;
-import by.babanin.todo.preferences.PreferencesGroup;
-import by.babanin.todo.view.preference.DimensionPreference;
-import by.babanin.todo.view.preference.IntegerPreference;
-import by.babanin.todo.view.preference.PointPreference;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.preference.DimensionPreference;
+import by.babanin.ext.preference.IntegerPreference;
+import by.babanin.ext.preference.PointPreference;
+import by.babanin.ext.preference.PreferenceAware;
+import by.babanin.ext.preference.PreferencesGroup;
 
 @Component
 public class MainFrame extends JFrame implements PreferenceAware<PreferencesGroup> {
@@ -64,15 +64,15 @@ public class MainFrame extends JFrame implements PreferenceAware<PreferencesGrou
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
-        preferencesGroup.get(MAIN_FRAME_SIZE_KEY)
+        preferencesGroup.getOpt(MAIN_FRAME_SIZE_KEY)
                         .ifPresentOrElse(preference -> setSize(((DimensionPreference) preference).getDimension()),
                                 () -> setSize(GUIUtils.getLargeFrameSize()));
-        preferencesGroup.get(MAIN_FRAME_EXTENDED_STATE_KEY)
+        preferencesGroup.getOpt(MAIN_FRAME_EXTENDED_STATE_KEY)
                 .ifPresent(preference -> setExtendedState(((IntegerPreference) preference).getValue()));
-        preferencesGroup.get(MAIN_FRAME_LOCATION_KEY)
+        preferencesGroup.getOpt(MAIN_FRAME_LOCATION_KEY)
                 .ifPresentOrElse(preference -> setLocation(((PointPreference) preference).getPoint()),
                         () -> setLocationRelativeTo(null));
-        preferencesGroup.get(TO_DO_PANEL_KEY)
+        preferencesGroup.getOpt(TO_DO_PANEL_KEY)
                 .ifPresent(preference -> todoPanel.apply((PreferencesGroup) preference));
     }
 

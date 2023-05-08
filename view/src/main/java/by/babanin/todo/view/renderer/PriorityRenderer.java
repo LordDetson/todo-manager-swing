@@ -2,9 +2,9 @@ package by.babanin.todo.view.renderer;
 
 import javax.swing.table.DefaultTableCellRenderer;
 
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.model.Priority;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class PriorityRenderer extends DefaultTableCellRenderer {
 
@@ -14,7 +14,7 @@ public class PriorityRenderer extends DefaultTableCellRenderer {
             setText(priority.getName());
         }
         else if(value == null) {
-            setText(Translator.toLocale(TranslateCode.PRIORITY_UNPRIORITIZED));
+            setText(Translator.toLocale(AppTranslateCode.PRIORITY_UNPRIORITIZED));
         }
         else {
             super.setValue(value);

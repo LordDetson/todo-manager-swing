@@ -7,8 +7,8 @@ import javax.swing.JTextField;
 
 import org.apache.commons.lang3.StringUtils;
 
+import by.babanin.ext.component.util.GUIUtils;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.util.GUIUtils;
 
 public class TextFormRow extends FormRow<String> {
 

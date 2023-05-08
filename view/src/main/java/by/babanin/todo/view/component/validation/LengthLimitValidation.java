@@ -2,10 +2,10 @@ package by.babanin.todo.view.component.validation;
 
 import org.apache.commons.lang3.StringUtils;
 
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.view.component.logger.LogMessageType;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class LengthLimitValidation implements Validator {
 
@@ -35,7 +35,7 @@ public class LengthLimitValidation implements Validator {
         if(newValue != null) {
             if(newValue instanceof String name) {
                 if(name.length() > maxLength) {
-                    String lengthLimitMessage = Translator.toLocale(TranslateCode.LENGTH_LIMIT).formatted(fieldCaption, maxLength);
+                    String lengthLimitMessage = Translator.toLocale(AppTranslateCode.LENGTH_LIMIT).formatted(fieldCaption, maxLength);
                     result.put(LogMessageType.ERROR, lengthLimitMessage);
                 }
             }

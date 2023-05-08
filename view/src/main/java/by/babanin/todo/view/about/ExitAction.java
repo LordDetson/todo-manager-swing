@@ -7,16 +7,16 @@ import javax.swing.Icon;
 
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.view.component.action.Action;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.ext.component.action.Action;
+import by.babanin.ext.message.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 @Component
 public class ExitAction extends Action {
 
     public ExitAction(Icon exitIcon) {
         setId("exit");
-        setName(Translator.toLocale(TranslateCode.MAIN_MENU_EXIT));
+        setName(Translator.toLocale(AppTranslateCode.MAIN_MENU_EXIT));
         setSmallIcon(exitIcon);
         setLargeIcon(exitIcon);
         setMnemonic(KeyEvent.VK_X);

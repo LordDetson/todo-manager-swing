@@ -9,11 +9,12 @@ import java.util.concurrent.ExecutionException;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
+import by.babanin.ext.component.IndeterminateProgressModalDialog;
+import by.babanin.ext.component.util.GUIUtils;
 import by.babanin.todo.task.exception.TaskException;
 import by.babanin.todo.task.listener.ExceptionListener;
 import by.babanin.todo.task.listener.FinishListener;
 import by.babanin.todo.task.listener.StartListener;
-import by.babanin.todo.view.progress.IndeterminateProgressModalDialog;
 
 public abstract class AbstractTask<R> extends SwingWorker<R, Void> implements Task<R> {
 
@@ -22,7 +23,7 @@ public abstract class AbstractTask<R> extends SwingWorker<R, Void> implements Ta
     private final List<StartListener> startListeners = new ArrayList<>();
     private final List<FinishListener<R>> finishListeners = new ArrayList<>();
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
-    private final IndeterminateProgressModalDialog progressDialog = new IndeterminateProgressModalDialog();
+    private final IndeterminateProgressModalDialog progressDialog = new IndeterminateProgressModalDialog(GUIUtils.getMainWindow());
     private String name;
 
     protected AbstractTask() {

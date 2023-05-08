@@ -40,8 +40,8 @@
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
-            <groupId>by.babanin.todo</groupId>
-            <artifactId>preferences-plugin</artifactId>
+            <groupId>by.babanin.ext</groupId>
+            <artifactId>extra-swing-components</artifactId>
             <version>1.0-SNAPSHOT</version>
         </dependency>
         <dependency>

@@ -7,7 +7,7 @@ import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.translat.AppTranslator;
 
 public class TodoValidatorFactory implements ValidatorFactory {
 
@@ -20,7 +20,7 @@ public class TodoValidatorFactory implements ValidatorFactory {
         ComponentRepresentation<Todo> representation = ComponentRepresentation.get(Todo.class);
         if(representation.getFields().contains(field)) {
             String fieldName = field.getName();
-            String fieldCaption = Translator.getFieldCaption(field);
+            String fieldCaption = AppTranslator.getFieldCaption(field);
             if(field.isMandatory()) {
                 validators.add(new MandatoryValueValidator(fieldCaption));
             }

@@ -1,6 +1,6 @@
 package by.babanin.todo.view.component;
 
-import static by.babanin.todo.view.translat.TranslateCode.*;
+import static by.babanin.todo.view.translat.AppTranslateCode.*;
 
 import java.awt.Color;
 import java.awt.event.ActionEvent;
@@ -21,12 +21,12 @@ import javax.swing.UIManager;
 import com.formdev.flatlaf.extras.FlatSVGIcon;
 import com.formdev.flatlaf.extras.FlatSVGIcon.ColorFilter;
 
+import by.babanin.ext.component.action.Action;
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.image.IconResources;
-import by.babanin.todo.view.component.action.Action;
 import by.babanin.todo.view.component.validation.ValidatorFactory;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.todo.view.util.AppUtils;
 
 public class CrudStyle implements Serializable {
 
@@ -215,7 +215,7 @@ public class CrudStyle implements Serializable {
                         .id(id)
                         .name(getCreateButtonToolTip())
                         .toolTip(getCreateButtonToolTip())
-                        .smallIcon(getCreateButtonIcon(GUIUtils.DEFAULT_MENU_ICON_SIZE))
+                        .smallIcon(getCreateButtonIcon(AppUtils.DEFAULT_MENU_ICON_SIZE))
                         .largeIcon(getCreateButtonIcon(iconSize))
                         .accelerator(KeyStroke.getKeyStroke("control SPACE"))
                         .action(getActionImpl(id))
@@ -232,7 +232,7 @@ public class CrudStyle implements Serializable {
                         .id(id)
                         .name(getEditButtonToolTip())
                         .toolTip(getEditButtonToolTip())
-                        .smallIcon(getEditButtonIcon(GUIUtils.DEFAULT_MENU_ICON_SIZE))
+                        .smallIcon(getEditButtonIcon(AppUtils.DEFAULT_MENU_ICON_SIZE))
                         .largeIcon(getEditButtonIcon(iconSize))
                         .accelerator(KeyStroke.getKeyStroke("control E"))
                         .action(getActionImpl(id))
@@ -249,7 +249,7 @@ public class CrudStyle implements Serializable {
                         .id(id)
                         .name(getDeleteButtonToolTip())
                         .toolTip(getDeleteButtonToolTip())
-                        .smallIcon(getDeleteButtonIcon(GUIUtils.DEFAULT_MENU_ICON_SIZE))
+                        .smallIcon(getDeleteButtonIcon(AppUtils.DEFAULT_MENU_ICON_SIZE))
                         .largeIcon(getDeleteButtonIcon(iconSize))
                         .accelerator(KeyStroke.getKeyStroke("DELETE"))
                         .action(getActionImpl(id))
@@ -266,7 +266,7 @@ public class CrudStyle implements Serializable {
                         .id(id)
                         .name(getMoveUpButtonToolTip())
                         .toolTip(getMoveUpButtonToolTip())
-                        .smallIcon(getMoveUpButtonIcon(GUIUtils.DEFAULT_MENU_ICON_SIZE))
+                        .smallIcon(getMoveUpButtonIcon(AppUtils.DEFAULT_MENU_ICON_SIZE))
                         .largeIcon(getMoveUpButtonIcon(iconSize))
                         .accelerator(KeyStroke.getKeyStroke("control UP"))
                         .action(getActionImpl(id))
@@ -283,7 +283,7 @@ public class CrudStyle implements Serializable {
                         .id(id)
                         .name(getMoveDownButtonToolTip())
                         .toolTip(getMoveDownButtonToolTip())
-                        .smallIcon(getMoveDownButtonIcon(GUIUtils.DEFAULT_MENU_ICON_SIZE))
+                        .smallIcon(getMoveDownButtonIcon(AppUtils.DEFAULT_MENU_ICON_SIZE))
                         .largeIcon(getMoveDownButtonIcon(iconSize))
                         .accelerator(KeyStroke.getKeyStroke("control DOWN"))
                         .action(getActionImpl(id))

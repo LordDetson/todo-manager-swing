@@ -10,9 +10,9 @@ import java.util.Map.Entry;
 import java.util.Optional;
 import java.util.Set;
 
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.message.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class Logger {
 
@@ -71,7 +71,7 @@ public class Logger {
 
         if(moreLinesIgnored.contains(type)) {
             result = new ArrayList<>(result);
-            result.add(Translator.toLocale(TranslateCode.LOG_LINES_IGNORED).formatted(getMessageCount(type)));
+            result.add(Translator.toLocale(AppTranslateCode.LOG_LINES_IGNORED).formatted(getMessageCount(type)));
             return result;
         }
         else {

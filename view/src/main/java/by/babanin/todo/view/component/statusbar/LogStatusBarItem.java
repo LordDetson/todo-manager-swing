@@ -19,16 +19,16 @@ import javax.swing.JDialog;
 import javax.swing.JRootPane;
 import javax.swing.KeyStroke;
 
-import by.babanin.todo.view.component.action.Action;
+import by.babanin.ext.component.action.Action;
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.view.component.logger.CombinedLogPanel;
 import by.babanin.todo.view.component.logger.CombinedLogger;
 import by.babanin.todo.view.component.logger.LogMessageType;
 import by.babanin.todo.view.component.logger.LogUpdateListener;
 import by.babanin.todo.view.component.logger.Logger;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class LogStatusBarItem extends StatusBarItem {
 
@@ -52,7 +52,7 @@ public class LogStatusBarItem extends StatusBarItem {
                     Window window = GUIUtils.getWindowOwner((Component) actionEvent.getSource());
                     JDialog dialog = new JDialog(window, ModalityType.APPLICATION_MODAL);
                     dialog.setContentPane(new CombinedLogPanel(combinedLogger));
-                    dialog.setTitle(Translator.toLocale(TranslateCode.LOG_MESSAGES));
+                    dialog.setTitle(Translator.toLocale(AppTranslateCode.LOG_MESSAGES));
                     Dimension smallFrameSize = GUIUtils.getSmallFrameSize();
                     dialog.setMinimumSize(smallFrameSize);
                     dialog.setSize(smallFrameSize);
@@ -150,7 +150,7 @@ public class LogStatusBarItem extends StatusBarItem {
                 setText(message);
             }
             else {
-                setText(Translator.toLocale(TranslateCode.ERROR_AND_X_MORE_CLICK).formatted(message, count - 1));
+                setText(Translator.toLocale(AppTranslateCode.ERROR_AND_X_MORE_CLICK).formatted(message, count - 1));
             }
             showLogAction.setEnabled(true);
         }

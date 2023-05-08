@@ -4,10 +4,6 @@ import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.Frame;
 import java.awt.Rectangle;
-import java.awt.Window;
-import java.awt.event.HierarchyEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -16,6 +12,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 import javax.swing.AbstractButton;
 import javax.swing.JButton;
@@ -26,10 +23,21 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JToolBar;
 
+import by.babanin.ext.component.action.BindingAction;
+import by.babanin.ext.component.table.adjustment.TableColumnAdjuster;
+import by.babanin.ext.component.table.adjustment.TableColumnAdjustment;
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.message.Translator;
+import by.babanin.ext.preference.BooleanPreference;
+import by.babanin.ext.preference.PreferenceAware;
+import by.babanin.ext.preference.PreferencesGroup;
+import by.babanin.ext.preference.StringsPreference;
+import by.babanin.ext.preference.TableColumnAdjustmentPreference;
+import by.babanin.ext.preference.TableColumnsPreference;
+import by.babanin.ext.settings.SettingsSubscriber;
+import by.babanin.ext.settings.SettingsUpdateEvent;
 import by.babanin.todo.application.service.CrudService;
 import by.babanin.todo.model.Persistent;
-import by.babanin.todo.preferences.PreferenceAware;
-import by.babanin.todo.preferences.PreferencesGroup;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.DeleteTask;
@@ -37,27 +45,15 @@ import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.Task;
 import by.babanin.todo.task.listener.ExceptionListener;
 import by.babanin.todo.task.listener.FinishListener;
-import by.babanin.todo.view.component.action.BindingAction;
 import by.babanin.todo.view.component.form.ComponentForm;
 import by.babanin.todo.view.component.form.FormDialog;
 import by.babanin.todo.view.component.form.FormRowFactory;
-import by.babanin.todo.view.component.table.adjustment.TableColumnAdjuster;
-import by.babanin.todo.view.component.table.adjustment.TableColumnAdjustment;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.preference.BooleanPreference;
-import by.babanin.todo.view.preference.StringsPreference;
-import by.babanin.todo.view.preference.TableColumnAdjustmentPreference;
-import by.babanin.todo.view.preference.TableColumnsPreference;
-import by.babanin.todo.view.settings.Settings;
-import by.babanin.todo.view.settings.SettingsObserver;
-import by.babanin.todo.view.settings.SettingsObserversDelegator;
-import by.babanin.todo.view.settings.SettingsUpdateEvent;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.todo.view.translat.AppTranslateCode;
+import by.babanin.todo.view.translat.AppTranslator;
 
 public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
-        implements PreferenceAware<PreferencesGroup>, SettingsObserver {
+        implements PreferenceAware<PreferencesGroup>, SettingsSubscriber {
 
     private static final String TABLE_COLUMN_ADJUSTMENT_KEY = "tableColumnAdjustment";
     private static final String TABLE_COLUMNS_PREFERENCE_KEY = "tableColumnsPreference";
@@ -67,11 +63,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     private final Map<CrudAction, List<FinishListener<?>>> crudListenersMap = new EnumMap<>(CrudAction.class);
     private final List<ExceptionListener> exceptionListeners = new ArrayList<>();
     private final Set<String> defaultColumnIdsToFit = new HashSet<>();
+    private final AtomicBoolean loaded = new AtomicBoolean();
 
     private final transient CrudService<C, I> service;
     private final transient ComponentRepresentation<C> representation;
     private final transient FormRowFactory formRowFactory;
-    private final Settings settings;
     private final CrudStyle crudStyle;
 
     private JToolBar toolBar;
@@ -80,12 +76,12 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     private CustomTableColumnModel columnModel;
     private JTable table;
     private TableColumnAdjuster tableColumnAdjuster;
+    private PreferencesGroup preferencesGroupToApplyAfterLoaded;
 
-    protected CrudTablePanel(CrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, Settings settings, CrudStyle crudStyle) {
+    protected CrudTablePanel(CrudService<C, I> service, Class<C> componentClass, FormRowFactory formRowFactory, CrudStyle crudStyle) {
         this.service = service;
         this.representation = ComponentRepresentation.get(componentClass);
         this.formRowFactory = formRowFactory;
-        this.settings = settings;
         this.crudStyle = crudStyle;
 
         createUiComponents();
@@ -104,7 +100,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         model = createTableModel(representation, reportFields);
         columnModel = createColumnModel(reportFields);
         table = new JTable();
-        tableColumnAdjuster = new TableColumnAdjuster(table, settings.getTableColumnAdjustment());
+        tableColumnAdjuster = new TableColumnAdjuster(table);
 
         crudStyle.setActionFactory(() -> new BindingAction(table));
         crudStyle.setShowCreationDialogActionImpl(event -> showCreationDialog());
@@ -161,8 +157,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     }
 
     private void addCrudListener(CrudAction crudAction, FinishListener<?> listener) {
-        crudListenersMap.computeIfAbsent(crudAction, action -> new ArrayList<>());
-        crudListenersMap.get(crudAction).add(listener);
+        crudListenersMap.computeIfAbsent(crudAction, action -> new ArrayList<>())
+                        .add(listener);
     }
 
     public void addExceptionListener(ExceptionListener exceptionListener) {
@@ -177,6 +173,11 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     protected void handleLoad(List<C> result) {
         model.addAll(result);
         selectFirstRow();
+        loaded.set(true);
+        if(preferencesGroupToApplyAfterLoaded != null) {
+            apply(preferencesGroupToApplyAfterLoaded);
+            preferencesGroupToApplyAfterLoaded = null;
+        }
     }
 
     protected void handleEdit(C result) {
@@ -240,6 +241,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     public void clear() {
         table.clearSelection();
         model.clear();
+        loaded.set(false);
     }
 
     public void reload() {
@@ -250,7 +252,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     private void showCreationDialog() {
         ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle);
         form.addApplyListener(this::runCreationTask);
-        FormDialog<C> formDialog = new FormDialog<>(this, form, TranslateCode.CREATION_DIALOG_TITLE);
+        FormDialog<C> formDialog = new FormDialog<>(this, form, AppTranslateCode.CREATION_DIALOG_TITLE);
         formDialog.setName(form.getComponentRepresentation().getComponentClass().getSimpleName() + "CreationFormDialog");
         GUIUtils.addPreferenceSupport(formDialog);
         formDialog.setVisible(true);
@@ -275,7 +277,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
                 .orElseThrow(() -> new ViewException("Can't open edit dialog because component is not selected"));
         ComponentForm<C> form = new ComponentForm<>(representation.getComponentClass(), formRowFactory, crudStyle, selectedComponent);
         form.addApplyListener(fieldValueMap -> runUpdateTask(fieldValueMap, selectedComponent));
-        FormDialog<C> formDialog = new FormDialog<>(this, form, TranslateCode.EDIT_DIALOG_TITLE);
+        FormDialog<C> formDialog = new FormDialog<>(this, form, AppTranslateCode.EDIT_DIALOG_TITLE);
         formDialog.setName(form.getComponentRepresentation().getComponentClass().getSimpleName() + "EditFormDialog");
         GUIUtils.addPreferenceSupport(formDialog);
         formDialog.setVisible(true);
@@ -298,10 +300,10 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     @SuppressWarnings("unchecked")
     private void showDeleteConfirmDialog() {
         Frame frame = JOptionPane.getFrameForComponent(CrudTablePanel.this);
-        String componentPluralCaption = Translator.getComponentPluralCaption(representation.getComponentClass());
+        String componentPluralCaption = AppTranslator.getComponentPluralCaption(representation.getComponentClass());
         int result = JOptionPane.showConfirmDialog(frame,
-                Translator.toLocale(TranslateCode.DELETION_CONFIRM_MESSAGE).formatted(componentPluralCaption.toLowerCase()),
-                Translator.toLocale(TranslateCode.DELETE_DIALOG_TITLE).formatted(componentPluralCaption),
+                Translator.toLocale(AppTranslateCode.DELETION_CONFIRM_MESSAGE).formatted(componentPluralCaption.toLowerCase()),
+                Translator.toLocale(AppTranslateCode.DELETE_DIALOG_TITLE).formatted(componentPluralCaption),
                 JOptionPane.YES_NO_OPTION);
         if(result == JOptionPane.YES_OPTION) {
             List<C> selectedComponents = getSelectedComponents();
@@ -370,29 +372,42 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
-        preferencesGroup.get(USE_GLOBAL_PREFERENCE_KEY)
-                        .ifPresent(preference -> tableColumnAdjuster.setUseGlobal(((BooleanPreference) preference).isValue()));
-        preferencesGroup.get(COLUMN_IDS_TO_FIT_PREFERENCE_KEY)
-                        .ifPresent(preference -> {
-                            Set<String> columnIdsToFit = tableColumnAdjuster.getColumnIdsToFit();
-                            columnIdsToFit.clear();
-                            columnIdsToFit.addAll(((StringsPreference) preference).getValues());
-                        });
-        preferencesGroup.get(TABLE_COLUMN_ADJUSTMENT_KEY)
-                .ifPresentOrElse(
-                        preference -> {
-                            tableColumnAdjuster.setAdjustment(((TableColumnAdjustmentPreference) preference).getTableColumnAdjustment());
-                            tableColumnAdjuster.adjustColumns();
-                        },
-                        () -> tableColumnAdjuster.adjustColumns());
-        preferencesGroup.get(TABLE_COLUMNS_PREFERENCE_KEY)
-                .ifPresent(preference -> ((TableColumnsPreference) preference).apply(columnModel));
+        if(loaded.get()) {
+            preferencesGroup.getOpt(USE_GLOBAL_PREFERENCE_KEY)
+                    .ifPresent(preference -> {
+                        if(((BooleanPreference) preference).isValue()) {
+                            tableColumnAdjuster.enableGlobal();
+                        }
+                        else {
+                            tableColumnAdjuster.disableGlobal();
+                        }
+                    });
+            preferencesGroup.getOpt(COLUMN_IDS_TO_FIT_PREFERENCE_KEY)
+                    .ifPresent(preference -> {
+                        Set<String> columnIdsToFit = tableColumnAdjuster.getColumnIdsToFit();
+                        columnIdsToFit.clear();
+                        columnIdsToFit.addAll(((StringsPreference) preference).getValues());
+                    });
+            preferencesGroup.getOpt(TABLE_COLUMN_ADJUSTMENT_KEY)
+                    .ifPresentOrElse(
+                            preference -> {
+                                tableColumnAdjuster.setAdjustment(
+                                        ((TableColumnAdjustmentPreference) preference).getTableColumnAdjustment());
+                                tableColumnAdjuster.adjustColumns();
+                            },
+                            () -> tableColumnAdjuster.adjustColumns());
+            preferencesGroup.getOpt(TABLE_COLUMNS_PREFERENCE_KEY)
+                    .ifPresent(preference -> ((TableColumnsPreference) preference).apply(columnModel));
+        }
+        else {
+            this.preferencesGroupToApplyAfterLoaded = preferencesGroup;
+        }
     }
 
     @Override
     public PreferencesGroup createCurrentPreference() {
         BooleanPreference useGlobalPreference = new BooleanPreference();
-        useGlobalPreference.setValue(tableColumnAdjuster.isUseGlobal());
+        useGlobalPreference.setValue(tableColumnAdjuster.isGlobalEnabled());
         TableColumnAdjustmentPreference tableColumnAdjustmentPreference = new TableColumnAdjustmentPreference();
         tableColumnAdjustmentPreference.setTableColumnAdjustment(tableColumnAdjuster.getAdjustment());
         TableColumnsPreference tableColumnsPreference = new TableColumnsPreference();
@@ -401,7 +416,7 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
         columnIdsToFitPreference.getValues().addAll(tableColumnAdjuster.getColumnIdsToFit());
         PreferencesGroup preferencesGroup = new PreferencesGroup();
         preferencesGroup.put(USE_GLOBAL_PREFERENCE_KEY, useGlobalPreference);
-        if(!tableColumnAdjuster.isUseGlobal()) {
+        if(!tableColumnAdjuster.isGlobalEnabled()) {
             preferencesGroup.put(TABLE_COLUMN_ADJUSTMENT_KEY, tableColumnAdjustmentPreference);
         }
         preferencesGroup.put(TABLE_COLUMNS_PREFERENCE_KEY, tableColumnsPreference);
@@ -427,29 +442,8 @@ public abstract class CrudTablePanel<C extends Persistent<I>, I> extends JPanel
     }
 
     @Override
-    public void register(SettingsObserversDelegator delegator) {
-        delegator.add(this);
-        addHierarchyListener(e -> {
-            if(e.getChangeFlags() == HierarchyEvent.SHOWING_CHANGED && e.getChanged() instanceof Window window) {
-                window.addWindowListener(new WindowAdapter() {
-
-                    @Override
-                    public void windowClosing(WindowEvent e) {
-                        delegator.remove(CrudTablePanel.this);
-                    }
-
-                    @Override
-                    public void windowClosed(WindowEvent e) {
-                        delegator.remove(CrudTablePanel.this);
-                    }
-                });
-            }
-        });
-    }
-
-    @Override
     public void handleSettingsUpdateEvent(SettingsUpdateEvent event) {
-        if(tableColumnAdjuster.isUseGlobal() && event.getSource() instanceof TableColumnAdjustment) {
+        if(tableColumnAdjuster.isGlobalEnabled() && event.getSetting() instanceof TableColumnAdjustment) {
             tableColumnAdjuster.adjustColumns();
         }
     }

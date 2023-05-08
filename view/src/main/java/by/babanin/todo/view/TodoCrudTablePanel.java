@@ -12,6 +12,10 @@ import javax.swing.KeyStroke;
 import org.springframework.beans.factory.annotation.Lookup;
 import org.springframework.stereotype.Component;
 
+import by.babanin.ext.component.action.Action;
+import by.babanin.ext.component.action.BindingAction;
+import by.babanin.ext.component.table.renderer.LocalDataRenderer;
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.application.service.TodoService;
 import by.babanin.todo.application.status.StatusWorkflow;
@@ -28,25 +32,20 @@ import by.babanin.todo.view.component.CustomTableColumnModel;
 import by.babanin.todo.view.component.IndexableTableModel;
 import by.babanin.todo.view.component.MovableCrudTablePanel;
 import by.babanin.todo.view.component.TableModel;
-import by.babanin.todo.view.component.action.Action;
-import by.babanin.todo.view.component.action.BindingAction;
 import by.babanin.todo.view.component.form.TodoFormRowFactory;
 import by.babanin.todo.view.component.validation.TodoValidatorFactory;
-import by.babanin.todo.view.renderer.LocalDataRenderer;
 import by.babanin.todo.view.renderer.PriorityRenderer;
 import by.babanin.todo.view.renderer.StatusRenderer;
-import by.babanin.todo.view.settings.Settings;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.todo.view.translat.AppTranslateCode;
+import by.babanin.todo.view.util.AppUtils;
 
 @Component
 public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Long> {
 
     private Action showPrioritiesDialogAction;
 
-    protected TodoCrudTablePanel(TodoService todoService, PriorityService priorityService, Settings settings) {
-        super(todoService, Todo.class, new TodoFormRowFactory(priorityService), settings, new CrudStyle()
+    protected TodoCrudTablePanel(TodoService todoService, PriorityService priorityService) {
+        super(todoService, Todo.class, new TodoFormRowFactory(priorityService), new CrudStyle()
                 .setValidatorFactory(new TodoValidatorFactory())
                 .excludeFieldFromCreationForm(Fields.creationDate, Fields.completionDate, Fields.status)
                 .excludeFieldFromEditForm(Fields.creationDate, Fields.completionDate, Fields.plannedDate)
@@ -60,9 +59,9 @@ public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<Todo, Lon
         CrudStyle crudStyle = getCrudStyle();
         showPrioritiesDialogAction = Action.builder(() -> new BindingAction(getTable()))
                 .id("showPrioritiesDialog")
-                .name(Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES))
-                .toolTip(Translator.toLocale(TranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES))
-                .smallIcon(crudStyle.getIcon("priority_list", GUIUtils.DEFAULT_MENU_ICON_SIZE))
+                .name(Translator.toLocale(AppTranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES))
+                .toolTip(Translator.toLocale(AppTranslateCode.TOOLTIP_BUTTON_SHOW_PRIORITIES))
+                .smallIcon(crudStyle.getIcon("priority_list", AppUtils.DEFAULT_MENU_ICON_SIZE))
                 .largeIcon(crudStyle.getIcon("priority_list", crudStyle.getIconSize()))
                 .accelerator(KeyStroke.getKeyStroke("control P"))
                 .action(actionEvent -> showPriorityDialog())

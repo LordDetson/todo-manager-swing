@@ -4,10 +4,10 @@ import java.util.List;
 
 import org.apache.commons.lang3.StringUtils;
 
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.view.component.logger.LogMessageType;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class ForbiddenSymbolsValidator implements Validator {
 
@@ -31,7 +31,7 @@ public class ForbiddenSymbolsValidator implements Validator {
         if(newValue != null) {
             if(newValue instanceof String name) {
                 if(containsForbiddenSymbol(name)) {
-                    String forbiddenSymbolsMessage = Translator.toLocale(TranslateCode.FORBIDDEN_SYMBOLS)
+                    String forbiddenSymbolsMessage = Translator.toLocale(AppTranslateCode.FORBIDDEN_SYMBOLS)
                             .formatted(fieldCaption, forbiddenSymbols);
                     result.put(LogMessageType.ERROR, forbiddenSymbolsMessage);
                 }

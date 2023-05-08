@@ -2,10 +2,10 @@ package by.babanin.todo.view.component.validation;
 
 import org.apache.commons.lang3.CharUtils;
 
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.view.component.logger.LogMessageType;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public class AsciiAndRussianValidator implements Validator {
 
@@ -21,7 +21,7 @@ public class AsciiAndRussianValidator implements Validator {
         if(newValue != null) {
             if(newValue instanceof String str) {
                 if(!containsAsciiAndRussian(str)) {
-                    String message = Translator.toLocale(TranslateCode.NON_ASCII_PRINTABLE).formatted(fieldCaption);
+                    String message = Translator.toLocale(AppTranslateCode.NON_ASCII_PRINTABLE).formatted(fieldCaption);
                     result.put(LogMessageType.WARNING, message);
                 }
             }

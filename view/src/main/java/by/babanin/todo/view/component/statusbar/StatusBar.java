@@ -6,8 +6,8 @@ import java.awt.FlowLayout;
 
 import javax.swing.JPanel;
 
+import by.babanin.ext.component.util.GUIUtils;
 import by.babanin.todo.view.exception.ViewException;
-import by.babanin.todo.view.util.GUIUtils;
 
 public class StatusBar extends JPanel {
 

@@ -9,13 +9,13 @@ import javax.swing.JSplitPane;
 
 import org.springframework.stereotype.Component;
 
+import by.babanin.ext.message.Translator;
+import by.babanin.ext.preference.PreferenceAware;
+import by.babanin.ext.preference.PreferencesGroup;
+import by.babanin.ext.preference.SplitPanePreference;
 import by.babanin.todo.model.Todo;
-import by.babanin.todo.preferences.PreferenceAware;
-import by.babanin.todo.preferences.PreferencesGroup;
 import by.babanin.todo.view.component.TextAreaPanel;
-import by.babanin.todo.view.preference.SplitPanePreference;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 @Component
 public final class TodoPanel extends JPanel implements PreferenceAware<PreferencesGroup> {
@@ -63,7 +63,7 @@ public final class TodoPanel extends JPanel implements PreferenceAware<Preferenc
         String text = crudTablePanel.getSelectedComponent()
                 .filter(isSingleSelection())
                 .map(Todo::getDescription)
-                .orElse(Translator.toLocale(TranslateCode.NO_DESCRIPTION_TO_SHOW));
+                .orElse(Translator.toLocale(AppTranslateCode.NO_DESCRIPTION_TO_SHOW));
         descriptionPanel.setText(text);
     }
 
@@ -73,12 +73,10 @@ public final class TodoPanel extends JPanel implements PreferenceAware<Preferenc
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
-        EventQueue.invokeLater(() -> {
-            preferencesGroup.get(SPLIT_PANE_KEY)
-                    .ifPresent(preference -> splitPane.setDividerLocation(((SplitPanePreference) preference).getProportion()));
-            preferencesGroup.get(TODO_CRUD_TABLE_PANEL_KEY)
-                    .ifPresent(preference -> crudTablePanel.apply((PreferencesGroup) preference));
-        });
+        EventQueue.invokeLater(() -> preferencesGroup.getOpt(SPLIT_PANE_KEY)
+                .ifPresent(preference -> splitPane.setDividerLocation(((SplitPanePreference) preference).getProportion())));
+        preferencesGroup.getOpt(TODO_CRUD_TABLE_PANEL_KEY)
+                .ifPresent(preference -> crudTablePanel.apply((PreferencesGroup) preference));
     }
 
     @Override

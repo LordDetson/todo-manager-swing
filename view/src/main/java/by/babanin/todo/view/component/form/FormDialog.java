@@ -6,11 +6,12 @@ import java.awt.Dimension;
 import javax.swing.JDialog;
 import javax.swing.JOptionPane;
 
-import by.babanin.todo.preferences.PreferenceAware;
-import by.babanin.todo.preferences.PreferencesGroup;
-import by.babanin.todo.view.preference.DimensionPreference;
-import by.babanin.todo.view.preference.PointPreference;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.ext.message.Translator;
+import by.babanin.ext.preference.DimensionPreference;
+import by.babanin.ext.preference.PointPreference;
+import by.babanin.ext.preference.PreferenceAware;
+import by.babanin.ext.preference.PreferencesGroup;
+import by.babanin.todo.view.translat.AppTranslator;
 
 public class FormDialog<C> extends JDialog implements PreferenceAware<PreferencesGroup> {
 
@@ -20,7 +21,7 @@ public class FormDialog<C> extends JDialog implements PreferenceAware<Preference
     public FormDialog(Component owner, ComponentForm<C> form, String titleCode) {
         super(JOptionPane.getFrameForComponent(owner), true);
         Class<C> componentClass = form.getComponentRepresentation().getComponentClass();
-        String componentCaption = Translator.getComponentCaption(componentClass);
+        String componentCaption = AppTranslator.getComponentCaption(componentClass);
         setTitle(Translator.toLocale(titleCode).formatted(componentCaption));
         setContentPane(form);
         form.setOwner(this);
@@ -28,13 +29,13 @@ public class FormDialog<C> extends JDialog implements PreferenceAware<Preference
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
-        preferencesGroup.get(SIZE_KEY)
+        preferencesGroup.getOpt(SIZE_KEY)
                 .ifPresentOrElse(preference -> {
                     Dimension size = ((DimensionPreference) preference).getDimension();
                     setMinimumSize(size);
                     setSize(size);
                 }, this::pack);
-        preferencesGroup.get(LOCATION_KEY)
+        preferencesGroup.getOpt(LOCATION_KEY)
                 .ifPresentOrElse(preference -> setLocation(((PointPreference) preference).getPoint()),
                         () -> setLocationRelativeTo(getOwner()));
     }

@@ -4,12 +4,12 @@ import java.time.LocalDate;
 
 import com.github.lgooddatepicker.zinternaltools.DateVetoPolicyMinimumMaximumDate;
 
+import by.babanin.ext.component.datepicker.CustomDatePicker;
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.component.datepicker.CustomDatePicker;
 import by.babanin.todo.view.exception.ViewException;
 
 public class TodoFormRowFactory implements FormRowFactory {

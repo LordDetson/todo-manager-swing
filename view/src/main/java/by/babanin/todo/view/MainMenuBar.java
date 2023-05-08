@@ -9,8 +9,8 @@ import javax.swing.JMenuBar;
 
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.ext.message.Translator;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 @Component
 public class MainMenuBar extends JMenuBar {
@@ -32,16 +32,16 @@ public class MainMenuBar extends JMenuBar {
     }
 
     private void initializeFileMenu() {
-        fileMenu = new JMenu(Translator.toLocale(TranslateCode.MAIN_MENU_FILE));
+        fileMenu = new JMenu(Translator.toLocale(AppTranslateCode.MAIN_MENU_FILE));
         fileMenu.setMnemonic(KeyEvent.VK_F);
 
-        fileMenu.add(actionMap.get("showSettingsAction"));
+        fileMenu.add(actionMap.get("showSettingsDialogAction"));
         fileMenu.addSeparator();
         fileMenu.add(actionMap.get("exitAction"));
     }
 
     private void initializeHelpMenu() {
-        helpMenu = new JMenu(Translator.toLocale(TranslateCode.MAIN_MENU_HELP));
+        helpMenu = new JMenu(Translator.toLocale(AppTranslateCode.MAIN_MENU_HELP));
         helpMenu.setMnemonic(KeyEvent.VK_H);
 
         helpMenu.add(actionMap.get("showAboutAction"));

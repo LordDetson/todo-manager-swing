@@ -5,8 +5,8 @@ import java.time.LocalDate;
 
 import javax.swing.JComponent;
 
+import by.babanin.ext.component.datepicker.CustomDatePicker;
 import by.babanin.todo.representation.ReportField;
-import by.babanin.todo.view.component.datepicker.CustomDatePicker;
 
 public class LocalDateFormRow extends FormRow<LocalDate> {
 

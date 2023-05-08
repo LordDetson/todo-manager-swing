@@ -3,7 +3,7 @@ package by.babanin.todo.view.translat;
 import lombok.experimental.UtilityClass;
 
 @UtilityClass
-public class TranslateCode {
+public class AppTranslateCode {
 
     public static final String PRIORITY_FRAME_TITLE = "priority.frame.title";
     public static final String PRIORITY_UNPRIORITIZED = "priority.unprioritized";

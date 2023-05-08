@@ -10,13 +10,13 @@ import org.springframework.beans.factory.config.ConfigurableBeanFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.preferences.PreferenceAware;
-import by.babanin.todo.preferences.PreferencesGroup;
-import by.babanin.todo.view.preference.DimensionPreference;
-import by.babanin.todo.view.preference.PointPreference;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.message.Translator;
+import by.babanin.ext.preference.DimensionPreference;
+import by.babanin.ext.preference.PointPreference;
+import by.babanin.ext.preference.PreferenceAware;
+import by.babanin.ext.preference.PreferencesGroup;
+import by.babanin.todo.view.translat.AppTranslateCode;
 import jakarta.annotation.PostConstruct;
 
 @Component
@@ -30,7 +30,7 @@ public abstract class PrioritiesDialog extends JDialog implements PreferenceAwar
     protected PrioritiesDialog(java.awt.Component owner) {
         super(JOptionPane.getFrameForComponent(owner), true);
         setName("prioritiesDialog");
-        setTitle(Translator.toLocale(TranslateCode.PRIORITY_FRAME_TITLE));
+        setTitle(Translator.toLocale(AppTranslateCode.PRIORITY_FRAME_TITLE));
         GUIUtils.addCloseActionOnEscape(this, PRIORITIES_DIALOG_CLOSING_ACTION_KEY);
     }
 
@@ -50,16 +50,16 @@ public abstract class PrioritiesDialog extends JDialog implements PreferenceAwar
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
-        preferencesGroup.get(SIZE_KEY)
+        preferencesGroup.getOpt(SIZE_KEY)
                 .ifPresent(preference -> {
                     Dimension size = ((DimensionPreference) preference).getDimension();
                     setMinimumSize(size);
                     setSize(size);
                 });
-        preferencesGroup.get(LOCATION_KEY)
+        preferencesGroup.getOpt(LOCATION_KEY)
                 .ifPresentOrElse(preference -> setLocation(((PointPreference) preference).getPoint()),
                         () -> setLocationRelativeTo(getOwner()));
-        preferencesGroup.get(getContentPane().getKey())
+        preferencesGroup.getOpt(getContentPane().getKey())
                 .ifPresent(preference -> getContentPane().apply((PreferencesGroup) preference));
     }
 

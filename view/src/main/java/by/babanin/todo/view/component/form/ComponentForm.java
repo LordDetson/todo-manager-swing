@@ -19,16 +19,17 @@ import javax.swing.JPanel;
 import javax.swing.SpringLayout;
 import javax.swing.event.ChangeListener;
 
+import by.babanin.ext.component.action.Action;
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.component.util.SpringUtilities;
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.representation.ComponentRepresentation;
 import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.view.component.CrudStyle;
-import by.babanin.todo.view.component.action.Action;
 import by.babanin.todo.view.component.statusbar.LogStatusBarItem;
 import by.babanin.todo.view.component.statusbar.StatusBar;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
-import by.babanin.todo.view.util.SpringUtilities;
+import by.babanin.todo.view.translat.AppTranslateCode;
+import by.babanin.todo.view.translat.AppTranslator;
 
 public class ComponentForm<C> extends JPanel {
 
@@ -82,7 +83,7 @@ public class ComponentForm<C> extends JPanel {
     private Action createApplyAction() {
         return Action.builder()
                 .id("apply")
-                .name(Translator.toLocale(TranslateCode.APPLY_BUTTON_TEXT))
+                .name(Translator.toLocale(AppTranslateCode.APPLY_BUTTON_TEXT))
                 .disable()
                 .action(actionEvent -> {
                     collectValues(values);
@@ -95,7 +96,7 @@ public class ComponentForm<C> extends JPanel {
     private Action createCloseDialogAction() {
         return Action.builder()
                 .id("close")
-                .name(Translator.toLocale(TranslateCode.CANCEL_BUTTON_TEXT))
+                .name(Translator.toLocale(AppTranslateCode.CANCEL_BUTTON_TEXT))
                 .action(actionEvent -> closeDialog())
                 .build();
     }
@@ -113,7 +114,7 @@ public class ComponentForm<C> extends JPanel {
             formRow.addListener(createChangeListener());
             crudStyle.getValidatorFactory()
                     .ifPresent(validatorFactory -> formRow.addValidators(validatorFactory.factor(formRow.getField())));
-            String fieldCaption = Translator.getFieldCaption(formRow.getField());
+            String fieldCaption = AppTranslator.getFieldCaption(formRow.getField());
             statusBarItem.addLogger(formRow.getInputComponent(), fieldCaption, formRow.getLogger());
         });
     }

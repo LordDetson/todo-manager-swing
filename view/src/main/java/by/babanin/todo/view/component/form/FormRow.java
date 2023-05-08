@@ -17,7 +17,7 @@ import by.babanin.todo.view.component.logger.Logger;
 import by.babanin.todo.view.component.validation.ValidationResult;
 import by.babanin.todo.view.component.validation.ValidationTask;
 import by.babanin.todo.view.component.validation.Validator;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.todo.view.translat.AppTranslator;
 
 public abstract class FormRow<T> {
 
@@ -30,7 +30,7 @@ public abstract class FormRow<T> {
 
     protected FormRow(ReportField field) {
         this.field = field;
-        String fieldCaption = Translator.getFieldCaption(field);
+        String fieldCaption = AppTranslator.getFieldCaption(field);
         this.label = new JLabel(field.isMandatory() ? fieldCaption + " *" : fieldCaption);
         addListener(this::applyOutlineProperty);
     }

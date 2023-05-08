@@ -10,11 +10,11 @@ import javax.swing.JDialog;
 
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.view.component.action.Action;
+import by.babanin.ext.component.action.Action;
+import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.view.component.custom.CustomDialog;
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
-import by.babanin.todo.view.util.GUIUtils;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 @Component
 public final class ShowAboutAction extends Action {
@@ -23,7 +23,7 @@ public final class ShowAboutAction extends Action {
     private final Image appLogoImage;
 
     public ShowAboutAction(AboutInfo aboutInfo, Icon aboutActionIcon, Image appLogoImage) {
-        setName(Translator.toLocale(TranslateCode.MAIN_MENU_ABOUT));
+        setName(Translator.toLocale(AppTranslateCode.MAIN_MENU_ABOUT));
         setSmallIcon(aboutActionIcon);
         setLargeIcon(aboutActionIcon);
         setMnemonic(KeyEvent.VK_A);
@@ -33,7 +33,7 @@ public final class ShowAboutAction extends Action {
 
     @Override
     public void actionPerformed(ActionEvent e) {
-        String title = Translator.toLocale(TranslateCode.ABOUT_TITLE).formatted(aboutInfo.getProduct().getNameWithVersion());
+        String title = Translator.toLocale(AppTranslateCode.ABOUT_TITLE).formatted(aboutInfo.getProduct().getNameWithVersion());
         JDialog dialog = new CustomDialog(GUIUtils.getMainWindow(), title, ModalityType.APPLICATION_MODAL);
         dialog.setContentPane(new AboutPanel(aboutInfo));
         dialog.setResizable(false);

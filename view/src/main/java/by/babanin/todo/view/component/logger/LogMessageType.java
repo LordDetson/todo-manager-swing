@@ -2,14 +2,14 @@ package by.babanin.todo.view.component.logger;
 
 import javax.swing.Icon;
 
-import by.babanin.todo.view.translat.TranslateCode;
-import by.babanin.todo.view.translat.Translator;
+import by.babanin.ext.message.Translator;
 import by.babanin.todo.image.IconResources;
+import by.babanin.todo.view.translat.AppTranslateCode;
 
 public enum LogMessageType {
-    ERROR(TranslateCode.ERRORS, "error"),
-    WARNING(TranslateCode.WARNINGS, "warning"),
-    INFORMATION(TranslateCode.INFORMATION, "information"),
+    ERROR(AppTranslateCode.ERRORS, "error"),
+    WARNING(AppTranslateCode.WARNINGS, "warning"),
+    INFORMATION(AppTranslateCode.INFORMATION, "information"),
     ;
 
     public static final int DEFAULT_ICON_SIZE = 16;
