@@ -2,19 +2,23 @@ package by.babanin.todo.task.priority;
 
 import java.util.Map;
 
+import org.modelmapper.ModelMapper;
+
+import by.babanin.ext.representation.Representation;
+import by.babanin.ext.representation.ReportField;
 import by.babanin.todo.application.service.PriorityService;
 import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Priority.Fields;
-import by.babanin.todo.representation.ComponentRepresentation;
-import by.babanin.todo.representation.ReportField;
 import by.babanin.todo.task.SaveTask;
+import by.babanin.todo.ui.dto.PriorityInfo;
 
-public class UpdatePriorityTask extends SaveTask<Priority, Long, PriorityService, Priority> {
-    private final Priority oldPriority;
+public class UpdatePriorityTask extends SaveTask<Priority, Long, PriorityService, PriorityInfo> {
 
-    public UpdatePriorityTask(PriorityService service, ComponentRepresentation<Priority> representation,
-            Map<ReportField, ?> fieldValueMap, Priority oldPriority) {
-        super(service, representation, fieldValueMap);
+    private final PriorityInfo oldPriority;
+
+    public UpdatePriorityTask(PriorityService service, ModelMapper modelMapper, Representation<PriorityInfo> representation,
+            Map<ReportField, ?> fieldValueMap, PriorityInfo oldPriority) {
+        super(service, modelMapper, representation, fieldValueMap);
         this.oldPriority = oldPriority;
     }
 

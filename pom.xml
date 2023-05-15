@@ -69,6 +69,7 @@
         <commons-collections.version>4.4</commons-collections.version>
         <launch4j.version>2.1.2</launch4j.version>
         <macappbundler.version>1.0</macappbundler.version>
+        <modelmapper.varsion>3.1.1</modelmapper.varsion>
     </properties>
 
     <dependencyManagement>
@@ -92,6 +93,11 @@
                 <groupId>org.apache.commons</groupId>
                 <artifactId>commons-collections4</artifactId>
                 <version>${commons-collections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.modelmapper</groupId>
+                <artifactId>modelmapper</artifactId>
+                <version>${modelmapper.varsion}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

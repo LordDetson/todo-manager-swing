@@ -6,7 +6,7 @@ import org.springframework.context.ApplicationListener;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.stereotype.Component;
 
-import by.babanin.todo.view.MainFrame;
+import by.babanin.todo.ui.MainFrame;
 
 @Component
 public class UILauncher implements ApplicationListener<ContextRefreshedEvent> {

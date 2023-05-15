@@ -10,7 +10,7 @@ public class SwapTask<C extends Persistent<I> & Indexable, I, S extends Abstract
     private final long position2;
 
     public SwapTask(S service, long position1, long position2) {
-        super(service);
+        super(service, null, null);
         this.position1 = position1;
         this.position2 = position2;
     }

@@ -6,8 +6,7 @@ import java.awt.event.KeyEvent;
 import java.nio.file.Path;
 import java.util.regex.Matcher;
 
-import javax.swing.Icon;
-
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.beans.factory.config.ConfigurableBeanFactory;
@@ -25,10 +24,12 @@ import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
-import by.babanin.ext.JsonFileExporter;
-import by.babanin.ext.JsonFileImporter;
 import by.babanin.ext.component.action.Action;
 import by.babanin.ext.component.util.GUIUtils;
+import by.babanin.ext.component.util.IconProvider;
+import by.babanin.ext.component.util.IconRegister;
+import by.babanin.ext.export.JsonFileExporter;
+import by.babanin.ext.export.JsonFileImporter;
 import by.babanin.ext.message.TranslateCode;
 import by.babanin.ext.message.Translator;
 import by.babanin.ext.preference.PreferencesGroup;
@@ -45,8 +46,8 @@ import by.babanin.ext.settings.SettingsPublisher;
 import by.babanin.ext.settings.deserialization.SettingsDeserializer;
 import by.babanin.ext.settings.serialization.SettingsSerializer;
 import by.babanin.todo.image.IconResources;
-import by.babanin.todo.view.about.AboutInfo;
-import by.babanin.todo.view.util.AppUtils;
+import by.babanin.todo.ui.about.AboutInfo;
+import by.babanin.todo.ui.translat.AppTranslateCode;
 
 @Configuration
 @EnableConfigurationProperties({
@@ -69,28 +70,26 @@ public class ViewConfiguration {
     }
 
     @Bean
+    public IconProvider iconProvider() {
+        IconProviderImpl iconProvider = new IconProviderImpl();
+        IconRegister.setIconProvider(iconProvider);
+        return iconProvider;
+    }
+
+    @Bean
     public Image appLogoImage() {
-        return IconResources.getIcon("transparent_check_hexagon", AppUtils.DEFAULT_MENU_ICON_SIZE).getImage();
+        return IconResources.getIcon("transparent_check_hexagon", 12).getImage();
     }
 
     @Bean
-    public Icon aboutActionIcon() {
-        return AppUtils.getMenuIcon("i");
-    }
-
-    @Bean
-    public Icon exitIcon() {
-        return AppUtils.getMenuIcon("out_door");
-    }
-
-    @Bean
-    public Icon settingsIcon() {
-        return AppUtils.getMenuIcon("gearwheel");
-    }
-
-    @Bean
-    public Icon errorIcon() {
-        return IconResources.getIcon("error", 48);
+    public Action exitAction() {
+        return Action.builder()
+                .id("exit")
+                .name(Translator.toLocale(AppTranslateCode.MAIN_MENU_EXIT))
+                .smallIcon(IconRegister.get("out_door", 12))
+                .mnemonic(KeyEvent.VK_X)
+                .action(e -> System.exit(0))
+                .build();
     }
 
     @Bean
@@ -144,7 +143,7 @@ public class ViewConfiguration {
         return Action.builder()
                 .id("showSettingsDialogAction")
                 .name(Translator.toLocale(TranslateCode.MAIN_MENU_SETTINGS))
-                .smallIcon(settingsIcon())
+                .smallIcon(IconRegister.get("gearwheel", 12))
                 .mnemonic(KeyEvent.VK_S)
                 .action(actionEvent -> settingsDialog(settingsPublisher).setVisible(true))
                 .build();
@@ -202,5 +201,10 @@ public class ViewConfiguration {
             @Value("${settings.filename}") String fileName
     ) {
         return new JsonFileImporter<>(settingsJsonMapper(), directory.resolve(fileName), Settings.class);
+    }
+
+    @Bean
+    public ModelMapper modelMapper() {
+        return new ModelMapper();
     }
 }
