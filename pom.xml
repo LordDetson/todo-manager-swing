@@ -64,7 +64,7 @@
     </modules>
 
     <properties>
-        <flatlaf.version>2.4</flatlaf.version>
+        <flatlaf.version>3.1.1</flatlaf.version>
         <lgooddatepicker.version>11.2.1</lgooddatepicker.version>
         <commons-collections.version>4.4</commons-collections.version>
         <launch4j.version>2.1.2</launch4j.version>

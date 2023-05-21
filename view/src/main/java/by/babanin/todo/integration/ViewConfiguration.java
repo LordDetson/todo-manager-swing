@@ -25,8 +25,8 @@ import com.fasterxml.jackson.databind.json.JsonMapper;
 import com.fasterxml.jackson.databind.module.SimpleModule;
 
 import by.babanin.ext.component.action.Action;
+import by.babanin.ext.component.table.adjustment.TableColumnAdjustment;
 import by.babanin.ext.component.util.GUIUtils;
-import by.babanin.ext.component.util.IconProvider;
 import by.babanin.ext.component.util.IconRegister;
 import by.babanin.ext.export.JsonFileExporter;
 import by.babanin.ext.export.JsonFileImporter;
@@ -43,8 +43,13 @@ import by.babanin.ext.settings.Settings;
 import by.babanin.ext.settings.SettingsDialog;
 import by.babanin.ext.settings.SettingsPanel;
 import by.babanin.ext.settings.SettingsPublisher;
+import by.babanin.ext.settings.SettingsViewRegister;
 import by.babanin.ext.settings.deserialization.SettingsDeserializer;
 import by.babanin.ext.settings.serialization.SettingsSerializer;
+import by.babanin.ext.settings.style.StyleSetting;
+import by.babanin.ext.settings.style.StyleView;
+import by.babanin.ext.settings.view.SettingViewType;
+import by.babanin.ext.settings.view.TableColumnAdjustmentView;
 import by.babanin.todo.image.IconResources;
 import by.babanin.todo.ui.about.AboutInfo;
 import by.babanin.todo.ui.translat.AppTranslateCode;
@@ -70,15 +75,8 @@ public class ViewConfiguration {
     }
 
     @Bean
-    public IconProvider iconProvider() {
-        IconProviderImpl iconProvider = new IconProviderImpl();
-        IconRegister.setIconProvider(iconProvider);
-        return iconProvider;
-    }
-
-    @Bean
     public Image appLogoImage() {
-        return IconResources.getIcon("transparent_check_hexagon", 12).getImage();
+        return IconResources.getImage("transparent_check_hexagon");
     }
 
     @Bean
@@ -139,19 +137,38 @@ public class ViewConfiguration {
     }
 
     @Bean
-    public Action showSettingsDialogAction(SettingsPublisher settingsPublisher) {
+    public Action showSettingsDialogAction(Settings settings, SettingsPublisher settingsPublisher) {
         return Action.builder()
                 .id("showSettingsDialogAction")
                 .name(Translator.toLocale(TranslateCode.MAIN_MENU_SETTINGS))
                 .smallIcon(IconRegister.get("gearwheel", 12))
                 .mnemonic(KeyEvent.VK_S)
-                .action(actionEvent -> settingsDialog(settingsPublisher).setVisible(true))
+                .action(actionEvent -> settingsDialog(settings, settingsPublisher).setVisible(true))
                 .build();
     }
 
     @Bean
-    public Settings settings() {
-        return Settings.getInstance();
+    public Settings settings(
+            @Value("${setting.style.theme}") String theme,
+            @Value("${setting.style.fontFamily}") String fontFamily,
+            @Value("${setting.style.fontSize}") Integer fontSize
+    ) {
+        Settings settings = Settings.getInstance();
+        StyleSetting styleSetting = (StyleSetting) settings.get(StyleSetting.ID);
+        styleSetting.setTheme(theme);
+        styleSetting.setFontFamily(fontFamily);
+        styleSetting.setFontSize(fontSize);
+        return settings;
+    }
+
+    @Bean
+    public SettingsViewRegister settingsViewRegister() {
+        SettingsViewRegister settingsViewRegister = SettingsViewRegister.getInstance();
+        settingsViewRegister.put(StyleSetting.ID, new SettingViewType(StyleSetting.ID,
+                (settings, type) -> new StyleView((StyleSetting) settings.get(StyleSetting.ID), type)));
+        settingsViewRegister.put(TableColumnAdjustment.ID, new SettingViewType(TableColumnAdjustment.ID,
+                (settings, type) -> new TableColumnAdjustmentView((TableColumnAdjustment) settings.get(TableColumnAdjustment.ID), type)));
+        return settingsViewRegister;
     }
 
     @Bean
@@ -163,14 +180,14 @@ public class ViewConfiguration {
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public SettingsDialog settingsDialog(SettingsPublisher settingsPublisher) {
-        return new SettingsDialog(GUIUtils.getMainWindow(), settingsPanel(settingsPublisher));
+    public SettingsDialog settingsDialog(Settings settings, SettingsPublisher settingsPublisher) {
+        return new SettingsDialog(GUIUtils.getMainWindow(), settingsPanel(settings, settingsPublisher));
     }
 
     @Bean
     @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public SettingsPanel settingsPanel(SettingsPublisher settingsPublisher) {
-        return new SettingsPanel(settingsPublisher, settings());
+    public SettingsPanel settingsPanel(Settings settings, SettingsPublisher settingsPublisher) {
+        return new SettingsPanel(settingsPublisher, settings);
     }
 
     @Bean

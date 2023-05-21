@@ -13,7 +13,6 @@ import javax.swing.KeyStroke;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.TypeToken;
 import org.springframework.beans.factory.annotation.Lookup;
-import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import by.babanin.ext.component.CrudStyle;
@@ -39,16 +38,15 @@ import by.babanin.todo.task.GetTask;
 import by.babanin.todo.task.SwapTask;
 import by.babanin.todo.task.todo.CreateTodoTask;
 import by.babanin.todo.task.todo.UpdateTodoTask;
-import by.babanin.todo.ui.form.TodoFormRowFactory;
-import by.babanin.todo.ui.validation.TodoValidatorFactory;
 import by.babanin.todo.ui.dto.PriorityInfo;
 import by.babanin.todo.ui.dto.ToDoInfo;
+import by.babanin.todo.ui.form.TodoFormRowFactory;
 import by.babanin.todo.ui.renderer.PriorityRenderer;
 import by.babanin.todo.ui.renderer.StatusRenderer;
 import by.babanin.todo.ui.translat.AppTranslateCode;
+import by.babanin.todo.ui.validation.TodoValidatorFactory;
 
 @Component
-@DependsOn("iconProvider")
 public abstract class TodoCrudTablePanel extends MovableCrudTablePanel<ToDoInfo> {
 
     private final TodoService todoService;

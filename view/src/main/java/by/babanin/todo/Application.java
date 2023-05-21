@@ -3,7 +3,6 @@ package by.babanin.todo;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
-import com.formdev.flatlaf.FlatDarculaLaf;
 import com.formdev.flatlaf.FlatLaf;
 
 import by.babanin.ext.component.logger.LogMessageType;
@@ -21,9 +20,9 @@ public class Application {
         System.setProperty("spring.config.additional-location", "classpath:view.properties");
         FontResources.registerFonts();
         FlatLaf.registerCustomDefaultsSource("themes");
-        FlatDarculaLaf.setup();
         RepresentationRegister.register(PriorityInfo.class);
         RepresentationRegister.register(ToDoInfo.class);
+        IconRegister.setIconProvider(IconResources::getIcon);
         IconRegister.registerLogMessageTypeIcon(LogMessageType.ERROR,
                 IconResources.getIcon("error", IconRegister.LOG_MESSAGE_TYPE_ICON_SIZE));
         IconRegister.registerLogMessageTypeIcon(LogMessageType.WARNING,

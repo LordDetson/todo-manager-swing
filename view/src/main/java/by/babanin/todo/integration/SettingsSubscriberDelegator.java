@@ -1,6 +1,5 @@
 package by.babanin.todo.integration;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.context.ApplicationEventPublisher;
@@ -13,19 +12,12 @@ import by.babanin.ext.settings.SettingsUpdateEvent;
 @Component
 public class SettingsSubscriberDelegator implements SettingsSubscriber, ApplicationListener<SettingsUpdateEventAdapter> {
 
-    private final List<SettingsSubscriber> subscribers = new ArrayList<>();
     private final ApplicationEventPublisher applicationEventPublisher;
+    private final List<SettingsSubscriber> subscribers;
 
-    public SettingsSubscriberDelegator(ApplicationEventPublisher applicationEventPublisher) {
+    public SettingsSubscriberDelegator(ApplicationEventPublisher applicationEventPublisher, List<SettingsSubscriber> subscribers) {
         this.applicationEventPublisher = applicationEventPublisher;
-    }
-
-    public void add(SettingsSubscriber subscriber) {
-        subscribers.add(subscriber);
-    }
-
-    public void remove(SettingsSubscriber subscriber) {
-        subscribers.remove(subscriber);
+        this.subscribers = subscribers;
     }
 
     @Override
