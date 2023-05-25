@@ -11,6 +11,7 @@ import by.babanin.todo.model.Priority;
 import by.babanin.todo.model.Todo;
 import by.babanin.todo.model.Todo.Fields;
 import by.babanin.todo.task.SaveTask;
+import by.babanin.todo.ui.dto.PriorityInfo;
 import by.babanin.todo.ui.dto.ToDoInfo;
 
 public class CreateTodoTask extends SaveTask<Todo, Long, TodoService, ToDoInfo> {
@@ -21,10 +22,15 @@ public class CreateTodoTask extends SaveTask<Todo, Long, TodoService, ToDoInfo> 
 
     @Override
     public Todo body() {
+        PriorityInfo priorityInfo = getValue(Fields.priority);
+        Priority priority = null;
+        if(priorityInfo != null) {
+            priority = getModelMapper().map(priorityInfo, Priority.class);
+        }
         return getService().create(
                 getValue(Fields.title),
                 getValue(Fields.description),
-                getModelMapper().map(getValue(Fields.priority), Priority.class),
+                priority,
                 getValue(Fields.plannedDate)
         );
     }
