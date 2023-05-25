@@ -7,10 +7,10 @@ import com.formdev.flatlaf.extras.FlatAnimatedLafChange;
 
 import by.babanin.ext.settings.SettingsSubscriber;
 import by.babanin.ext.settings.SettingsUpdateEvent;
-import by.babanin.ext.settings.style.AccentColorManager;
-import by.babanin.ext.settings.style.FontManager;
 import by.babanin.ext.settings.style.StyleSetting;
-import by.babanin.ext.settings.style.ThemeManager;
+import by.babanin.ext.settings.style.color.AccentColorManager;
+import by.babanin.ext.settings.style.font.FontManager;
+import by.babanin.ext.settings.style.theme.ThemeManager;
 
 @Component
 public class StyleHandler implements SettingsSubscriber {
