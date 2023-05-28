@@ -18,6 +18,7 @@ import by.babanin.ext.preference.IntegerPreference;
 import by.babanin.ext.preference.PointPreference;
 import by.babanin.ext.preference.PreferenceAware;
 import by.babanin.ext.preference.PreferencesGroup;
+import by.babanin.ext.preference.until.PreferenceUtils;
 
 @Component
 public class MainFrame extends JFrame implements PreferenceAware<PreferencesGroup> {
@@ -64,6 +65,8 @@ public class MainFrame extends JFrame implements PreferenceAware<PreferencesGrou
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
+        preferencesGroup.getOpt(TO_DO_PANEL_KEY)
+                .ifPresent(preference -> PreferenceUtils.applyLater(todoPanel, (PreferencesGroup) preference));
         preferencesGroup.getOpt(MAIN_FRAME_SIZE_KEY)
                         .ifPresentOrElse(preference -> setSize(((DimensionPreference) preference).getDimension()),
                                 () -> setSize(GUIUtils.getLargeFrameSize()));
@@ -72,8 +75,6 @@ public class MainFrame extends JFrame implements PreferenceAware<PreferencesGrou
         preferencesGroup.getOpt(MAIN_FRAME_LOCATION_KEY)
                 .ifPresentOrElse(preference -> setLocation(((PointPreference) preference).getPoint()),
                         () -> setLocationRelativeTo(null));
-        preferencesGroup.getOpt(TO_DO_PANEL_KEY)
-                .ifPresent(preference -> todoPanel.apply((PreferencesGroup) preference));
     }
 
     @Override

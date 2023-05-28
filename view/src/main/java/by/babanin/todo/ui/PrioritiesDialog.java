@@ -16,6 +16,7 @@ import by.babanin.ext.preference.DimensionPreference;
 import by.babanin.ext.preference.PointPreference;
 import by.babanin.ext.preference.PreferenceAware;
 import by.babanin.ext.preference.PreferencesGroup;
+import by.babanin.ext.preference.until.PreferenceUtils;
 import by.babanin.todo.ui.translat.AppTranslateCode;
 import jakarta.annotation.PostConstruct;
 
@@ -50,6 +51,8 @@ public abstract class PrioritiesDialog extends JDialog implements PreferenceAwar
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
+        preferencesGroup.getOpt(getContentPane().getKey())
+                .ifPresent(preference -> PreferenceUtils.applyLater(getContentPane(), (PreferencesGroup) preference));
         preferencesGroup.getOpt(SIZE_KEY)
                 .ifPresent(preference -> {
                     Dimension size = ((DimensionPreference) preference).getDimension();
@@ -59,8 +62,6 @@ public abstract class PrioritiesDialog extends JDialog implements PreferenceAwar
         preferencesGroup.getOpt(LOCATION_KEY)
                 .ifPresentOrElse(preference -> setLocation(((PointPreference) preference).getPoint()),
                         () -> setLocationRelativeTo(getOwner()));
-        preferencesGroup.getOpt(getContentPane().getKey())
-                .ifPresent(preference -> getContentPane().apply((PreferencesGroup) preference));
     }
 
     @Override

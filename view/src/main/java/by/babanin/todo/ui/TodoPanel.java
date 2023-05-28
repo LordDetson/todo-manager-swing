@@ -1,7 +1,6 @@
 package by.babanin.todo.ui;
 
 import java.awt.BorderLayout;
-import java.awt.EventQueue;
 import java.util.function.Predicate;
 
 import javax.swing.JPanel;
@@ -73,8 +72,8 @@ public final class TodoPanel extends JPanel implements PreferenceAware<Preferenc
 
     @Override
     public void apply(PreferencesGroup preferencesGroup) {
-        EventQueue.invokeLater(() -> preferencesGroup.getOpt(SPLIT_PANE_KEY)
-                .ifPresent(preference -> splitPane.setDividerLocation(((SplitPanePreference) preference).getProportion())));
+        preferencesGroup.getOpt(SPLIT_PANE_KEY)
+                .ifPresent(preference -> splitPane.setDividerLocation(((SplitPanePreference) preference).getProportion()));
         preferencesGroup.getOpt(TODO_CRUD_TABLE_PANEL_KEY)
                 .ifPresent(preference -> crudTablePanel.apply((PreferencesGroup) preference));
     }
